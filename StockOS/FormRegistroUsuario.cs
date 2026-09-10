@@ -9,6 +9,11 @@ namespace Vistas_Usuarios
         {
             InitializeComponent();
         }
+
+        private void lblCodigo_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
