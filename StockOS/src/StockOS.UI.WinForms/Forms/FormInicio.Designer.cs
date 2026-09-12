@@ -1,4 +1,4 @@
-namespace Vistas_Usuarios
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormInicio
     {

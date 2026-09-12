@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Vistas_Usuarios
+namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormRegistroUsuario : Form
     {

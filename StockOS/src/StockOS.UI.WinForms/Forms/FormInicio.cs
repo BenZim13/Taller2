@@ -3,11 +3,12 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace Vistas_Usuarios
+namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormInicio : Form
     {
-        private RoundedPanel dockPanel;
+        // Se agregó el '?' para indicar que el panel puede inicializarse vacío antes del constructor
+        private RoundedPanel? dockPanel;
 
         public FormInicio()
         {
@@ -15,7 +16,6 @@ namespace Vistas_Usuarios
             InicializarDock();
             this.Resize += FormInicio_Resize;
         }
-
         private void InicializarDock()
         {
             // Panel Dock Contenedor
@@ -68,7 +68,8 @@ namespace Vistas_Usuarios
             PosicionarDock();
         }
 
-        private void FormInicio_Resize(object sender, EventArgs e)
+        // Se agregó el '?' al parámetro sender para cumplir con la firma estricta de EventHandler
+        private void FormInicio_Resize(object? sender, EventArgs e)
         {
             PosicionarDock();
         }
@@ -124,4 +125,3 @@ namespace Vistas_Usuarios
         }
     }
 }
-

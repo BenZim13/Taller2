@@ -1,4 +1,6 @@
-namespace Vistas_Usuarios
+using StockOS.UI.WinForms.Forms;
+
+namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormLogin : Form
     {
@@ -151,7 +153,7 @@ namespace Vistas_Usuarios
         /// </summary>
         private void btnSalir_Click(object? sender, EventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
     }
 }
