@@ -1,9 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\StockOS.Domain\StockOS.Domain.csproj" />
     <ProjectReference Include="..\StockOS.Application\StockOS.Application.csproj" />
-    <ProjectReference Include="..\StockOS.Infrastructure\StockOS.Infrastructure.csproj" />
+    <ProjectReference Include="..\StockOS.Infrastructure\StockOS.DataAccess.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

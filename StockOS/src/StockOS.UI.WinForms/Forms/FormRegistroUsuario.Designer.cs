@@ -17,256 +17,326 @@ namespace StockOS.UI.WinForms.Forms
 
         private void InitializeComponent()
         {
-            this.pnlHeader = new System.Windows.Forms.Panel();
-            this.lblTitulo = new System.Windows.Forms.Label();
-            this.lblDNI = new System.Windows.Forms.Label();
-            this.txtDNI = new System.Windows.Forms.TextBox();
-            this.lblNombre = new System.Windows.Forms.Label();
-            this.txtNombre = new System.Windows.Forms.TextBox();
-            this.lblDireccion = new System.Windows.Forms.Label();
-            this.txtDireccion = new System.Windows.Forms.TextBox();
-            this.lblCelular = new System.Windows.Forms.Label();
-            this.txtCelular = new System.Windows.Forms.TextBox();
-            this.lblRol = new System.Windows.Forms.Label();
-            this.cmbRol = new System.Windows.Forms.ComboBox();
-            this.lblCodigo = new System.Windows.Forms.Label();
-            this.txtCodigo = new System.Windows.Forms.TextBox();
-            this.btnGuardar = new System.Windows.Forms.Button();
-            this.btnCancelar = new System.Windows.Forms.Button();
-            this.pnlHeader.SuspendLayout();
-            this.SuspendLayout();
+            pnlHeader = new Panel();
+            lblTitulo = new Label();
+            lblDNI = new Label();
+            txtDNI = new TextBox();
+            lblNombre = new Label();
+            txtNombre = new TextBox();
+            lblDireccion = new Label();
+            txtDireccion = new TextBox();
+            lblCelular = new Label();
+            txtCelular = new TextBox();
+            lblRol = new Label();
+            cmbRol = new ComboBox();
+            lblCodigo = new Label();
+            txtPassword = new TextBox();
+            btnGuardar = new Button();
+            btnCancelar = new Button();
+            textApellido = new TextBox();
+            lblApellido = new Label();
+            textEmail = new TextBox();
+            lblEmail = new Label();
+            lblSucursal = new Label();
+            cmbSucursal = new ComboBox();
+            pnlHeader.SuspendLayout();
+            SuspendLayout();
             // 
             // pnlHeader
             // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
-            this.pnlHeader.Controls.Add(this.lblTitulo);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(434, 80);
-            this.pnlHeader.TabIndex = 0;
+            pnlHeader.BackColor = Color.FromArgb(16, 185, 129);
+            pnlHeader.Controls.Add(lblTitulo);
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Location = new Point(0, 0);
+            pnlHeader.Name = "pnlHeader";
+            pnlHeader.Size = new Size(434, 80);
+            pnlHeader.TabIndex = 0;
             // 
             // lblTitulo
             // 
-            this.lblTitulo.AutoSize = true;
-            this.lblTitulo.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTitulo.ForeColor = System.Drawing.Color.White;
-            this.lblTitulo.Location = new System.Drawing.Point(30, 25);
-            this.lblTitulo.Name = "lblTitulo";
-            this.lblTitulo.Size = new System.Drawing.Size(220, 32);
-            this.lblTitulo.TabIndex = 0;
-            this.lblTitulo.Text = "Carga de Personal";
+            lblTitulo.AutoSize = true;
+            lblTitulo.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            lblTitulo.ForeColor = Color.White;
+            lblTitulo.Location = new Point(30, 25);
+            lblTitulo.Name = "lblTitulo";
+            lblTitulo.Size = new Size(220, 32);
+            lblTitulo.TabIndex = 0;
+            lblTitulo.Text = "Carga de Personal";
             // 
             // lblDNI
             // 
-            this.lblDNI.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblDNI.AutoSize = true;
-            this.lblDNI.ForeColor = System.Drawing.Color.White;
-            this.lblDNI.Location = new System.Drawing.Point(40, 95);
-            this.lblDNI.Name = "lblDNI";
-            this.lblDNI.Size = new System.Drawing.Size(33, 19);
-            this.lblDNI.TabIndex = 1;
-            this.lblDNI.Text = "DNI";
+            lblDNI.Anchor = AnchorStyles.None;
+            lblDNI.AutoSize = true;
+            lblDNI.ForeColor = Color.White;
+            lblDNI.Location = new Point(40, 111);
+            lblDNI.Name = "lblDNI";
+            lblDNI.Size = new Size(33, 19);
+            lblDNI.TabIndex = 1;
+            lblDNI.Text = "DNI";
             // 
             // txtDNI
             // 
-            this.txtDNI.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtDNI.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtDNI.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDNI.ForeColor = System.Drawing.Color.White;
-            this.txtDNI.Location = new System.Drawing.Point(40, 118);
-            this.txtDNI.Name = "txtDNI";
-            this.txtDNI.Size = new System.Drawing.Size(350, 25);
-            this.txtDNI.TabIndex = 2;
+            txtDNI.Anchor = AnchorStyles.None;
+            txtDNI.BackColor = Color.FromArgb(51, 65, 85);
+            txtDNI.BorderStyle = BorderStyle.FixedSingle;
+            txtDNI.ForeColor = Color.White;
+            txtDNI.Location = new Point(40, 134);
+            txtDNI.Name = "txtDNI";
+            txtDNI.Size = new Size(350, 25);
+            txtDNI.TabIndex = 2;
             // 
             // lblNombre
             // 
-            this.lblNombre.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblNombre.AutoSize = true;
-            this.lblNombre.ForeColor = System.Drawing.Color.White;
-            this.lblNombre.Location = new System.Drawing.Point(40, 150);
-            this.lblNombre.Name = "lblNombre";
-            this.lblNombre.Size = new System.Drawing.Size(185, 19);
-            this.lblNombre.TabIndex = 3;
-            this.lblNombre.Text = "Nombre y Apellido completo";
+            lblNombre.Anchor = AnchorStyles.None;
+            lblNombre.AutoSize = true;
+            lblNombre.ForeColor = Color.White;
+            lblNombre.Location = new Point(40, 162);
+            lblNombre.Name = "lblNombre";
+            lblNombre.Size = new Size(59, 19);
+            lblNombre.TabIndex = 3;
+            lblNombre.Text = "Nombre";
             // 
             // txtNombre
             // 
-            this.txtNombre.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtNombre.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtNombre.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtNombre.ForeColor = System.Drawing.Color.White;
-            this.txtNombre.Location = new System.Drawing.Point(40, 173);
-            this.txtNombre.Name = "txtNombre";
-            this.txtNombre.Size = new System.Drawing.Size(350, 25);
-            this.txtNombre.TabIndex = 4;
+            txtNombre.Anchor = AnchorStyles.None;
+            txtNombre.BackColor = Color.FromArgb(51, 65, 85);
+            txtNombre.BorderStyle = BorderStyle.FixedSingle;
+            txtNombre.ForeColor = Color.White;
+            txtNombre.Location = new Point(40, 185);
+            txtNombre.Name = "txtNombre";
+            txtNombre.Size = new Size(350, 25);
+            txtNombre.TabIndex = 4;
             // 
             // lblDireccion
             // 
-            this.lblDireccion.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblDireccion.AutoSize = true;
-            this.lblDireccion.ForeColor = System.Drawing.Color.White;
-            this.lblDireccion.Location = new System.Drawing.Point(40, 205);
-            this.lblDireccion.Name = "lblDireccion";
-            this.lblDireccion.Size = new System.Drawing.Size(65, 19);
-            this.lblDireccion.TabIndex = 5;
-            this.lblDireccion.Text = "Dirección";
+            lblDireccion.Anchor = AnchorStyles.None;
+            lblDireccion.AutoSize = true;
+            lblDireccion.ForeColor = Color.White;
+            lblDireccion.Location = new Point(40, 315);
+            lblDireccion.Name = "lblDireccion";
+            lblDireccion.Size = new Size(65, 19);
+            lblDireccion.TabIndex = 5;
+            lblDireccion.Text = "Dirección";
             // 
             // txtDireccion
             // 
-            this.txtDireccion.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtDireccion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtDireccion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDireccion.ForeColor = System.Drawing.Color.White;
-            this.txtDireccion.Location = new System.Drawing.Point(40, 228);
-            this.txtDireccion.MaxLength = 100;
-            this.txtDireccion.Name = "txtDireccion";
-            this.txtDireccion.Size = new System.Drawing.Size(350, 25);
-            this.txtDireccion.TabIndex = 6;
+            txtDireccion.Anchor = AnchorStyles.None;
+            txtDireccion.BackColor = Color.FromArgb(51, 65, 85);
+            txtDireccion.BorderStyle = BorderStyle.FixedSingle;
+            txtDireccion.ForeColor = Color.White;
+            txtDireccion.Location = new Point(40, 338);
+            txtDireccion.MaxLength = 100;
+            txtDireccion.Name = "txtDireccion";
+            txtDireccion.Size = new Size(350, 25);
+            txtDireccion.TabIndex = 6;
             // 
             // lblCelular
             // 
-            this.lblCelular.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblCelular.AutoSize = true;
-            this.lblCelular.ForeColor = System.Drawing.Color.White;
-            this.lblCelular.Location = new System.Drawing.Point(40, 260);
-            this.lblCelular.Name = "lblCelular";
-            this.lblCelular.Size = new System.Drawing.Size(51, 19);
-            this.lblCelular.TabIndex = 7;
-            this.lblCelular.Text = "Celular";
+            lblCelular.Anchor = AnchorStyles.None;
+            lblCelular.AutoSize = true;
+            lblCelular.ForeColor = Color.White;
+            lblCelular.Location = new Point(40, 366);
+            lblCelular.Name = "lblCelular";
+            lblCelular.Size = new Size(51, 19);
+            lblCelular.TabIndex = 7;
+            lblCelular.Text = "Celular";
             // 
             // txtCelular
             // 
-            this.txtCelular.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtCelular.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtCelular.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtCelular.ForeColor = System.Drawing.Color.White;
-            this.txtCelular.Location = new System.Drawing.Point(40, 283);
-            this.txtCelular.MaxLength = 20;
-            this.txtCelular.Name = "txtCelular";
-            this.txtCelular.PlaceholderText = "Ej: 1123456789";
-            this.txtCelular.Size = new System.Drawing.Size(350, 25);
-            this.txtCelular.TabIndex = 8;
+            txtCelular.Anchor = AnchorStyles.None;
+            txtCelular.BackColor = Color.FromArgb(51, 65, 85);
+            txtCelular.BorderStyle = BorderStyle.FixedSingle;
+            txtCelular.ForeColor = Color.White;
+            txtCelular.Location = new Point(40, 389);
+            txtCelular.MaxLength = 20;
+            txtCelular.Name = "txtCelular";
+            txtCelular.PlaceholderText = "Ej: 1123456789";
+            txtCelular.Size = new Size(350, 25);
+            txtCelular.TabIndex = 8;
             // 
             // lblRol
             // 
-            this.lblRol.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblRol.AutoSize = true;
-            this.lblRol.ForeColor = System.Drawing.Color.White;
-            this.lblRol.Location = new System.Drawing.Point(40, 315);
-            this.lblRol.Name = "lblRol";
-            this.lblRol.Size = new System.Drawing.Size(28, 19);
-            this.lblRol.TabIndex = 9;
-            this.lblRol.Text = "Rol";
+            lblRol.Anchor = AnchorStyles.None;
+            lblRol.AutoSize = true;
+            lblRol.ForeColor = Color.White;
+            lblRol.Location = new Point(40, 417);
+            lblRol.Name = "lblRol";
+            lblRol.Size = new Size(28, 19);
+            lblRol.TabIndex = 9;
+            lblRol.Text = "Rol";
             // 
             // cmbRol
             // 
-            this.cmbRol.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.cmbRol.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.cmbRol.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbRol.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmbRol.ForeColor = System.Drawing.Color.White;
-            this.cmbRol.FormattingEnabled = true;
-            this.cmbRol.Items.AddRange(new object[] {
-            "Gerente",
-            "Cajero",
-            "Repositor"});
-            this.cmbRol.Location = new System.Drawing.Point(40, 338);
-            this.cmbRol.Name = "cmbRol";
-            this.cmbRol.Size = new System.Drawing.Size(350, 27);
-            this.cmbRol.TabIndex = 10;
+            cmbRol.Anchor = AnchorStyles.None;
+            cmbRol.BackColor = Color.FromArgb(51, 65, 85);
+            cmbRol.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbRol.FlatStyle = FlatStyle.Flat;
+            cmbRol.ForeColor = Color.White;
+            cmbRol.FormattingEnabled = true;
+            cmbRol.Items.AddRange(new object[] { "Gerente", "Cajero", "Repositor" });
+            cmbRol.Location = new Point(40, 440);
+            cmbRol.Name = "cmbRol";
+            cmbRol.Size = new Size(350, 25);
+            cmbRol.TabIndex = 10;
             // 
             // lblCodigo
             // 
-            this.lblCodigo.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblCodigo.AutoSize = true;
-            this.lblCodigo.ForeColor = System.Drawing.Color.White;
-            this.lblCodigo.Location = new System.Drawing.Point(40, 372);
-            this.lblCodigo.Name = "lblCodigo";
-            this.lblCodigo.Size = new System.Drawing.Size(150, 19);
-            this.lblCodigo.TabIndex = 11;
-            this.lblCodigo.Text = "Contraseña (8 dígitos)";
+            lblCodigo.Anchor = AnchorStyles.None;
+            lblCodigo.AutoSize = true;
+            lblCodigo.ForeColor = Color.White;
+            lblCodigo.Location = new Point(40, 538);
+            lblCodigo.Name = "lblCodigo";
+            lblCodigo.Size = new Size(144, 19);
+            lblCodigo.TabIndex = 11;
+            lblCodigo.Text = "Contraseña (8 dígitos)";
             // 
-            // txtCodigo
+            // txtPassword
             // 
-            this.txtCodigo.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtCodigo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtCodigo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtCodigo.ForeColor = System.Drawing.Color.White;
-            this.txtCodigo.Location = new System.Drawing.Point(40, 395);
-            this.txtCodigo.MaxLength = 8;
-            this.txtCodigo.Name = "txtCodigo";
-            this.txtCodigo.PlaceholderText = "••••••••";
-            this.txtCodigo.Size = new System.Drawing.Size(350, 25);
-            this.txtCodigo.TabIndex = 12;
-            this.txtCodigo.UseSystemPasswordChar = true;
+            txtPassword.Anchor = AnchorStyles.None;
+            txtPassword.BackColor = Color.FromArgb(51, 65, 85);
+            txtPassword.BorderStyle = BorderStyle.FixedSingle;
+            txtPassword.ForeColor = Color.White;
+            txtPassword.Location = new Point(40, 561);
+            txtPassword.MaxLength = 8;
+            txtPassword.Name = "txtPassword";
+            txtPassword.PlaceholderText = "••••••••";
+            txtPassword.Size = new Size(350, 25);
+            txtPassword.TabIndex = 12;
+            txtPassword.UseSystemPasswordChar = true;
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnGuardar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(130)))), ((int)(((byte)(246)))));
-            this.btnGuardar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnGuardar.FlatAppearance.BorderSize = 0;
-            this.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGuardar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btnGuardar.ForeColor = System.Drawing.Color.White;
-            this.btnGuardar.Location = new System.Drawing.Point(92, 445);
-            this.btnGuardar.Name = "btnGuardar";
-            this.btnGuardar.Size = new System.Drawing.Size(120, 40);
-            this.btnGuardar.TabIndex = 13;
-            this.btnGuardar.Text = "Guardar";
-            this.btnGuardar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.btnGuardar.UseVisualStyleBackColor = false;
+            btnGuardar.Anchor = AnchorStyles.None;
+            btnGuardar.BackColor = Color.FromArgb(59, 130, 246);
+            btnGuardar.Cursor = Cursors.Hand;
+            btnGuardar.FlatAppearance.BorderSize = 0;
+            btnGuardar.FlatStyle = FlatStyle.Flat;
+            btnGuardar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnGuardar.ForeColor = Color.White;
+            btnGuardar.Location = new Point(40, 592);
+            btnGuardar.Name = "btnGuardar";
+            btnGuardar.Size = new Size(120, 40);
+            btnGuardar.TabIndex = 13;
+            btnGuardar.Text = "Guardar";
+            btnGuardar.UseVisualStyleBackColor = false;
             // 
             // btnCancelar
             // 
-            this.btnCancelar.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
-            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancelar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
-            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btnCancelar.ForeColor = System.Drawing.Color.White;
-            this.btnCancelar.Location = new System.Drawing.Point(222, 445);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(120, 40);
-            this.btnCancelar.TabIndex = 14;
-            this.btnCancelar.Text = "Cancelar";
-            this.btnCancelar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.btnCancelar.UseVisualStyleBackColor = false;
+            btnCancelar.Anchor = AnchorStyles.None;
+            btnCancelar.BackColor = Color.FromArgb(239, 68, 68);
+            btnCancelar.Cursor = Cursors.Hand;
+            btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
+            btnCancelar.FlatStyle = FlatStyle.Flat;
+            btnCancelar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnCancelar.ForeColor = Color.White;
+            btnCancelar.Location = new Point(270, 592);
+            btnCancelar.Name = "btnCancelar";
+            btnCancelar.Size = new Size(120, 40);
+            btnCancelar.TabIndex = 14;
+            btnCancelar.Text = "Cancelar";
+            btnCancelar.UseVisualStyleBackColor = false;
+            // 
+            // textApellido
+            // 
+            textApellido.Anchor = AnchorStyles.None;
+            textApellido.BackColor = Color.FromArgb(51, 65, 85);
+            textApellido.BorderStyle = BorderStyle.FixedSingle;
+            textApellido.ForeColor = Color.White;
+            textApellido.Location = new Point(40, 236);
+            textApellido.Name = "textApellido";
+            textApellido.Size = new Size(350, 25);
+            textApellido.TabIndex = 16;
+            // 
+            // lblApellido
+            // 
+            lblApellido.Anchor = AnchorStyles.None;
+            lblApellido.AutoSize = true;
+            lblApellido.ForeColor = Color.White;
+            lblApellido.Location = new Point(40, 213);
+            lblApellido.Name = "lblApellido";
+            lblApellido.Size = new Size(58, 19);
+            lblApellido.TabIndex = 15;
+            lblApellido.Text = "Apellido";
+            // 
+            // textEmail
+            // 
+            textEmail.Anchor = AnchorStyles.None;
+            textEmail.BackColor = Color.FromArgb(51, 65, 85);
+            textEmail.BorderStyle = BorderStyle.FixedSingle;
+            textEmail.ForeColor = Color.White;
+            textEmail.Location = new Point(40, 287);
+            textEmail.Name = "textEmail";
+            textEmail.Size = new Size(350, 25);
+            textEmail.TabIndex = 18;
+            // 
+            // lblEmail
+            // 
+            lblEmail.Anchor = AnchorStyles.None;
+            lblEmail.AutoSize = true;
+            lblEmail.ForeColor = Color.White;
+            lblEmail.Location = new Point(40, 264);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(121, 19);
+            lblEmail.TabIndex = 17;
+            lblEmail.Text = "Correo Electronico";
+            // 
+            // lblSucursal
+            // 
+            lblSucursal.Anchor = AnchorStyles.None;
+            lblSucursal.AutoSize = true;
+            lblSucursal.ForeColor = SystemColors.ButtonFace;
+            lblSucursal.Location = new Point(39, 470);
+            lblSucursal.Name = "lblSucursal";
+            lblSucursal.Size = new Size(59, 19);
+            lblSucursal.TabIndex = 19;
+            lblSucursal.Text = "Sucursal";
+            // 
+            // cmbSucursal
+            // 
+            cmbSucursal.Anchor = AnchorStyles.None;
+            cmbSucursal.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSucursal.FormattingEnabled = true;
+            cmbSucursal.Location = new Point(39, 492);
+            cmbSucursal.Name = "cmbSucursal";
+            cmbSucursal.Size = new Size(121, 25);
+            cmbSucursal.TabIndex = 20;
             // 
             // FormRegistroUsuario
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.ClientSize = new System.Drawing.Size(434, 520);
-            this.Controls.Add(this.btnCancelar);
-            this.Controls.Add(this.btnGuardar);
-            this.Controls.Add(this.txtCodigo);
-            this.Controls.Add(this.lblCodigo);
-            this.Controls.Add(this.cmbRol);
-            this.Controls.Add(this.lblRol);
-            this.Controls.Add(this.txtCelular);
-            this.Controls.Add(this.lblCelular);
-            this.Controls.Add(this.txtDireccion);
-            this.Controls.Add(this.lblDireccion);
-            this.Controls.Add(this.txtNombre);
-            this.Controls.Add(this.lblNombre);
-            this.Controls.Add(this.txtDNI);
-            this.Controls.Add(this.lblDNI);
-            this.Controls.Add(this.pnlHeader);
-            this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-            this.MaximizeBox = true;
-            this.Name = "FormRegistroUsuario";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Registro de Usuario";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.pnlHeader.ResumeLayout(false);
-            this.pnlHeader.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(30, 41, 59);
+            ClientSize = new Size(434, 667);
+            Controls.Add(cmbSucursal);
+            Controls.Add(lblSucursal);
+            Controls.Add(textEmail);
+            Controls.Add(lblEmail);
+            Controls.Add(textApellido);
+            Controls.Add(lblApellido);
+            Controls.Add(btnCancelar);
+            Controls.Add(btnGuardar);
+            Controls.Add(txtPassword);
+            Controls.Add(lblCodigo);
+            Controls.Add(cmbRol);
+            Controls.Add(lblRol);
+            Controls.Add(txtCelular);
+            Controls.Add(lblCelular);
+            Controls.Add(txtDireccion);
+            Controls.Add(lblDireccion);
+            Controls.Add(txtNombre);
+            Controls.Add(lblNombre);
+            Controls.Add(txtDNI);
+            Controls.Add(lblDNI);
+            Controls.Add(pnlHeader);
+            Font = new Font("Segoe UI", 10F);
+            Name = "FormRegistroUsuario";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Registro de Usuario";
+            WindowState = FormWindowState.Maximized;
+            pnlHeader.ResumeLayout(false);
+            pnlHeader.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -285,9 +355,15 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblRol;
         private System.Windows.Forms.ComboBox cmbRol;
         private System.Windows.Forms.Label lblCodigo;
-        private System.Windows.Forms.TextBox txtCodigo;
+        private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
+        private TextBox textApellido;
+        private Label lblApellido;
+        private TextBox textEmail;
+        private Label lblEmail;
+        private Label lblSucursal;
+        private ComboBox cmbSucursal;
     }
 }
 
