@@ -45,24 +45,25 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // pnlHeader
             // 
-            pnlHeader.BackColor = Color.FromArgb(16, 185, 129);
+            pnlHeader.BackColor = Color.FromArgb(30, 41, 59);
             pnlHeader.Controls.Add(btnVolver);
             pnlHeader.Controls.Add(lblTitulo);
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Location = new Point(0, 0);
             pnlHeader.Name = "pnlHeader";
-            pnlHeader.Size = new Size(434, 80);
+            pnlHeader.Padding = new Padding(25, 10, 25, 5);
+            pnlHeader.Size = new Size(434, 50);
             pnlHeader.TabIndex = 0;
             // 
             // btnVolver
             // 
-            btnVolver.BackColor = Color.FromArgb(10, 150, 100);
+            btnVolver.BackColor = Color.FromArgb(51, 65, 85);
             btnVolver.Cursor = Cursors.Hand;
             btnVolver.FlatAppearance.BorderSize = 0;
             btnVolver.FlatStyle = FlatStyle.Flat;
             btnVolver.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnVolver.ForeColor = Color.White;
-            btnVolver.Location = new Point(10, 25);
+            btnVolver.Location = new Point(25, 10);
             btnVolver.Name = "btnVolver";
             btnVolver.Size = new Size(80, 32);
             btnVolver.TabIndex = 4;
@@ -72,11 +73,11 @@ namespace StockOS.UI.WinForms.Forms
             // lblTitulo
             // 
             lblTitulo.AutoSize = true;
-            lblTitulo.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            lblTitulo.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             lblTitulo.ForeColor = Color.White;
-            lblTitulo.Location = new Point(100, 25);
+            lblTitulo.Location = new Point(120, 7);
             lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(237, 32);
+            lblTitulo.Size = new Size(237, 30);
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "Registro de Usuario";
             // 
