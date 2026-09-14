@@ -1,0 +1,71 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using StockOS.Domain.Entities;
+using StockOS.Domain.Interfaces;
+
+namespace StockOS.Application.Services
+{
+    public class EmpleadoService : IEmpleadoService
+    {
+        private readonly IEmpleadoRepository _empleadoRepository;
+
+        public EmpleadoService(IEmpleadoRepository empleadoRepository)
+        {
+            _empleadoRepository = empleadoRepository;
+        }
+
+        public IEnumerable<Empleado> ObtenerTodos()
+        {
+            return _empleadoRepository.ObtenerTodos();
+        }
+
+        public Empleado? ObtenerPorId(int id)
+        {
+            return _empleadoRepository.ObtenerPorId(id);
+        }
+
+        public async Task<bool> CrearAsync(Empleado empleado)
+        {
+            if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
+            if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
+
+            _empleadoRepository.Agregar(empleado);
+            return true;
+        }
+
+        public async Task<(bool Exito, string Mensaje)> ActualizarAsync(Empleado empleado)
+        {
+            var empConMismoDni = _empleadoRepository.ObtenerPorDni(empleado.Dni);
+            if (empConMismoDni != null && empConMismoDni.IdEmpleado != empleado.IdEmpleado)
+            {
+                return (false, "El DNI ya se encuentra registrado por otro empleado.");
+            }
+
+            var empConMismoEmail = _empleadoRepository.ObtenerPorEmail(empleado.Email);
+            if (empConMismoEmail != null && empConMismoEmail.IdEmpleado != empleado.IdEmpleado)
+            {
+                return (false, "El correo electrónico ya se encuentra registrado por otro empleado.");
+            }
+
+            _empleadoRepository.Actualizar(empleado);
+            return (true, "Empleado actualizado correctamente.");
+        }
+
+        public async Task<bool> EliminarAsync(int id)
+        {
+            _empleadoRepository.Eliminar(id);
+            return true;
+        }
+
+        public async Task<bool> CambiarEstadoAsync(int id, bool nuevoEstado)
+        {
+            var emp = _empleadoRepository.ObtenerPorId(id);
+            if (emp == null) return false;
+
+            emp.Estado = nuevoEstado;
+            _empleadoRepository.Actualizar(emp);
+            return true;
+        }
+    }
+}
+

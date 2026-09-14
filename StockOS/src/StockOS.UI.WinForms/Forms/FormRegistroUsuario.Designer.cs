@@ -18,6 +18,7 @@ namespace StockOS.UI.WinForms.Forms
         private void InitializeComponent()
         {
             pnlHeader = new Panel();
+            btnVolver = new Button();
             lblTitulo = new Label();
             lblDNI = new Label();
             txtDNI = new TextBox();
@@ -45,6 +46,7 @@ namespace StockOS.UI.WinForms.Forms
             // pnlHeader
             // 
             pnlHeader.BackColor = Color.FromArgb(16, 185, 129);
+            pnlHeader.Controls.Add(btnVolver);
             pnlHeader.Controls.Add(lblTitulo);
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Location = new Point(0, 0);
@@ -52,16 +54,31 @@ namespace StockOS.UI.WinForms.Forms
             pnlHeader.Size = new Size(434, 80);
             pnlHeader.TabIndex = 0;
             // 
+            // btnVolver
+            // 
+            btnVolver.BackColor = Color.FromArgb(10, 150, 100);
+            btnVolver.Cursor = Cursors.Hand;
+            btnVolver.FlatAppearance.BorderSize = 0;
+            btnVolver.FlatStyle = FlatStyle.Flat;
+            btnVolver.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnVolver.ForeColor = Color.White;
+            btnVolver.Location = new Point(10, 25);
+            btnVolver.Name = "btnVolver";
+            btnVolver.Size = new Size(80, 32);
+            btnVolver.TabIndex = 4;
+            btnVolver.Text = "← Volver";
+            btnVolver.UseVisualStyleBackColor = false;
+            // 
             // lblTitulo
             // 
             lblTitulo.AutoSize = true;
             lblTitulo.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             lblTitulo.ForeColor = Color.White;
-            lblTitulo.Location = new Point(30, 25);
+            lblTitulo.Location = new Point(100, 25);
             lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(220, 32);
+            lblTitulo.Size = new Size(237, 32);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Carga de Personal";
+            lblTitulo.Text = "Registro de Usuario";
             // 
             // lblDNI
             // 
@@ -173,7 +190,6 @@ namespace StockOS.UI.WinForms.Forms
             cmbRol.FlatStyle = FlatStyle.Flat;
             cmbRol.ForeColor = Color.White;
             cmbRol.FormattingEnabled = true;
-            cmbRol.Items.AddRange(new object[] { "Gerente", "Cajero", "Repositor" });
             cmbRol.Location = new Point(40, 440);
             cmbRol.Name = "cmbRol";
             cmbRol.Size = new Size(350, 25);
@@ -284,8 +300,8 @@ namespace StockOS.UI.WinForms.Forms
             // 
             lblSucursal.Anchor = AnchorStyles.None;
             lblSucursal.AutoSize = true;
-            lblSucursal.ForeColor = SystemColors.ButtonFace;
-            lblSucursal.Location = new Point(39, 470);
+            lblSucursal.ForeColor = Color.White;
+            lblSucursal.Location = new Point(40, 470);
             lblSucursal.Name = "lblSucursal";
             lblSucursal.Size = new Size(59, 19);
             lblSucursal.TabIndex = 19;
@@ -294,11 +310,14 @@ namespace StockOS.UI.WinForms.Forms
             // cmbSucursal
             // 
             cmbSucursal.Anchor = AnchorStyles.None;
+            cmbSucursal.BackColor = Color.FromArgb(51, 65, 85);
             cmbSucursal.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSucursal.FlatStyle = FlatStyle.Flat;
+            cmbSucursal.ForeColor = Color.White;
             cmbSucursal.FormattingEnabled = true;
-            cmbSucursal.Location = new Point(39, 492);
+            cmbSucursal.Location = new Point(40, 492);
             cmbSucursal.Name = "cmbSucursal";
-            cmbSucursal.Size = new Size(121, 25);
+            cmbSucursal.Size = new Size(350, 25);
             cmbSucursal.TabIndex = 20;
             // 
             // FormRegistroUsuario
@@ -332,7 +351,8 @@ namespace StockOS.UI.WinForms.Forms
             Name = "FormRegistroUsuario";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Registro de Usuario";
-            WindowState = FormWindowState.Maximized;
+            AutoScroll = true;
+            WindowState = FormWindowState.Normal;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);
@@ -343,6 +363,7 @@ namespace StockOS.UI.WinForms.Forms
         #endregion
 
         private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Button btnVolver;
         private System.Windows.Forms.Label lblTitulo;
         private System.Windows.Forms.Label lblDNI;
         private System.Windows.Forms.TextBox txtDNI;

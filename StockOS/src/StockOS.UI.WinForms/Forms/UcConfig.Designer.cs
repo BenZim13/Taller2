@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class UcConfig
     {
@@ -30,6 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = Color.FromArgb(30, 41, 59);
+            this.ForeColor = Color.White;
+            this.Font = new Font("Segoe UI", 10F);
         }
 
         #endregion

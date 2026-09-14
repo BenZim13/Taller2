@@ -1,84 +1,109 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using Microsoft.Extensions.DependencyInjection;
 using StockOS.Domain.Entities;
 
 namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormInicio : Form
     {
-        // Se agregó el '?' para indicar que el panel puede inicializarse vacío antes del constructor
+        private readonly IServiceProvider _serviceProvider;
         private RoundedPanel? dockPanel;
         private Panel pnlContenedor;
+        private Empleado? _usuarioActual;
 
-        public FormInicio()
+        public FormInicio(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             InitializeComponent();
 
             // Inicializar el contenedor principal donde cargarán las vistas
             pnlContenedor = new Panel();
             pnlContenedor.Dock = DockStyle.Fill;
-            pnlContenedor.BackColor = Color.FromArgb(240, 242, 245); // Color de fondo general
+            pnlContenedor.BackColor = Color.FromArgb(30, 41, 59);
             this.Controls.Add(pnlContenedor);
-            pnlContenedor.SendToBack(); // Enviar al fondo para que no tape el Dock
+            
+            // Fix Z-order: pnlHeader must be SendToBack so it evaluates first for Dock=Top
+            // pnlContenedor must be BringToFront so it evaluates last for Dock=Fill
+            pnlContenedor.BringToFront();
+            pnlHeader.SendToBack();
 
-            InicializarDock();
             this.Resize += FormInicio_Resize;
         }
-        private Empleado? _usuarioActual;
 
         public void EstablecerUsuario(Empleado usuario)
         {
             _usuarioActual = usuario;
 
-            // Reflejamos en el título de la ventana quién ingresó
-            this.Text = $"StockOS | Sucursal: {_usuarioActual.IdSucursal} | Cajero: {_usuarioActual.Nombre} {_usuarioActual.Apellido}";
+            string rolTexto = _usuarioActual.IdRol == 1 ? "Administrador / Gerente" : "Personal";
+            this.Text = $"StockOS | Sucursal: {_usuarioActual.IdSucursal} | {_usuarioActual.Nombre} {_usuarioActual.Apellido} ({rolTexto})";
+            lblTitulo.Text = $"Bienvenido a StockOS — {_usuarioActual.Nombre} {_usuarioActual.Apellido}";
+
+            InicializarDock();
+            CambiarVista("Inicio");
         }
+
         private void InicializarDock()
         {
+            if (dockPanel != null)
+            {
+                this.Controls.Remove(dockPanel);
+                dockPanel.Dispose();
+                dockPanel = null;
+            }
+
+            // Construir lista de secciones según rol
+            var secciones = new List<string> { "Inicio", "Inventario", "Ventas", "Reportes" };
+
+            // Si el usuario es Administrador (IdRol == 1), habilitar opción de gestión de Usuarios
+            if (_usuarioActual != null && _usuarioActual.IdRol == 1)
+            {
+                secciones.Add("Usuarios");
+            }
+
+            secciones.Add("Config.");
+
             // Panel Dock Contenedor
             dockPanel = new RoundedPanel();
             dockPanel.BackColor = Color.FromArgb(30, 38, 56); // Fondo oscuro #1E2638
-            dockPanel.BorderRadius = 25; // Bordes redondeados
+            dockPanel.BorderRadius = 25;
             dockPanel.Height = 70;
-            dockPanel.Width = 650; // Ancho fijo para 5 botones
-            dockPanel.Anchor = AnchorStyles.None; // Permite manejar el centro manualmente
+            dockPanel.Width = secciones.Count * 130;
+            dockPanel.Anchor = AnchorStyles.None;
 
-            // 5 Secciones del menú
-            string[] secciones = { "Inicio", "Inventario", "Ventas", "Reportes", "Config." };
-            int btnWidth = dockPanel.Width / secciones.Length;
+            int btnWidth = dockPanel.Width / secciones.Count;
 
-            for (int i = 0; i < secciones.Length; i++)
+            for (int i = 0; i < secciones.Count; i++)
             {
                 Button btn = new Button();
                 btn.Text = secciones[i];
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
-                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(45, 55, 72); // Aclarar fondo en hover
-                btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(16, 185, 129); // Fondo esmeralda al hacer clic
+                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(45, 55, 72);
+                btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(16, 185, 129);
                 btn.BackColor = Color.Transparent;
-                btn.ForeColor = Color.White; // Texto blanco por defecto
+                btn.ForeColor = Color.White;
                 btn.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
                 btn.Cursor = Cursors.Hand;
 
-                // Posicionamiento dentro del Dock
                 btn.Width = btnWidth;
                 btn.Height = dockPanel.Height;
                 btn.Left = i * btnWidth;
                 btn.Top = 0;
 
-                // Eventos Hover Interactividad
                 btn.MouseEnter += (s, e) =>
                 {
-                    btn.ForeColor = Color.FromArgb(16, 185, 129); // Verde esmeralda (#10B981)
+                    btn.ForeColor = Color.FromArgb(16, 185, 129);
                 };
                 btn.MouseLeave += (s, e) =>
                 {
-                    btn.ForeColor = Color.White; // Vuelve a blanco original
+                    btn.ForeColor = Color.White;
                 };
 
-                btn.Tag = secciones[i]; // Guardamos el nombre de la sección
+                btn.Tag = secciones[i];
                 btn.Click += BotonDock_Click;
 
                 dockPanel.Controls.Add(btn);
@@ -86,9 +111,9 @@ namespace StockOS.UI.WinForms.Forms
 
             this.Controls.Add(dockPanel);
             dockPanel.BringToFront();
-            // Forzar el posicionamiento inicial
             PosicionarDock();
         }
+
         private void BotonDock_Click(object? sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag != null)
@@ -99,38 +124,52 @@ namespace StockOS.UI.WinForms.Forms
 
         private void CambiarVista(string nombreVista)
         {
-            // Limpiamos la vista anterior
             pnlContenedor.Controls.Clear();
             UserControl? nuevaVista = null;
 
-            // Instanciamos la vista correspondiente según el botón
             switch (nombreVista)
             {
                 case "Inicio":
+                    lblTitulo.Text = $"Bienvenido a StockOS — {_usuarioActual?.Nombre} {_usuarioActual?.Apellido}";
                     nuevaVista = new UcInicio();
                     break;
                 case "Inventario":
+                    lblTitulo.Text = "Inventario";
                     nuevaVista = new UcInventario();
                     break;
                 case "Ventas":
+                    lblTitulo.Text = "Ventas";
                     nuevaVista = new UcVentas();
                     break;
                 case "Reportes":
+                    lblTitulo.Text = "Reportes";
                     nuevaVista = new UcReportes();
                     break;
+                case "Usuarios":
+                    lblTitulo.Text = "Usuarios";
+                    if (_usuarioActual != null && _usuarioActual.IdRol == 1)
+                    {
+                        nuevaVista = _serviceProvider.GetRequiredService<UcUsuarios>();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No tiene permisos suficientes para acceder a este módulo.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    break;
                 case "Config.":
+                    lblTitulo.Text = "Configuración";
                     nuevaVista = new UcConfig();
                     break;
             }
 
             if (nuevaVista != null)
             {
-                nuevaVista.Dock = DockStyle.Fill; // Hacer que ocupe todo el espacio
+                nuevaVista.Dock = DockStyle.Fill;
                 pnlContenedor.Controls.Add(nuevaVista);
             }
         }
 
-        // Se agregó el '?' al parámetro sender para cumplir con la firma estricta de EventHandler
         private void FormInicio_Resize(object? sender, EventArgs e)
         {
             PosicionarDock();
@@ -140,15 +179,13 @@ namespace StockOS.UI.WinForms.Forms
         {
             if (dockPanel != null)
             {
-                int margenInferior = 20; // Separación del borde inferior
-                // Calcular posición central horizontal
+                int margenInferior = 20;
                 dockPanel.Left = (this.ClientSize.Width - dockPanel.Width) / 2;
                 dockPanel.Top = this.ClientSize.Height - dockPanel.Height - margenInferior;
             }
         }
     }
 
-    // Clase personalizada para Panel con bordes redondeados GDI+
     public class RoundedPanel : Panel
     {
         public int BorderRadius { get; set; } = 20;
@@ -161,9 +198,7 @@ namespace StockOS.UI.WinForms.Forms
             Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
             using (GraphicsPath path = GetRoundedPath(rect, BorderRadius))
             {
-                // Limita el área visible al contorno redondeado
                 this.Region = new Region(path);
-                
                 using (SolidBrush brush = new SolidBrush(this.BackColor))
                 {
                     e.Graphics.FillPath(brush, path);
@@ -182,7 +217,7 @@ namespace StockOS.UI.WinForms.Forms
             path.AddArc(rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize, 0, 90);
             path.AddArc(rect.X, rect.Bottom - curveSize, curveSize, curveSize, 90, 90);
             path.CloseFigure();
-            
+
             return path;
         }
     }

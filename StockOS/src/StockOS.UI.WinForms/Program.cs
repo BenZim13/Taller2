@@ -5,7 +5,6 @@ using StockOS.DataAccess.Persistence;
 using StockOS.Domain.Interfaces;
 using StockOS.DataAccess.Repositories;
 using StockOS.Application.Services;
-// using StockOS.Application.Services; (Aun no lo vamos a usar, ya que aun no hice eso je)
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -21,25 +20,30 @@ namespace StockOS.UI.WinForms.Forms
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    // Configurar BD con tu cadena real
+                    // Configurar BD con la cadena de conexión
                     services.AddDbContext<StockOsContext>(options =>
                         options.UseSqlServer("Server=localhost;Database=StockOS;Trusted_Connection=True;TrustServerCertificate=True;"));
 
-                    // Repositorios y Servicios
+                    // Repositorios
                     services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
-                    services.AddScoped<IAuthService, AuthService>();
                     services.AddScoped<ISucursalRepository, SucursalRepository>();
-                    services.AddScoped<ISucursalService, SucursalService>();
-                    services.AddTransient<FormRegistroUsuario>();
+                    services.AddScoped<IRolRepository, RolRepository>();
 
-                    // Registrar Formularios
+                    // Servicios de Negocio
+                    services.AddScoped<IAuthService, AuthService>();
+                    services.AddScoped<ISucursalService, SucursalService>();
+                    services.AddScoped<IRolService, RolService>();
+                    services.AddScoped<IEmpleadoService, EmpleadoService>();
+
+                    // Formularios y Vistas
                     services.AddTransient<FormLogin>();
                     services.AddTransient<FormInicio>();
+                    services.AddTransient<FormRegistroUsuario>();
+                    services.AddTransient<ListarUsuarios>();
+                    services.AddTransient<UcUsuarios>();
                 }).Build();
 
-            /*
-
-            // 3. Obtenemo el formulario de login desde el contenedor
+            // 3. Obtenemos el formulario de login desde el contenedor
             var formLogin = host.Services.GetRequiredService<FormLogin>();
 
             // Mostrarlo como un cuadro de diálogo (bloqueante)
@@ -63,11 +67,6 @@ namespace StockOS.UI.WinForms.Forms
                 // 7. Si cerró la ventana en la "X" sin loguearse, salimos
                 System.Windows.Forms.Application.Exit();
             }
-            */
-            // --- PRUEBA TEMPORAL DE REGISTRO --- luego de que funque, esto se comenta o se borra.
-            var formRegistro = host.Services.GetRequiredService<FormRegistroUsuario>();
-            System.Windows.Forms.Application.Run(formRegistro);
         }
     }
-
 }

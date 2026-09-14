@@ -2,86 +2,234 @@ using StockOS.Application.Services;
 using StockOS.Domain.Entities;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormRegistroUsuario : Form
     {
-        private readonly IAuthService _authService;
-        private readonly ISucursalService _sucursalService; // <-- Nuevo servicio
+        private readonly IEmpleadoService _empleadoService;
+        private readonly ISucursalService _sucursalService;
+        private readonly IRolService _rolService;
+        private Empleado? _empleadoEdicion;
 
-        // Modificamos el constructor para recibir ambos servicios
-        public FormRegistroUsuario(IAuthService authService, ISucursalService sucursalService)
+        public event Action? OperacionTerminada;
+        public event Action? AlVolver;
+
+        public FormRegistroUsuario(
+            IEmpleadoService empleadoService,
+            ISucursalService sucursalService,
+            IRolService rolService)
         {
             InitializeComponent();
-            _authService = authService;
+            _empleadoService = empleadoService;
             _sucursalService = sucursalService;
+            _rolService = rolService;
 
             btnGuardar.Click += btnGuardar_Click;
+            btnVolver.Click += (s, e) => AlVolver?.Invoke();
             btnCancelar.Click += btnCancelar_Click;
-            this.Load += FormRegistroUsuario_Load; // <-- Evento al cargar la ventana
+            this.Load += FormRegistroUsuario_Load;
+        }
+
+
+        public void PrepararParaEdicion(Empleado empleado)
+        {
+            _empleadoEdicion = empleado;
+            CargarDatosEdicion();
+        }
+
+        public void LimpiarFormulario()
+        {
+            _empleadoEdicion = null;
+            txtDNI.Clear();
+            txtNombre.Clear();
+            textApellido.Clear();
+            textEmail.Clear();
+            txtDireccion.Clear();
+            txtCelular.Clear();
+            txtPassword.Clear();
+            lblTitulo.Text = "Carga de Personal";
+            this.Text = "Registro de Usuario";
+            lblCodigo.Text = "Contraseña (8 dígitos)";
+            if (cmbRol.Items.Count > 0) cmbRol.SelectedIndex = 0;
+            if (cmbSucursal.Items.Count > 0) cmbSucursal.SelectedIndex = 0;
+        }
+
+        private void CargarDatosEdicion()
+        {
+            if (_empleadoEdicion != null)
+            {
+                lblTitulo.Text = "Modificar Personal";
+                this.Text = "Modificar Empleado";
+                lblCodigo.Text = "Nueva Contraseña (dejar vacío si no cambia)";
+
+                txtDNI.Text = _empleadoEdicion.Dni;
+                txtNombre.Text = _empleadoEdicion.Nombre;
+                textApellido.Text = _empleadoEdicion.Apellido;
+                textEmail.Text = _empleadoEdicion.Email;
+                txtCelular.Text = _empleadoEdicion.Telefono;
+                txtPassword.Clear();
+
+                if (_empleadoEdicion.IdRol > 0 && cmbRol.DataSource != null)
+                {
+                    cmbRol.SelectedValue = _empleadoEdicion.IdRol;
+                }
+
+                if (_empleadoEdicion.IdSucursal > 0 && cmbSucursal.DataSource != null)
+                {
+                    cmbSucursal.SelectedValue = _empleadoEdicion.IdSucursal;
+                }
+            }
+        }
+
+        private void CargarCombos()
+        {
+            // Cargar sucursales
+            var sucursales = _sucursalService.ObtenerSucursales().ToList();
+            if (sucursales.Any())
+            {
+                cmbSucursal.DataSource = sucursales;
+                cmbSucursal.DisplayMember = "Nombre";
+                cmbSucursal.ValueMember = "IdSucursal";
+                cmbSucursal.SelectedIndex = 0;
+            }
+
+            // Cargar roles dinámicamente desde la BD
+            var roles = _rolService.ObtenerRoles().ToList();
+            if (roles.Any())
+            {
+                cmbRol.DataSource = roles;
+                cmbRol.DisplayMember = "Nombre";
+                cmbRol.ValueMember = "IdRol";
+                cmbRol.SelectedIndex = 0;
+            }
         }
 
         private void FormRegistroUsuario_Load(object? sender, EventArgs e)
         {
-            // Cargamos las sucursales desde la BD
-            var sucursales = _sucursalService.ObtenerSucursales().ToList();
+            CargarCombos();
 
-            if (sucursales.Any())
+            // Si es modo modificación, prellenar campos
+            if (_empleadoEdicion != null)
             {
-                cmbSucursal.DataSource = sucursales;
-                cmbSucursal.DisplayMember = "Nombre"; // Lo que el usuario lee
-                // NOTA: Si tu entidad Sucursal tiene la clave primaria llamada "IdSucursal", cambia "Id" por "IdSucursal" aquí abajo.
-                cmbSucursal.ValueMember = "IdSucursal";       // El valor interno que se guarda
-                cmbSucursal.SelectedIndex = 0;
+                lblTitulo.Text = "Modificar Personal";
+                this.Text = "Modificar Empleado";
+                lblCodigo.Text = "Nueva Contraseña (dejar vacío si no cambia)";
+
+                txtDNI.Text = _empleadoEdicion.Dni;
+                txtNombre.Text = _empleadoEdicion.Nombre;
+                textApellido.Text = _empleadoEdicion.Apellido;
+                textEmail.Text = _empleadoEdicion.Email;
+                txtCelular.Text = _empleadoEdicion.Telefono;
+                txtPassword.Clear();
+
+                if (_empleadoEdicion.IdRol > 0)
+                {
+                    cmbRol.SelectedValue = _empleadoEdicion.IdRol;
+                }
+
+                if (_empleadoEdicion.IdSucursal > 0)
+                {
+                    cmbSucursal.SelectedValue = _empleadoEdicion.IdSucursal;
+                }
             }
         }
 
         private async void btnGuardar_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtNombre.Text) ||
-                string.IsNullOrWhiteSpace(textApellido.Text) ||
-                string.IsNullOrWhiteSpace(txtDNI.Text) ||
-                string.IsNullOrWhiteSpace(textEmail.Text) ||
-                string.IsNullOrWhiteSpace(txtPassword.Text) ||
-                cmbRol.SelectedIndex == -1 ||
-                cmbSucursal.SelectedIndex == -1) // <-- Validamos que elija sucursal
+            string nombre = txtNombre.Text.Trim();
+            string apellido = textApellido.Text.Trim();
+            string dni = txtDNI.Text.Trim();
+            string email = textEmail.Text.Trim();
+            string celular = txtCelular.Text.Trim();
+            string password = txtPassword.Text;
+
+            if (string.IsNullOrWhiteSpace(nombre) ||
+                string.IsNullOrWhiteSpace(apellido) ||
+                string.IsNullOrWhiteSpace(dni) ||
+                string.IsNullOrWhiteSpace(email) ||
+                cmbRol.SelectedValue == null ||
+                cmbSucursal.SelectedValue == null)
             {
-                MessageBox.Show("Todos los campos y selectores son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Nombre, Apellido, DNI, Email, Rol y Sucursal son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var nuevoEmpleado = new Empleado
+            int idRol = (int)cmbRol.SelectedValue;
+            int idSucursal = (int)cmbSucursal.SelectedValue;
+
+            if (_empleadoEdicion == null)
             {
-                Nombre = txtNombre.Text.Trim(),
-                Apellido = textApellido.Text.Trim(),
-                Dni = txtDNI.Text.Trim(),
-                Email = textEmail.Text.Trim(),
-                Telefono = txtCelular.Text.Trim(),
-                PasswordHash = txtPassword.Text,
-                Estado = true,
-                IdRol = cmbRol.SelectedIndex + 1,
+                // Modo Alta
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    MessageBox.Show("La contraseña es obligatoria para un nuevo usuario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                // Capturamos la ID real de la sucursal seleccionada en el ComboBox
-                IdSucursal = cmbSucursal.SelectedValue as int? ?? 1
-            };
+                var nuevoEmpleado = new Empleado
+                {
+                    Nombre = nombre,
+                    Apellido = apellido,
+                    Dni = dni,
+                    Email = email,
+                    Telefono = celular,
+                    PasswordHash = password,
+                    Estado = true,
+                    IdRol = idRol,
+                    IdSucursal = idSucursal
+                };
 
-            bool exito = await _authService.RegistrarAsync(nuevoEmpleado);
-
-            if (exito)
-            {
-                MessageBox.Show("¡Usuario registrado correctamente!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                bool exito = await _empleadoService.CrearAsync(nuevoEmpleado);
+                if (exito)
+                {
+                    MessageBox.Show("¡Usuario registrado exitosamente!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    OperacionTerminada?.Invoke();
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("El DNI o el Email ya existen en la base de datos.", "Error de duplicidad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
-                MessageBox.Show("El DNI o el Email ya existen en la base de datos.", "Error de duplicidad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Modo Modificación
+                _empleadoEdicion.Nombre = nombre;
+                _empleadoEdicion.Apellido = apellido;
+                _empleadoEdicion.Dni = dni;
+                _empleadoEdicion.Email = email;
+                _empleadoEdicion.Telefono = celular;
+                _empleadoEdicion.IdRol = idRol;
+                _empleadoEdicion.IdSucursal = idSucursal;
+
+                if (!string.IsNullOrWhiteSpace(password))
+                {
+                    _empleadoEdicion.PasswordHash = password;
+                }
+
+                var (exito, mensaje) = await _empleadoService.ActualizarAsync(_empleadoEdicion);
+                if (exito)
+                {
+                    MessageBox.Show("¡Empleado actualizado exitosamente!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    OperacionTerminada?.Invoke();
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(mensaje, "Error al actualizar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
         private void btnCancelar_Click(object? sender, EventArgs e)
         {
+            OperacionTerminada?.Invoke();
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
     }

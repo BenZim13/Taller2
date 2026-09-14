@@ -54,6 +54,7 @@ namespace StockOS.UI.WinForms.Forms
             Name = "FormInicio";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "StockOS - Inicio";
+            WindowState = FormWindowState.Maximized;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);
