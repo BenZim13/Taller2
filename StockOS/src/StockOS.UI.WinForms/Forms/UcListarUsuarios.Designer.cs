@@ -1,6 +1,6 @@
 namespace StockOS.UI.WinForms.Forms
 {
-    partial class ListarUsuarios
+    partial class UcListarUsuarios
     {
         private System.ComponentModel.IContainer components = null;
 

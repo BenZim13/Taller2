@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
+// Importamos la librería de BCrypt que acabamos de instalar
+using BCrypt.Net;
 
 namespace StockOS.Application.Services
 {
@@ -17,8 +19,9 @@ namespace StockOS.Application.Services
         {
             var empleado = _empleadoRepository.ObtenerPorDni(dni);
 
-            // Validamos que exista y que la contraseña coincida (Luego implementaremos el Hash)
-            if (empleado != null && empleado.PasswordHash == password)
+            // Aca le validamos si esta o no el gente cuera.
+            // BCrypt.Verify toma la contraseña plana (password) y la compara matemáticamente con el Hash guardado.
+            if (empleado != null && BCrypt.Net.BCrypt.Verify(password, empleado.PasswordHash))
             {
                 return empleado;
             }
@@ -31,7 +34,9 @@ namespace StockOS.Application.Services
             if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
             if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
 
-            // Por ahora guardamos la contraseña plana (luego le hacemos que sea Hash)
+            // Encriptamos la contraseña plana que viene del formulario antes de enviarla al repositorio
+            empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
+
             _empleadoRepository.Agregar(empleado);
             return true;
         }

@@ -9,7 +9,7 @@ namespace StockOS.UI.WinForms.Forms
     public partial class UcUsuarios : UserControl
     {
         private readonly IServiceProvider _serviceProvider;
-        private ListarUsuarios? _vistaListar;
+        private UcListarUsuarios? _vistaListar;
 
         public UcUsuarios(IServiceProvider serviceProvider)
         {
@@ -32,7 +32,7 @@ namespace StockOS.UI.WinForms.Forms
 
             if (_vistaListar == null)
             {
-                _vistaListar = _serviceProvider.GetRequiredService<ListarUsuarios>();
+                _vistaListar = _serviceProvider.GetRequiredService<UcListarUsuarios>();
                 _vistaListar.Dock = DockStyle.Fill;
                 _vistaListar.SolicitarEdicionUsuario += (emp) => MostrarCargarUsuario(emp);
                 _vistaListar.AlVolver += () => MostrarOpciones();

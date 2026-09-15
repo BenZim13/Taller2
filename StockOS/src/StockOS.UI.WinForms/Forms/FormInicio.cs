@@ -135,15 +135,15 @@ namespace StockOS.UI.WinForms.Forms
                     break;
                 case "Inventario":
                     lblTitulo.Text = "Inventario";
-                    nuevaVista = new UcInventario();
+                    nuevaVista = _serviceProvider.GetRequiredService<UcInventario>();
                     break;
                 case "Ventas":
                     lblTitulo.Text = "Ventas";
-                    nuevaVista = new UcVentas();
+                    nuevaVista = _serviceProvider.GetRequiredService<UcVentas>();
                     break;
                 case "Reportes":
                     lblTitulo.Text = "Reportes";
-                    nuevaVista = new UcReportes();
+                    nuevaVista = _serviceProvider.GetRequiredService<UcReportes>();
                     break;
                 case "Usuarios":
                     lblTitulo.Text = "Usuarios";

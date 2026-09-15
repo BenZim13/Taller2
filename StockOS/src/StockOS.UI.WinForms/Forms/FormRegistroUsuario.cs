@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BCrypt.Net;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -12,20 +13,21 @@ namespace StockOS.UI.WinForms.Forms
         private readonly IEmpleadoService _empleadoService;
         private readonly ISucursalService _sucursalService;
         private readonly IRolService _rolService;
+        private readonly IAuthService _authService;
         private Empleado? _empleadoEdicion;
 
         public event Action? OperacionTerminada;
         public event Action? AlVolver;
 
-        public FormRegistroUsuario(
-            IEmpleadoService empleadoService,
-            ISucursalService sucursalService,
-            IRolService rolService)
+        public FormRegistroUsuario(IEmpleadoService empleadoService,ISucursalService sucursalService,
+            IRolService rolService,IAuthService authService)
         {
             InitializeComponent();
             _empleadoService = empleadoService;
             _sucursalService = sucursalService;
             _rolService = rolService;
+            _authService = authService;
+
 
             btnGuardar.Click += btnGuardar_Click;
             btnVolver.Click += (s, e) => AlVolver?.Invoke();
@@ -162,7 +164,9 @@ namespace StockOS.UI.WinForms.Forms
 
             if (_empleadoEdicion == null)
             {
-                // Modo Alta
+                // ==========================================
+                // MODO ALTA (NUEVO USUARIO)
+                // ==========================================
                 if (string.IsNullOrWhiteSpace(password))
                 {
                     MessageBox.Show("La contraseña es obligatoria para un nuevo usuario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -176,13 +180,15 @@ namespace StockOS.UI.WinForms.Forms
                     Dni = dni,
                     Email = email,
                     Telefono = celular,
-                    PasswordHash = password,
+                    PasswordHash = password, // Se manda plana, el AuthService la encripta
                     Estado = true,
                     IdRol = idRol,
                     IdSucursal = idSucursal
                 };
 
-                bool exito = await _empleadoService.CrearAsync(nuevoEmpleado);
+                // 2. CAMBIO AQUÍ: Usamos _authService en lugar de _empleadoService
+                bool exito = await _authService.RegistrarAsync(nuevoEmpleado);
+
                 if (exito)
                 {
                     MessageBox.Show("¡Usuario registrado exitosamente!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -197,7 +203,9 @@ namespace StockOS.UI.WinForms.Forms
             }
             else
             {
-                // Modo Modificación
+                // ==========================================
+                // MODO MODIFICACIÓN
+                // ==========================================
                 _empleadoEdicion.Nombre = nombre;
                 _empleadoEdicion.Apellido = apellido;
                 _empleadoEdicion.Dni = dni;
@@ -208,7 +216,8 @@ namespace StockOS.UI.WinForms.Forms
 
                 if (!string.IsNullOrWhiteSpace(password))
                 {
-                    _empleadoEdicion.PasswordHash = password;
+                    // 3. CAMBIO AQUÍ: Encriptamos la nueva contraseña antes de guardarla
+                    _empleadoEdicion.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
                 }
 
                 var (exito, mensaje) = await _empleadoService.ActualizarAsync(_empleadoEdicion);

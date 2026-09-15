@@ -9,7 +9,7 @@ using StockOS.Domain.Entities;
 
 namespace StockOS.UI.WinForms.Forms
 {
-    public partial class ListarUsuarios : UserControl
+    public partial class UcListarUsuarios : UserControl
     {
         private readonly IEmpleadoService _empleadoService;
         private readonly IServiceProvider _serviceProvider;
@@ -18,7 +18,7 @@ namespace StockOS.UI.WinForms.Forms
         public event Action<Empleado>? SolicitarEdicionUsuario;
         public event Action? AlVolver;
 
-        public ListarUsuarios(IEmpleadoService empleadoService, IServiceProvider serviceProvider)
+        public UcListarUsuarios(IEmpleadoService empleadoService, IServiceProvider serviceProvider)
         {
             InitializeComponent();
             _empleadoService = empleadoService;

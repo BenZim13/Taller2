@@ -5,6 +5,8 @@ using StockOS.DataAccess.Persistence;
 using StockOS.Domain.Interfaces;
 using StockOS.DataAccess.Repositories;
 using StockOS.Application.Services;
+using System;
+using System.Windows.Forms;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -28,21 +30,37 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
                     services.AddScoped<ISucursalRepository, SucursalRepository>();
                     services.AddScoped<IRolRepository, RolRepository>();
+                    services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+                    services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+                    services.AddScoped<IProductoRepository, ProductoRepository>();
+                    services.AddScoped<IStockSucursalRepository, StockSucursalRepository>();
 
                     // Servicios de Negocio
                     services.AddScoped<IAuthService, AuthService>();
                     services.AddScoped<ISucursalService, SucursalService>();
                     services.AddScoped<IRolService, RolService>();
                     services.AddScoped<IEmpleadoService, EmpleadoService>();
+                    services.AddScoped<ICategoriaService, CategoriaService>();
+                    services.AddScoped<ICategoriaService, CategoriaService>();
+                    services.AddScoped<IProductoService, ProductoService>();
+                    services.AddScoped<IStockService, StockService>();
 
                     // Formularios y Vistas
                     services.AddTransient<FormLogin>();
                     services.AddTransient<FormInicio>();
                     services.AddTransient<FormRegistroUsuario>();
-                    services.AddTransient<ListarUsuarios>();
+                    services.AddTransient<UcListarUsuarios>();
                     services.AddTransient<UcUsuarios>();
-                }).Build();
 
+                    // --- ACA AGREGAMOS LAS VISTAS FALTANTES DEL MENÚ ---
+                    services.AddTransient<UcInicio>();
+                    services.AddTransient<UcInventario>();
+                    services.AddTransient<UcVentas>();
+                    services.AddTransient<UcReportes>();
+                    services.AddTransient<UcConfig>();
+
+                }).Build();
+            
             // 3. Obtenemos el formulario de login desde el contenedor
             var formLogin = host.Services.GetRequiredService<FormLogin>();
 
@@ -67,6 +85,9 @@ namespace StockOS.UI.WinForms.Forms
                 // 7. Si cerró la ventana en la "X" sin loguearse, salimos
                 System.Windows.Forms.Application.Exit();
             }
+            /*// 2. Ejecutamos directamente el formulario de registro
+            var formRegistro = host.Services.GetRequiredService<FormRegistroUsuario>();
+            System.Windows.Forms.Application.Run(formRegistro);*/
         }
     }
 }
