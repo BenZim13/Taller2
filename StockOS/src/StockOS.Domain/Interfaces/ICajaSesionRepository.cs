@@ -9,5 +9,7 @@ namespace StockOS.Domain.Interfaces
     public interface ICajaSesionRepository
     {
         int AbrirCaja(int idCaja, int idEmpleado, decimal montoApertura);
+
+        bool VerificarCajaAbierta(int idEmpleado);
     }
 }

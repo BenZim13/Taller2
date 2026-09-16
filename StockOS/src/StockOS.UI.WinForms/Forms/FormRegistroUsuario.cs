@@ -19,8 +19,8 @@ namespace StockOS.UI.WinForms.Forms
         public event Action? OperacionTerminada;
         public event Action? AlVolver;
 
-        public FormRegistroUsuario(IEmpleadoService empleadoService,ISucursalService sucursalService,
-            IRolService rolService,IAuthService authService)
+        public FormRegistroUsuario(IEmpleadoService empleadoService, ISucursalService sucursalService,
+            IRolService rolService, IAuthService authService)
         {
             InitializeComponent();
             _empleadoService = empleadoService;
@@ -240,6 +240,11 @@ namespace StockOS.UI.WinForms.Forms
             OperacionTerminada?.Invoke();
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void FormRegistroUsuario_Load_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

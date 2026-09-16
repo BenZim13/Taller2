@@ -29,5 +29,21 @@ namespace StockOS.DataAccess.Repositories
 
             return (int)idParam.Value;
         }
+
+        public bool VerificarCajaAbierta(int idEmpleado)
+        {
+            var paramAbierta = new SqlParameter
+            {
+                ParameterName = "@EstaAbierta",
+                SqlDbType = System.Data.SqlDbType.Bit,
+                Direction = System.Data.ParameterDirection.Output
+            };
+
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_CajaSesion_VerificarAbierta @IdEmpleado={0}, @EstaAbierta=@EstaAbierta OUTPUT",
+                idEmpleado, paramAbierta);
+
+            return (bool)paramAbierta.Value;
+        }
     }
 }

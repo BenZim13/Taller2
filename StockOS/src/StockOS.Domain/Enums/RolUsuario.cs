@@ -10,6 +10,7 @@ namespace StockOS.Domain.Enums
     {
         Gerente = 1,
         Cajero = 2,
-        Deposito = 3
+        EncargadoDeposito = 3,
+        Repositor = 4
     }
 }

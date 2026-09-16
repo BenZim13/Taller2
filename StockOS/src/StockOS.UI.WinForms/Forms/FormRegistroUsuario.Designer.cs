@@ -41,8 +41,8 @@ namespace StockOS.UI.WinForms.Forms
             lblSucursal = new Label();
             cmbSucursal = new ComboBox();
             tlpBotones = new TableLayoutPanel();
-            tlpBotones.SuspendLayout();
             pnlHeader.SuspendLayout();
+            tlpBotones.SuspendLayout();
             SuspendLayout();
             // 
             // pnlHeader
@@ -54,7 +54,7 @@ namespace StockOS.UI.WinForms.Forms
             pnlHeader.Location = new Point(0, 0);
             pnlHeader.Name = "pnlHeader";
             pnlHeader.Padding = new Padding(25, 10, 25, 5);
-            pnlHeader.Size = new Size(434, 50);
+            pnlHeader.Size = new Size(472, 50);
             pnlHeader.TabIndex = 0;
             // 
             // btnVolver
@@ -79,16 +79,15 @@ namespace StockOS.UI.WinForms.Forms
             lblTitulo.ForeColor = Color.White;
             lblTitulo.Location = new Point(120, 7);
             lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(237, 30);
+            lblTitulo.Size = new Size(216, 30);
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "Registro de Usuario";
             // 
             // lblDNI
             // 
-            lblDNI.Anchor = AnchorStyles.None;
             lblDNI.AutoSize = true;
             lblDNI.ForeColor = Color.White;
-            lblDNI.Location = new Point(40, 111);
+            lblDNI.Location = new Point(40, 126);
             lblDNI.Name = "lblDNI";
             lblDNI.Size = new Size(33, 19);
             lblDNI.TabIndex = 1;
@@ -96,21 +95,19 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtDNI
             // 
-            txtDNI.Anchor = AnchorStyles.None;
             txtDNI.BackColor = Color.FromArgb(51, 65, 85);
             txtDNI.BorderStyle = BorderStyle.FixedSingle;
             txtDNI.ForeColor = Color.White;
-            txtDNI.Location = new Point(40, 134);
+            txtDNI.Location = new Point(40, 149);
             txtDNI.Name = "txtDNI";
             txtDNI.Size = new Size(350, 25);
             txtDNI.TabIndex = 2;
             // 
             // lblNombre
             // 
-            lblNombre.Anchor = AnchorStyles.None;
             lblNombre.AutoSize = true;
             lblNombre.ForeColor = Color.White;
-            lblNombre.Location = new Point(40, 162);
+            lblNombre.Location = new Point(40, 177);
             lblNombre.Name = "lblNombre";
             lblNombre.Size = new Size(59, 19);
             lblNombre.TabIndex = 3;
@@ -118,21 +115,19 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtNombre
             // 
-            txtNombre.Anchor = AnchorStyles.None;
             txtNombre.BackColor = Color.FromArgb(51, 65, 85);
             txtNombre.BorderStyle = BorderStyle.FixedSingle;
             txtNombre.ForeColor = Color.White;
-            txtNombre.Location = new Point(40, 185);
+            txtNombre.Location = new Point(40, 200);
             txtNombre.Name = "txtNombre";
             txtNombre.Size = new Size(350, 25);
             txtNombre.TabIndex = 4;
             // 
             // lblDireccion
             // 
-            lblDireccion.Anchor = AnchorStyles.None;
             lblDireccion.AutoSize = true;
             lblDireccion.ForeColor = Color.White;
-            lblDireccion.Location = new Point(40, 315);
+            lblDireccion.Location = new Point(40, 330);
             lblDireccion.Name = "lblDireccion";
             lblDireccion.Size = new Size(65, 19);
             lblDireccion.TabIndex = 5;
@@ -140,11 +135,10 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtDireccion
             // 
-            txtDireccion.Anchor = AnchorStyles.None;
             txtDireccion.BackColor = Color.FromArgb(51, 65, 85);
             txtDireccion.BorderStyle = BorderStyle.FixedSingle;
             txtDireccion.ForeColor = Color.White;
-            txtDireccion.Location = new Point(40, 338);
+            txtDireccion.Location = new Point(40, 353);
             txtDireccion.MaxLength = 100;
             txtDireccion.Name = "txtDireccion";
             txtDireccion.Size = new Size(350, 25);
@@ -152,10 +146,9 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // lblCelular
             // 
-            lblCelular.Anchor = AnchorStyles.None;
             lblCelular.AutoSize = true;
             lblCelular.ForeColor = Color.White;
-            lblCelular.Location = new Point(40, 366);
+            lblCelular.Location = new Point(40, 381);
             lblCelular.Name = "lblCelular";
             lblCelular.Size = new Size(51, 19);
             lblCelular.TabIndex = 7;
@@ -163,11 +156,10 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtCelular
             // 
-            txtCelular.Anchor = AnchorStyles.None;
             txtCelular.BackColor = Color.FromArgb(51, 65, 85);
             txtCelular.BorderStyle = BorderStyle.FixedSingle;
             txtCelular.ForeColor = Color.White;
-            txtCelular.Location = new Point(40, 389);
+            txtCelular.Location = new Point(40, 404);
             txtCelular.MaxLength = 20;
             txtCelular.Name = "txtCelular";
             txtCelular.PlaceholderText = "Ej: 1123456789";
@@ -176,10 +168,9 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // lblRol
             // 
-            lblRol.Anchor = AnchorStyles.None;
             lblRol.AutoSize = true;
             lblRol.ForeColor = Color.White;
-            lblRol.Location = new Point(40, 417);
+            lblRol.Location = new Point(40, 432);
             lblRol.Name = "lblRol";
             lblRol.Size = new Size(28, 19);
             lblRol.TabIndex = 9;
@@ -187,23 +178,21 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // cmbRol
             // 
-            cmbRol.Anchor = AnchorStyles.None;
             cmbRol.BackColor = Color.FromArgb(51, 65, 85);
             cmbRol.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbRol.FlatStyle = FlatStyle.Flat;
             cmbRol.ForeColor = Color.White;
             cmbRol.FormattingEnabled = true;
-            cmbRol.Location = new Point(40, 440);
+            cmbRol.Location = new Point(40, 455);
             cmbRol.Name = "cmbRol";
             cmbRol.Size = new Size(350, 25);
             cmbRol.TabIndex = 10;
             // 
             // lblCodigo
             // 
-            lblCodigo.Anchor = AnchorStyles.None;
             lblCodigo.AutoSize = true;
             lblCodigo.ForeColor = Color.White;
-            lblCodigo.Location = new Point(40, 538);
+            lblCodigo.Location = new Point(40, 533);
             lblCodigo.Name = "lblCodigo";
             lblCodigo.Size = new Size(144, 19);
             lblCodigo.TabIndex = 11;
@@ -211,11 +200,10 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtPassword
             // 
-            txtPassword.Anchor = AnchorStyles.None;
             txtPassword.BackColor = Color.FromArgb(51, 65, 85);
             txtPassword.BorderStyle = BorderStyle.FixedSingle;
             txtPassword.ForeColor = Color.White;
-            txtPassword.Location = new Point(40, 561);
+            txtPassword.Location = new Point(40, 556);
             txtPassword.MaxLength = 8;
             txtPassword.Name = "txtPassword";
             txtPassword.PlaceholderText = "••••••••";
@@ -225,55 +213,51 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // btnGuardar
             // 
-            btnGuardar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             btnGuardar.BackColor = Color.FromArgb(59, 130, 246);
             btnGuardar.Cursor = Cursors.Hand;
             btnGuardar.FlatAppearance.BorderSize = 0;
             btnGuardar.FlatStyle = FlatStyle.Flat;
             btnGuardar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnGuardar.ForeColor = Color.White;
-            btnGuardar.Location = new Point(3, 3);
+            btnGuardar.Location = new Point(40, 0);
             btnGuardar.Margin = new Padding(10, 0, 10, 0);
             btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(181, 42);
+            btnGuardar.Size = new Size(167, 42);
             btnGuardar.TabIndex = 13;
             btnGuardar.Text = "Guardar";
             btnGuardar.UseVisualStyleBackColor = false;
             // 
             // btnCancelar
             // 
-            btnCancelar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             btnCancelar.BackColor = Color.FromArgb(239, 68, 68);
             btnCancelar.Cursor = Cursors.Hand;
             btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
             btnCancelar.FlatStyle = FlatStyle.Flat;
             btnCancelar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnCancelar.ForeColor = Color.White;
-            btnCancelar.Location = new Point(190, 3);
+            btnCancelar.Location = new Point(246, 0);
             btnCancelar.Margin = new Padding(10, 0, 10, 0);
             btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(181, 42);
+            btnCancelar.Size = new Size(167, 42);
             btnCancelar.TabIndex = 14;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = false;
             // 
             // textApellido
             // 
-            textApellido.Anchor = AnchorStyles.None;
             textApellido.BackColor = Color.FromArgb(51, 65, 85);
             textApellido.BorderStyle = BorderStyle.FixedSingle;
             textApellido.ForeColor = Color.White;
-            textApellido.Location = new Point(40, 236);
+            textApellido.Location = new Point(40, 251);
             textApellido.Name = "textApellido";
             textApellido.Size = new Size(350, 25);
             textApellido.TabIndex = 16;
             // 
             // lblApellido
             // 
-            lblApellido.Anchor = AnchorStyles.None;
             lblApellido.AutoSize = true;
             lblApellido.ForeColor = Color.White;
-            lblApellido.Location = new Point(40, 213);
+            lblApellido.Location = new Point(40, 228);
             lblApellido.Name = "lblApellido";
             lblApellido.Size = new Size(58, 19);
             lblApellido.TabIndex = 15;
@@ -281,21 +265,19 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // textEmail
             // 
-            textEmail.Anchor = AnchorStyles.None;
             textEmail.BackColor = Color.FromArgb(51, 65, 85);
             textEmail.BorderStyle = BorderStyle.FixedSingle;
             textEmail.ForeColor = Color.White;
-            textEmail.Location = new Point(40, 287);
+            textEmail.Location = new Point(40, 302);
             textEmail.Name = "textEmail";
             textEmail.Size = new Size(350, 25);
             textEmail.TabIndex = 18;
             // 
             // lblEmail
             // 
-            lblEmail.Anchor = AnchorStyles.None;
             lblEmail.AutoSize = true;
             lblEmail.ForeColor = Color.White;
-            lblEmail.Location = new Point(40, 264);
+            lblEmail.Location = new Point(40, 279);
             lblEmail.Name = "lblEmail";
             lblEmail.Size = new Size(121, 19);
             lblEmail.TabIndex = 17;
@@ -303,10 +285,9 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // lblSucursal
             // 
-            lblSucursal.Anchor = AnchorStyles.None;
             lblSucursal.AutoSize = true;
             lblSucursal.ForeColor = Color.White;
-            lblSucursal.Location = new Point(40, 470);
+            lblSucursal.Location = new Point(40, 483);
             lblSucursal.Name = "lblSucursal";
             lblSucursal.Size = new Size(59, 19);
             lblSucursal.TabIndex = 19;
@@ -314,46 +295,46 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // cmbSucursal
             // 
-            cmbSucursal.Anchor = AnchorStyles.None;
             cmbSucursal.BackColor = Color.FromArgb(51, 65, 85);
             cmbSucursal.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbSucursal.FlatStyle = FlatStyle.Flat;
             cmbSucursal.ForeColor = Color.White;
             cmbSucursal.FormattingEnabled = true;
-            cmbSucursal.Location = new Point(40, 492);
+            cmbSucursal.Location = new Point(40, 505);
             cmbSucursal.Name = "cmbSucursal";
             cmbSucursal.Size = new Size(350, 25);
             cmbSucursal.TabIndex = 20;
-            // 
             // 
             // tlpBotones
             // 
             tlpBotones.ColumnCount = 2;
             tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpBotones.Controls.Add(btnGuardar, 0, 0);
             tlpBotones.Controls.Add(btnCancelar, 1, 0);
+            tlpBotones.Controls.Add(btnGuardar, 0, 0);
             tlpBotones.Dock = DockStyle.Bottom;
-            tlpBotones.Location = new Point(0, 592);
+            tlpBotones.Location = new Point(0, 688);
             tlpBotones.Name = "tlpBotones";
+            tlpBotones.Padding = new Padding(30, 0, 30, 15);
             tlpBotones.RowCount = 1;
             tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlpBotones.Size = new Size(434, 60);
+            tlpBotones.Size = new Size(472, 60);
             tlpBotones.TabIndex = 21;
-            tlpBotones.Padding = new Padding(30, 0, 30, 15);
+            // 
             // FormRegistroUsuario
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoScroll = true;
+            AutoScrollMargin = new Size(0, 80);
             BackColor = Color.FromArgb(30, 41, 59);
-            ClientSize = new Size(434, 667);
+            ClientSize = new Size(472, 748);
             Controls.Add(cmbSucursal);
             Controls.Add(lblSucursal);
             Controls.Add(textEmail);
             Controls.Add(lblEmail);
             Controls.Add(textApellido);
             Controls.Add(lblApellido);
-            
             Controls.Add(tlpBotones);
             Controls.Add(txtPassword);
             Controls.Add(lblCodigo);
@@ -372,9 +353,7 @@ namespace StockOS.UI.WinForms.Forms
             Name = "FormRegistroUsuario";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Registro de Usuario";
-            AutoScroll = true;
-            AutoScrollMargin = new Size(0, 80);
-            WindowState = FormWindowState.Normal;
+            Load += FormRegistroUsuario_Load_1;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             tlpBotones.ResumeLayout(false);

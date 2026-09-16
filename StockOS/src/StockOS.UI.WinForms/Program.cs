@@ -34,6 +34,8 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddScoped<IProductoRepository, ProductoRepository>();
                     services.AddScoped<IStockSucursalRepository, StockSucursalRepository>();
                     services.AddScoped<ICajaSesionRepository, CajaSesionRepository>();
+                    services.AddScoped<ICajaRepository, CajaRepository>();
+                    services.AddScoped<IVentaRepository, VentaRepository>();
 
                     // Servicios de Negocio
                     services.AddScoped<IAuthService, AuthService>();
@@ -44,6 +46,7 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddScoped<IProductoService, ProductoService>();
                     services.AddScoped<IStockService, StockService>();
                     services.AddScoped<ICajaService, CajaService>();
+                    services.AddScoped<IVentaService, VentaService>();
 
                     // Formularios y Vistas
                     services.AddTransient<FormLogin>();
@@ -53,6 +56,8 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddTransient<UcUsuarios>();
                     services.AddTransient<FormRegistroProducto>();
                     services.AddTransient<FormIngresoStock>();
+                    services.AddTransient<FormAperturaCaja>();
+                    
 
                     // --- ACA AGREGAMOS LAS VISTAS FALTANTES DEL MENÚ ---
                     services.AddTransient<UcInicio>();

@@ -91,9 +91,14 @@ namespace StockOS.UI.WinForms.Forms
                     // El cajero no ve reportes ni configuraciones
                     secciones.AddRange(new[] { "Inventario", "Ventas" });
                 }
-                else if (idRol == (int)RolUsuario.Deposito)
+                else if (idRol == (int)RolUsuario.EncargadoDeposito)
                 {
-                    // Depósito solo ve el inventario
+                    // EncargadoDeposito solo ve el inventario
+                    secciones.AddRange(new[] { "Inventario" });
+                }
+                else if (idRol == (int)RolUsuario.Repositor)
+                {
+                    // Repositor solo ve el inventario
                     secciones.AddRange(new[] { "Inventario" });
                 }
             }
