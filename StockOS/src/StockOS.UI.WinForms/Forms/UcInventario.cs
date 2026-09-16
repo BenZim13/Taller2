@@ -110,16 +110,20 @@ namespace StockOS.UI.WinForms.Forms
                 string categoriaNombre = prod.IdCategoriaNavigation?.Nombre ?? $"Categoría {prod.IdCategoria}";
                 string estadoTexto = (prod.Activo == true) ? "Activo" : "Inactivo";
 
+                // Le preguntamos al servicio de stock cuántas unidades hay (usando nuestra sesión dinámica)
+                int stockActual = _stockService.ObtenerCantidadActual(prod.IdProducto, SesionActual.IdSucursal);
+
                 int index = dgvProductos.Rows.Add(
-                    prod.IdProducto,
+                    prod.IdProducto.ToString(), // <-- Convertimos a texto
                     prod.CodigoBarra,
                     prod.Nombre,
                     categoriaNombre,
-                    prod.PrecioVentaActual,
+                    $"$ {prod.PrecioVentaActual:N2}", // <-- Convertimos a texto con formato de moneda
+                    stockActual.ToString(), // <-- Convertimos a texto
                     estadoTexto
                 );
 
-                // Colorear el estado al igual que hizo tu compañero con los usuarios
+                // Colorear el estado 
                 if (prod.Activo == false)
                 {
                     dgvProductos.Rows[index].DefaultCellStyle.ForeColor = Color.FromArgb(148, 163, 184); // Color gris oscuro
@@ -128,30 +132,9 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     dgvProductos.Rows[index].Cells["colEstado"].Style.ForeColor = Color.FromArgb(52, 211, 153); // Color esmeralda
                 }
+
             }
 
-            dgvProductos.Rows.Add();
-
-            foreach (var prod in filtrados)
-            {
-                string categoriaNombre = prod.IdCategoriaNavigation?.Nombre ?? $"Categoría {prod.IdCategoria}";
-                string estadoTexto = (prod.Activo == true) ? "Activo" : "Inactivo";
-
-                // Le preguntamos al servicio de stock cuántas unidades hay en la sucursal actual
-                int stockActual = _stockService.ObtenerCantidadActual(prod.IdProducto, SesionActual.IdSucursal);
-
-                int index = dgvProductos.Rows.Add(
-                    prod.IdProducto,
-                    prod.CodigoBarra,
-                    prod.Nombre,
-                    categoriaNombre,
-                    prod.PrecioVentaActual,
-                    stockActual,
-                    estadoTexto
-                );
-
-                
-            }
         }
 
         private void BtnNuevo_Click(object? sender, EventArgs e)
@@ -194,7 +177,7 @@ namespace StockOS.UI.WinForms.Forms
             using var scope = _serviceProvider.CreateScope();
             var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
 
-            // 3. ¡LA MAGIA! Le pasamos el producto para que los TextBoxes se llenen solos
+            // 3. Le pasamos el producto para que los TextBoxes se llenen solos
             formRegistro.PrepararParaEdicion(productoSeleccionado);
 
             // 4. Mostramos el formulario y si el usuario da click en "Guardar" (DialogResult.OK), recargamos la grilla

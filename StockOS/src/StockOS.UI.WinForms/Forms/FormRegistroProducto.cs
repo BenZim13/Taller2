@@ -73,6 +73,13 @@ namespace StockOS.UI.WinForms.Forms
                 return;
             }
 
+            // Validar que se haya seleccionado una categoría válida
+            if (cmbCategoria.SelectedValue == null || Convert.ToInt32(cmbCategoria.SelectedValue) <= 0)
+            {
+                MessageBox.Show("Debe seleccionar una categoría de la lista. Si está vacía, debe crear categorías en el sistema primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             // 2. Si _productoEdicion es NULL, estamos creando uno nuevo
             if (_productoEdicion == null)
             {
