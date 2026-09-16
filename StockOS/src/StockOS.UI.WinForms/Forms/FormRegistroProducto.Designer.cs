@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormRegistroProducto
     {
@@ -212,8 +212,10 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormRegistroProducto";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Registro de Producto";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);

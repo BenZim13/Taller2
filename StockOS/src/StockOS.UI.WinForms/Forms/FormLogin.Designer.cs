@@ -182,7 +182,9 @@ namespace StockOS.UI.WinForms.Forms
             Name = "FormLogin";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "StockOS - Iniciar Sesión";
-            WindowState = FormWindowState.Maximized;
+            WindowState = FormWindowState.Normal;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);

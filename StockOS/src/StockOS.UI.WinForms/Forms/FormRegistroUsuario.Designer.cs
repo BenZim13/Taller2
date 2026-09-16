@@ -40,6 +40,8 @@ namespace StockOS.UI.WinForms.Forms
             lblEmail = new Label();
             lblSucursal = new Label();
             cmbSucursal = new ComboBox();
+            tlpBotones = new TableLayoutPanel();
+            tlpBotones.SuspendLayout();
             pnlHeader.SuspendLayout();
             SuspendLayout();
             // 
@@ -223,32 +225,34 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // btnGuardar
             // 
-            btnGuardar.Anchor = AnchorStyles.None;
+            btnGuardar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             btnGuardar.BackColor = Color.FromArgb(59, 130, 246);
             btnGuardar.Cursor = Cursors.Hand;
             btnGuardar.FlatAppearance.BorderSize = 0;
             btnGuardar.FlatStyle = FlatStyle.Flat;
             btnGuardar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnGuardar.ForeColor = Color.White;
-            btnGuardar.Location = new Point(40, 592);
+            btnGuardar.Location = new Point(3, 3);
+            btnGuardar.Margin = new Padding(10, 0, 10, 0);
             btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(120, 40);
+            btnGuardar.Size = new Size(181, 42);
             btnGuardar.TabIndex = 13;
             btnGuardar.Text = "Guardar";
             btnGuardar.UseVisualStyleBackColor = false;
             // 
             // btnCancelar
             // 
-            btnCancelar.Anchor = AnchorStyles.None;
+            btnCancelar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             btnCancelar.BackColor = Color.FromArgb(239, 68, 68);
             btnCancelar.Cursor = Cursors.Hand;
             btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
             btnCancelar.FlatStyle = FlatStyle.Flat;
             btnCancelar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnCancelar.ForeColor = Color.White;
-            btnCancelar.Location = new Point(270, 592);
+            btnCancelar.Location = new Point(190, 3);
+            btnCancelar.Margin = new Padding(10, 0, 10, 0);
             btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(120, 40);
+            btnCancelar.Size = new Size(181, 42);
             btnCancelar.TabIndex = 14;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = false;
@@ -321,6 +325,22 @@ namespace StockOS.UI.WinForms.Forms
             cmbSucursal.Size = new Size(350, 25);
             cmbSucursal.TabIndex = 20;
             // 
+            // 
+            // tlpBotones
+            // 
+            tlpBotones.ColumnCount = 2;
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tlpBotones.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tlpBotones.Controls.Add(btnGuardar, 0, 0);
+            tlpBotones.Controls.Add(btnCancelar, 1, 0);
+            tlpBotones.Dock = DockStyle.Bottom;
+            tlpBotones.Location = new Point(0, 592);
+            tlpBotones.Name = "tlpBotones";
+            tlpBotones.RowCount = 1;
+            tlpBotones.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpBotones.Size = new Size(434, 60);
+            tlpBotones.TabIndex = 21;
+            tlpBotones.Padding = new Padding(30, 0, 30, 15);
             // FormRegistroUsuario
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -333,8 +353,8 @@ namespace StockOS.UI.WinForms.Forms
             Controls.Add(lblEmail);
             Controls.Add(textApellido);
             Controls.Add(lblApellido);
-            Controls.Add(btnCancelar);
-            Controls.Add(btnGuardar);
+            
+            Controls.Add(tlpBotones);
             Controls.Add(txtPassword);
             Controls.Add(lblCodigo);
             Controls.Add(cmbRol);
@@ -353,9 +373,11 @@ namespace StockOS.UI.WinForms.Forms
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Registro de Usuario";
             AutoScroll = true;
+            AutoScrollMargin = new Size(0, 80);
             WindowState = FormWindowState.Normal;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
+            tlpBotones.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
 
@@ -386,6 +408,7 @@ namespace StockOS.UI.WinForms.Forms
         private Label lblEmail;
         private Label lblSucursal;
         private ComboBox cmbSucursal;
+        private System.Windows.Forms.TableLayoutPanel tlpBotones;
     }
 }
 
