@@ -51,6 +51,8 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddTransient<FormRegistroUsuario>();
                     services.AddTransient<UcListarUsuarios>();
                     services.AddTransient<UcUsuarios>();
+                    services.AddTransient<FormRegistroProducto>();
+                    services.AddTransient<FormIngresoStock>();
 
                     // --- ACA AGREGAMOS LAS VISTAS FALTANTES DEL MENÚ ---
                     services.AddTransient<UcInicio>();

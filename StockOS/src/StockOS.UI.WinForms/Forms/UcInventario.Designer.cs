@@ -20,6 +20,7 @@ namespace StockOS.UI.WinForms.Forms
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlHeaderLista = new System.Windows.Forms.Panel();
+            this.btnIngresarStock = new System.Windows.Forms.Button();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.btnRecargar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
@@ -39,6 +40,7 @@ namespace StockOS.UI.WinForms.Forms
             // pnlHeaderLista
             // 
             this.pnlHeaderLista.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.pnlHeaderLista.Controls.Add(this.btnIngresarStock);
             this.pnlHeaderLista.Controls.Add(this.btnNuevo);
             this.pnlHeaderLista.Controls.Add(this.btnRecargar);
             this.pnlHeaderLista.Controls.Add(this.btnEliminar);
@@ -50,6 +52,21 @@ namespace StockOS.UI.WinForms.Forms
             this.pnlHeaderLista.Padding = new System.Windows.Forms.Padding(25, 10, 25, 5);
             this.pnlHeaderLista.Size = new System.Drawing.Size(1000, 50);
             this.pnlHeaderLista.TabIndex = 0;
+            // 
+            // btnIngresarStock
+            // 
+            this.btnIngresarStock.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(139)))), ((int)(((byte)(92)))), ((int)(((byte)(246)))));
+            this.btnIngresarStock.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnIngresarStock.FlatAppearance.BorderSize = 0;
+            this.btnIngresarStock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnIngresarStock.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnIngresarStock.ForeColor = System.Drawing.Color.White;
+            this.btnIngresarStock.Location = new System.Drawing.Point(155, 10);
+            this.btnIngresarStock.Name = "btnIngresarStock";
+            this.btnIngresarStock.Size = new System.Drawing.Size(140, 32);
+            this.btnIngresarStock.TabIndex = 5;
+            this.btnIngresarStock.Text = "📦 Ingresar Stock";
+            this.btnIngresarStock.UseVisualStyleBackColor = false;
             // 
             // btnNuevo
             // 
@@ -119,7 +136,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblTituloLista.AutoSize = true;
             this.lblTituloLista.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.lblTituloLista.ForeColor = System.Drawing.Color.White;
-            this.lblTituloLista.Location = new System.Drawing.Point(165, 7);
+            this.lblTituloLista.Location = new System.Drawing.Point(310, 7);
             this.lblTituloLista.Name = "lblTituloLista";
             this.lblTituloLista.Size = new System.Drawing.Size(120, 30);
             this.lblTituloLista.TabIndex = 0;
@@ -266,6 +283,7 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Button btnRecargar;
         private System.Windows.Forms.Button btnNuevo;
+        private System.Windows.Forms.Button btnIngresarStock;
         private System.Windows.Forms.Panel pnlFiltros;
         private System.Windows.Forms.TextBox txtBuscar;
         private System.Windows.Forms.Label lblBuscar;

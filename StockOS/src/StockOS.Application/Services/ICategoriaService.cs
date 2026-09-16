@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StockOS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace StockOS.Application.Services
 {
     public interface ICategoriaService
     {
+        IEnumerable<Categoria> ObtenerTodos();
     }
 }

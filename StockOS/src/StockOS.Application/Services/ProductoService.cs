@@ -19,5 +19,14 @@ namespace StockOS.Application.Services
         {
             return _productoRepository.ObtenerTodos(); 
         }
+        public void Agregar(Producto producto)
+        {
+            _productoRepository.Agregar(producto);
+        }
+
+        public void Actualizar(Producto producto)
+        {
+            _productoRepository.Actualizar(producto);
+        }
     }
 }

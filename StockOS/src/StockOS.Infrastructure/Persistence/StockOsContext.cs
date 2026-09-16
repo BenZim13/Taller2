@@ -20,7 +20,7 @@ public partial class StockOsContext : DbContext
 
     public virtual DbSet<CajaSesion> CajaSesiones { get; set; }
 
-    public virtual DbSet<Categoria> Categoria { get; set; }
+    public virtual DbSet<Categoria> Categorias { get; set; }
 
     public virtual DbSet<Cliente> Clientes { get; set; }
 
@@ -28,7 +28,7 @@ public partial class StockOsContext : DbContext
 
     public virtual DbSet<DetalleCompra> DetalleCompras { get; set; }
 
-    public virtual DbSet<DetalleVenta> DetalleVenta { get; set; }
+    public virtual DbSet<DetalleVenta> DetalleVentas { get; set; }
 
     public virtual DbSet<Empleado> Empleados { get; set; }
 
@@ -50,7 +50,7 @@ public partial class StockOsContext : DbContext
 
     public virtual DbSet<Sucursal> Sucursales { get; set; }
 
-    public virtual DbSet<Venta> Venta { get; set; }
+    public virtual DbSet<Venta> Ventas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

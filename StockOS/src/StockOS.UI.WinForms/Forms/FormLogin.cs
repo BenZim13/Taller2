@@ -60,6 +60,10 @@ namespace StockOS.UI.WinForms.Forms
             if (empleado != null)
             {
                 UsuarioAutenticado = empleado;
+
+                //Guardamo el usuario en la memoria global
+                SesionActual.Usuario = empleado;
+
                 MostrarExito("Ingreso exitoso");
                 btnIngresar.Enabled = false;
                 await Task.Delay(1200);

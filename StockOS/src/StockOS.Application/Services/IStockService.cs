@@ -8,6 +8,10 @@ namespace StockOS.Application.Services
 {
     public interface IStockService
     {
+        // Método principal para ingresar mercadería
+        void AgregarStock(int idProducto, int idSucursal, int cantidadAAgregar);
 
+        // Método para saber cuánto hay actualmente
+        int ObtenerCantidadActual(int idProducto, int idSucursal);
     }
 }

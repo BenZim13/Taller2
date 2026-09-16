@@ -10,5 +10,7 @@ namespace StockOS.Domain.Interfaces
     public interface IProductoRepository
     {
         IEnumerable<Producto> ObtenerTodos();
+        void Agregar(Producto producto);
+        void Actualizar(Producto producto);
     }
 }
