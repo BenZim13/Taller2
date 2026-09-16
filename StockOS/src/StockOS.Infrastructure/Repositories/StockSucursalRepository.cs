@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using StockOS.DataAccess.Persistence;
-using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 
 namespace StockOS.DataAccess.Repositories
@@ -14,23 +14,30 @@ namespace StockOS.DataAccess.Repositories
             _context = context;
         }
 
-        public StockSucursal? ObtenerPorProductoYSucursal(int idProducto, int idSucursal)
+        public int ObtenerCantidadActual(int idProducto, int idSucursal)
         {
-            // Busca si ya existe un registro previo para ese producto en esa sucursal
-            return _context.StockSucursales // Nota: Revisa si en tu contexto se llama StockSucursal o StockSucursales
-                .FirstOrDefault(s => s.IdProducto == idProducto && s.IdSucursal == idSucursal);
+            var paramCantidad = new SqlParameter
+            {
+                ParameterName = "@StockActual",
+                SqlDbType = System.Data.SqlDbType.Int,
+                Direction = System.Data.ParameterDirection.Output
+            };
+
+            // Ejecutamos el SP de lectura
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Stock_ObtenerActual @IdProducto={0}, @IdSucursal={1}, @StockActual=@StockActual OUTPUT",
+                idProducto, idSucursal, paramCantidad);
+
+            // Si devuelve DBNull, retornamos 0, sino retornamos el valor
+            return paramCantidad.Value != System.DBNull.Value ? (int)paramCantidad.Value : 0;
         }
 
-        public void Agregar(StockSucursal stock)
+        public void IngresarMercaderia(int idProducto, int idSucursal, int cantidad)
         {
-            _context.StockSucursales.Add(stock);
-            _context.SaveChanges();
-        }
-
-        public void Actualizar(StockSucursal stock)
-        {
-            _context.StockSucursales.Update(stock);
-            _context.SaveChanges();
+            // Ejecutamos el SP de ingreso (SQL Server hace el IF/ELSE por nosotros)
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Stock_IngresarMercaderia @IdProducto={0}, @IdSucursal={1}, @CantidadAIngresar={2}",
+                idProducto, idSucursal, cantidad);
         }
     }
 }

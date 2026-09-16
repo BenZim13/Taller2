@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using StockOS.Application.Services;
+using StockOS.Domain.Entities;
+using StockOS.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
-using StockOS.Application.Services;
-using StockOS.Domain.Entities;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -29,6 +30,8 @@ namespace StockOS.UI.WinForms.Forms
 
             ConfigurarGrid();
             ConfigurarEventos();
+            ConfigurarPermisosModulo();
+
         }
 
         private void ConfigurarGrid()
@@ -66,7 +69,21 @@ namespace StockOS.UI.WinForms.Forms
             // Capturar cuando la lectora de barras presiona ENTER
             txtBuscar.KeyDown += TxtBuscar_KeyDown;
         }
+        private void ConfigurarPermisosModulo()
+        {
+            if (SesionActual.Usuario == null) return;
 
+            int idRol = SesionActual.Usuario.IdRol;
+
+            // Si el usuario es Cajero, el inventario es de "Solo Lectura"
+            if (idRol == (int)RolUsuario.Cajero)
+            {
+                btnNuevo.Visible = false;
+                btnIngresarStock.Visible = false;
+                btnEditar.Visible = false;
+                btnEliminar.Visible = false;
+            }
+        }
         private void CargarDatos()
         {
             try

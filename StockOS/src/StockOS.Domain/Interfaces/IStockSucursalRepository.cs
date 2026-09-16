@@ -9,8 +9,7 @@ namespace StockOS.Domain.Interfaces
 {
     public interface IStockSucursalRepository
     {
-        StockSucursal? ObtenerPorProductoYSucursal(int idProducto, int idSucursal);
-        void Agregar(StockSucursal stock);
-        void Actualizar(StockSucursal stock);
+        int ObtenerCantidadActual(int idProducto, int idSucursal);
+        void IngresarMercaderia(int idProducto, int idSucursal, int cantidad);
     }
 }

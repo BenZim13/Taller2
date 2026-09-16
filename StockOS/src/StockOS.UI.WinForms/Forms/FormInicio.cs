@@ -5,6 +5,8 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using Microsoft.Extensions.DependencyInjection;
 using StockOS.Domain.Entities;
+using StockOS.Application.Services; // Para SesionActual
+using StockOS.Domain.Enums;         // Para los roles
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -39,13 +41,28 @@ namespace StockOS.UI.WinForms.Forms
         {
             _usuarioActual = usuario;
 
-            string rolTexto = _usuarioActual.IdRol == 1 ? "Administrador / Gerente" : "Personal";
+            // Mostramos el nombre del rol en el título de la ventana
+            string rolTexto = _usuarioActual.IdRol == (int)RolUsuario.Gerente ? "Gerente" :
+                             (_usuarioActual.IdRol == (int)RolUsuario.Cajero ? "Cajero" : "Depósito");
+
             this.Text = $"StockOS | Sucursal: {_usuarioActual.IdSucursal} | {_usuarioActual.Nombre} {_usuarioActual.Apellido} ({rolTexto})";
             lblTitulo.Text = $"Bienvenido a StockOS — {_usuarioActual.Nombre} {_usuarioActual.Apellido}";
 
+            // 1. Inicializamos el dock con los botones correctos según el rol
             InicializarDock();
-            CambiarVista("Inicio");
+
+            // 2. UX: Si es cajero, lo mandamos directo a Ventas para que facture rápido.
+            // Si es otro rol, lo mandamos a Inicio.
+            if (_usuarioActual.IdRol == (int)RolUsuario.Cajero)
+            {
+                CambiarVista("Ventas");
+            }
+            else
+            {
+                CambiarVista("Inicio");
+            }
         }
+
 
         private void InicializarDock()
         {
@@ -56,20 +73,34 @@ namespace StockOS.UI.WinForms.Forms
                 dockPanel = null;
             }
 
-            // Construir lista de secciones según rol
-            var secciones = new List<string> { "Inicio", "Inventario", "Ventas", "Reportes" };
+            // Todos los perfiles ven al menos el Inicio
+            var secciones = new List<string> { "Inicio" };
 
-            // Si el usuario es Administrador (IdRol == 1), habilitar opción de gestión de Usuarios
-            if (_usuarioActual != null && _usuarioActual.IdRol == 1)
+            // Agregamos los botones según el rol del usuario actual
+            if (_usuarioActual != null)
             {
-                secciones.Add("Usuarios");
+                int idRol = _usuarioActual.IdRol;
+
+                if (idRol == (int)RolUsuario.Gerente)
+                {
+                    // El gerente ve todo
+                    secciones.AddRange(new[] { "Inventario", "Ventas", "Reportes", "Usuarios", "Config." });
+                }
+                else if (idRol == (int)RolUsuario.Cajero)
+                {
+                    // El cajero no ve reportes ni configuraciones
+                    secciones.AddRange(new[] { "Inventario", "Ventas" });
+                }
+                else if (idRol == (int)RolUsuario.Deposito)
+                {
+                    // Depósito solo ve el inventario
+                    secciones.AddRange(new[] { "Inventario" });
+                }
             }
 
-            secciones.Add("Config.");
-
-            // Panel Dock Contenedor
+            // Construcción visual del panel contenedor
             dockPanel = new RoundedPanel();
-            dockPanel.BackColor = Color.FromArgb(30, 38, 56); // Fondo oscuro #1E2638
+            dockPanel.BackColor = Color.FromArgb(30, 38, 56);
             dockPanel.BorderRadius = 25;
             dockPanel.Height = 70;
             dockPanel.Width = secciones.Count * 130;
@@ -95,14 +126,8 @@ namespace StockOS.UI.WinForms.Forms
                 btn.Left = i * btnWidth;
                 btn.Top = 0;
 
-                btn.MouseEnter += (s, e) =>
-                {
-                    btn.ForeColor = Color.FromArgb(16, 185, 129);
-                };
-                btn.MouseLeave += (s, e) =>
-                {
-                    btn.ForeColor = Color.White;
-                };
+                btn.MouseEnter += (s, e) => { btn.ForeColor = Color.FromArgb(16, 185, 129); };
+                btn.MouseLeave += (s, e) => { btn.ForeColor = Color.White; };
 
                 btn.Tag = secciones[i];
                 btn.Click += BotonDock_Click;

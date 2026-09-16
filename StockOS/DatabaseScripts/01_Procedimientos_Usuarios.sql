@@ -71,4 +71,3 @@ BEGIN
     WHERE id_empleado = @IdEmpleado;
 END
 GO
-
