@@ -24,6 +24,7 @@ namespace StockOS.UI.WinForms.Forms
             pnlContenedor = new Panel();
             pnlContenedor.Dock = DockStyle.Fill;
             pnlContenedor.BackColor = Color.FromArgb(30, 41, 59);
+            pnlContenedor.Padding = new Padding(0, 0, 0, 110); // Reserva espacio en la parte inferior para el dock
             this.Controls.Add(pnlContenedor);
             
             // Fix Z-order: pnlHeader must be SendToBack so it evaluates first for Dock=Top

@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 using StockOS.DataAccess.Persistence;
+using System.Data;
 
 namespace StockOS.DataAccess.Repositories
 {
@@ -27,10 +29,19 @@ namespace StockOS.DataAccess.Repositories
 
         public Empleado? ObtenerPorDni(string dni)
         {
-            return _context.Empleados
-                .Include(e => e.IdRolNavigation)
-                .Include(e => e.IdSucursalNavigation)
-                .FirstOrDefault(e => e.Dni == dni);
+            // [Procedimiento 3: sp_Usuarios_Autenticar]
+            var empleado = _context.Empleados
+                .FromSqlRaw("EXEC sp_Usuarios_Autenticar @Dni={0}", dni)
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            if (empleado != null)
+            {
+                _context.Entry(empleado).Reference(e => e.IdRolNavigation).Load();
+                _context.Entry(empleado).Reference(e => e.IdSucursalNavigation).Load();
+            }
+
+            return empleado;
         }
 
         public Empleado? ObtenerPorId(int id)
@@ -51,31 +62,44 @@ namespace StockOS.DataAccess.Repositories
 
         public void Agregar(Empleado empleado)
         {
-            _context.Empleados.Add(empleado);
-            _context.SaveChanges();
+            // [Procedimiento 1: sp_Usuarios_Insertar]
+            var idParam = new SqlParameter
+            {
+                ParameterName = "@IdEmpleado",
+                SqlDbType = SqlDbType.Int,
+                Direction = ParameterDirection.Output
+            };
+
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Usuarios_Insertar @Nombre, @Apellido, @Dni, @Email, @Telefono, @PasswordHash, @IdRol, @IdSucursal, @IdEmpleado OUTPUT",
+                new SqlParameter("@Nombre", empleado.Nombre),
+                new SqlParameter("@Apellido", empleado.Apellido),
+                new SqlParameter("@Dni", empleado.Dni),
+                new SqlParameter("@Email", empleado.Email),
+                new SqlParameter("@Telefono", empleado.Telefono ?? (object)DBNull.Value),
+                new SqlParameter("@PasswordHash", empleado.PasswordHash),
+                new SqlParameter("@IdRol", empleado.IdRol),
+                new SqlParameter("@IdSucursal", empleado.IdSucursal),
+                idParam);
+
+            empleado.IdEmpleado = (int)idParam.Value;
         }
 
         public void Actualizar(Empleado empleado)
         {
-            var existente = _context.Empleados.FirstOrDefault(e => e.IdEmpleado == empleado.IdEmpleado);
-            if (existente != null)
-            {
-                existente.Nombre = empleado.Nombre;
-                existente.Apellido = empleado.Apellido;
-                existente.Dni = empleado.Dni;
-                existente.Email = empleado.Email;
-                existente.Telefono = empleado.Telefono;
-                existente.IdRol = empleado.IdRol;
-                existente.IdSucursal = empleado.IdSucursal;
-                existente.Estado = empleado.Estado;
-
-                if (!string.IsNullOrWhiteSpace(empleado.PasswordHash))
-                {
-                    existente.PasswordHash = empleado.PasswordHash;
-                }
-
-                _context.SaveChanges();
-            }
+            // [Procedimiento 4: sp_Usuarios_Actualizar]
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Usuarios_Actualizar @IdEmpleado, @Nombre, @Apellido, @Dni, @Email, @Telefono, @IdRol, @IdSucursal, @Estado, @PasswordHash",
+                new SqlParameter("@IdEmpleado", empleado.IdEmpleado),
+                new SqlParameter("@Nombre", empleado.Nombre),
+                new SqlParameter("@Apellido", empleado.Apellido),
+                new SqlParameter("@Dni", empleado.Dni),
+                new SqlParameter("@Email", empleado.Email),
+                new SqlParameter("@Telefono", empleado.Telefono ?? (object)DBNull.Value),
+                new SqlParameter("@IdRol", empleado.IdRol),
+                new SqlParameter("@IdSucursal", empleado.IdSucursal),
+                new SqlParameter("@Estado", empleado.Estado),
+                new SqlParameter("@PasswordHash", string.IsNullOrWhiteSpace(empleado.PasswordHash) ? DBNull.Value : empleado.PasswordHash));
         }
 
         public void Eliminar(int id)
@@ -83,29 +107,28 @@ namespace StockOS.DataAccess.Repositories
             var empleado = _context.Empleados.FirstOrDefault(e => e.IdEmpleado == id);
             if (empleado != null)
             {
-                // Si el empleado tiene relaciones históricas, se realiza baja lógica
                 bool tieneHistorial = _context.CajaSesiones.Any(c => c.IdEmpleado == id) ||
                                       _context.Compras.Any(c => c.IdEmpleado == id);
 
                 if (tieneHistorial)
                 {
-                    empleado.Estado = false;
+                    // [Procedimiento 5: sp_Usuarios_CambiarEstado]
+                    _context.Database.ExecuteSqlRaw("EXEC sp_Usuarios_CambiarEstado @IdEmpleado={0}, @Estado={1}", id, false);
                 }
                 else
                 {
                     try
                     {
                         _context.Empleados.Remove(empleado);
+                        _context.SaveChanges();
                     }
                     catch
                     {
-                        // En caso de conflicto de integridad de base de datos imprevisto, respaldar con baja lógica
+                        // [Procedimiento 5: sp_Usuarios_CambiarEstado] (Fallback)
                         _context.Entry(empleado).State = EntityState.Unchanged;
-                        empleado.Estado = false;
+                        _context.Database.ExecuteSqlRaw("EXEC sp_Usuarios_CambiarEstado @IdEmpleado={0}, @Estado={1}", id, false);
                     }
                 }
-
-                _context.SaveChanges();
             }
         }
     }
