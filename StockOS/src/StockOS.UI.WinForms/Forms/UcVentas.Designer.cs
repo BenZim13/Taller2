@@ -25,6 +25,8 @@ namespace StockOS.UI.WinForms.Forms
             pnlBottom = new System.Windows.Forms.Panel();
             lblTextoTotal = new System.Windows.Forms.Label();
             lblTotal = new System.Windows.Forms.Label();
+            lblDescuento = new System.Windows.Forms.Label();
+            txtDescuento = new System.Windows.Forms.TextBox();
             btnCobrar = new System.Windows.Forms.Button();
             dgvTicket = new System.Windows.Forms.DataGridView();
             IdProducto = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -75,6 +77,8 @@ namespace StockOS.UI.WinForms.Forms
             // pnlBottom
             // 
             pnlBottom.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
+            pnlBottom.Controls.Add(lblDescuento);
+            pnlBottom.Controls.Add(txtDescuento);
             pnlBottom.Controls.Add(lblTextoTotal);
             pnlBottom.Controls.Add(lblTotal);
             pnlBottom.Controls.Add(btnCobrar);
@@ -105,6 +109,32 @@ namespace StockOS.UI.WinForms.Forms
             lblTotal.Size = new System.Drawing.Size(137, 59);
             lblTotal.TabIndex = 2;
             lblTotal.Text = "$ 0.00";
+            // 
+            // lblDescuento
+            // 
+            lblDescuento.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            lblDescuento.AutoSize = true;
+            lblDescuento.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            lblDescuento.ForeColor = System.Drawing.Color.White;
+            lblDescuento.Location = new System.Drawing.Point(400, 38);
+            lblDescuento.Name = "lblDescuento";
+            lblDescuento.Size = new System.Drawing.Size(107, 21);
+            lblDescuento.TabIndex = 3;
+            lblDescuento.Text = "Descuento $:";
+            // 
+            // txtDescuento
+            // 
+            txtDescuento.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            txtDescuento.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            txtDescuento.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtDescuento.Font = new System.Drawing.Font("Segoe UI", 16F);
+            txtDescuento.ForeColor = System.Drawing.Color.White;
+            txtDescuento.Location = new System.Drawing.Point(515, 32);
+            txtDescuento.Name = "txtDescuento";
+            txtDescuento.Size = new System.Drawing.Size(110, 36);
+            txtDescuento.TabIndex = 4;
+            txtDescuento.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            txtDescuento.TextChanged += txtDescuento_TextChanged;
             // 
             // btnCobrar
             // 
@@ -220,7 +250,6 @@ namespace StockOS.UI.WinForms.Forms
         }
 
         #endregion
-
         private System.Windows.Forms.Panel pnlTop;
         private System.Windows.Forms.Label lblBuscador;
         private System.Windows.Forms.TextBox txtCodigoBarra;
@@ -229,6 +258,8 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblTextoTotal;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnCobrar;
+        private System.Windows.Forms.Label lblDescuento;
+        private System.Windows.Forms.TextBox txtDescuento;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdProducto;
         private System.Windows.Forms.DataGridViewTextBoxColumn Producto;
         private System.Windows.Forms.DataGridViewTextBoxColumn Cantidad;

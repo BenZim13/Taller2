@@ -33,13 +33,19 @@ namespace StockOS.DataAccess.Repositories
                         Direction = ParameterDirection.Output
                     };
 
+                    // Creamos el parámetro explícito para que EF Core sepa que es un número entero (INT)
+                    var idClienteParam = new SqlParameter("@IdCliente", SqlDbType.Int)
+                    {
+                        Value = cabecera.IdCliente ?? (object)DBNull.Value
+                    };
+
                     _context.Database.ExecuteSqlRaw(
                         "EXEC sp_Ventas_Insertar @Subtotal={0}, @DescuentoTotal={1}, @TotalVenta={2}, @IdCajaSesion={3}, @IdCliente={4}, @IdVenta=@IdVenta OUTPUT",
                         cabecera.Subtotal,
                         cabecera.DescuentoTotal,
                         cabecera.TotalVenta,
                         cabecera.IdCajaSesion,
-                        cabecera.IdCliente ?? (object)DBNull.Value, // Si no hay cliente, pasamos NULL a SQL
+                        idClienteParam,
                         idVentaParam);
 
                     int idVentaGenerado = (int)idVentaParam.Value;
@@ -58,14 +64,14 @@ namespace StockOS.DataAccess.Repositories
                             item.IdProducto, idSucursal, item.Cantidad);
                     }
 
-                    // 3. Si llegamos hasta acá sin errores, confirmamos todo en la base de datos
+                    // 3. Si se llegó hasta acá sin errores, confirmamos todo en la bd
                     transaction.Commit();
 
                     return idVentaGenerado;
                 }
                 catch (Exception)
                 {
-                    // Si algo falla (ej. error de SQL, corte de conexión), se reverte TODO
+                    // Si algo falla (ej. error de SQL, corte de conexión), se hace rollback de TODO
                     transaction.Rollback();
                     throw; // Lanzamos el error hacia arriba para que el formulario lo muestre
                 }

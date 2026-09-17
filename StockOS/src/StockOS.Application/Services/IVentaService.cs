@@ -5,6 +5,6 @@ namespace StockOS.Application.Services
 {
     public interface IVentaService
     {
-        int ProcesarNuevaVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal);
+        int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal);
     }
 }

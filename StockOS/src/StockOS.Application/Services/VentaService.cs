@@ -13,11 +13,8 @@ namespace StockOS.Application.Services
             _ventaRepo = ventaRepo;
         }
 
-        public int ProcesarNuevaVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal)
+        public int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal)
         {
-            // Aca en el futuro podemo agregar validaciones lógicas antes de ir a BD (asi no usamos tantos SP's Benja)
-            // Por ejemplo: if (detalles.Count == 0) throw new Exception("La venta está vacía");
-
             return _ventaRepo.RegistrarVenta(cabecera, detalles, idSucursal);
         }
     }
