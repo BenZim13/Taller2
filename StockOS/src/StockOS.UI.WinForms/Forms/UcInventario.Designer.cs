@@ -80,7 +80,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnNuevo.Name = "btnNuevo";
             this.btnNuevo.Size = new System.Drawing.Size(120, 32);
             this.btnNuevo.TabIndex = 4;
-            this.btnNuevo.Text = "➕ Nuevo Producto";
+            this.btnNuevo.Text = "+ Nuevo";
             this.btnNuevo.UseVisualStyleBackColor = false;
             // 
             // btnRecargar
@@ -140,7 +140,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblTituloLista.Name = "lblTituloLista";
             this.lblTituloLista.Size = new System.Drawing.Size(120, 30);
             this.lblTituloLista.TabIndex = 0;
-            this.lblTituloLista.Text = "Inventario";
+            this.lblTituloLista.Text = "";
             // 
             // pnlFiltros
             // 
@@ -178,7 +178,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             this.lblFiltroEstado.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblFiltroEstado.AutoSize = true;
-            this.lblFiltroEstado.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblFiltroEstado.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblFiltroEstado.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
             this.lblFiltroEstado.Location = new System.Drawing.Point(778, 13);
             this.lblFiltroEstado.Name = "lblFiltroEstado";
@@ -201,7 +201,7 @@ namespace StockOS.UI.WinForms.Forms
             // lblBuscar
             // 
             this.lblBuscar.AutoSize = true;
-            this.lblBuscar.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblBuscar.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.lblBuscar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
             this.lblBuscar.Location = new System.Drawing.Point(25, 13);
             this.lblBuscar.Name = "lblBuscar";

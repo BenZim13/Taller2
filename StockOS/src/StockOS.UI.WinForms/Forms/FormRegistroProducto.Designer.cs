@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormRegistroProducto
     {
@@ -83,7 +83,7 @@
             this.lblCodigoBarra.Name = "lblCodigoBarra";
             this.lblCodigoBarra.Size = new System.Drawing.Size(117, 19);
             this.lblCodigoBarra.TabIndex = 1;
-            this.lblCodigoBarra.Text = "CÃ³digo de Barras";
+            this.lblCodigoBarra.Text = "Código";
             // 
             // txtCodigoBarra
             // 
@@ -123,7 +123,7 @@
             this.lblCategoria.Name = "lblCategoria";
             this.lblCategoria.Size = new System.Drawing.Size(68, 19);
             this.lblCategoria.TabIndex = 5;
-            this.lblCategoria.Text = "CategorÃ­a";
+            this.lblCategoria.Text = "Categoría";
             // 
             // cmbCategoria
             // 
@@ -165,7 +165,7 @@
             this.lblDescripcion.Name = "lblDescripcion";
             this.lblDescripcion.Size = new System.Drawing.Size(79, 19);
             this.lblDescripcion.TabIndex = 9;
-            this.lblDescripcion.Text = "DescripciÃ³n";
+            this.lblDescripcion.Text = "Descripción";
             // 
             // txtDescripcion
             // 

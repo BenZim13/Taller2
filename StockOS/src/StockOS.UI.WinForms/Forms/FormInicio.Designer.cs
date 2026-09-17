@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormInicio
     {
@@ -55,13 +55,12 @@
             btnSalirApp.FlatStyle = FlatStyle.Flat;
             btnSalirApp.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnSalirApp.ForeColor = Color.White;
-            btnSalirApp.Location = new Point(670, 20);
+            btnSalirApp.Location = new Point(640, 20);
             btnSalirApp.Name = "btnSalirApp";
-            btnSalirApp.Size = new Size(100, 40);
+            btnSalirApp.Size = new Size(130, 40);
             btnSalirApp.TabIndex = 1;
-            btnSalirApp.Text = "Salir";
+            btnSalirApp.Text = "Cerrar Sesión";
             btnSalirApp.UseVisualStyleBackColor = false;
-            btnSalirApp.Click += (s, e) => System.Windows.Forms.Application.Exit();
             // 
             // FormInicio
             // 

@@ -68,33 +68,46 @@ namespace StockOS.UI.WinForms.Forms
 
                 }).Build();
             
-            // 3. Obtenemos el formulario de login desde el contenedor
-            var formLogin = host.Services.GetRequiredService<FormLogin>();
-
-            // Mostrarlo como un cuadro de diálogo (bloqueante)
-            if (formLogin.ShowDialog() == DialogResult.OK)
+            // 3. Bucle principal para soportar cierre de sesión y cambio de usuario
+            while (true)
             {
-                // 4. Capturamos el usuario logueado
-                var usuario = formLogin.UsuarioAutenticado;
-                var formInicio = host.Services.GetRequiredService<FormInicio>();
+                var formLogin = host.Services.GetRequiredService<FormLogin>();
 
-                // 5. Le pasamos el empleado al menú principal
-                if (usuario != null)
+                // Mostrar el login como un cuadro de diálogo (bloqueante)
+                if (formLogin.ShowDialog() == DialogResult.OK)
                 {
-                    formInicio.EstablecerUsuario(usuario);
-                }
+                    // 4. Capturamos el usuario logueado
+                    var usuario = formLogin.UsuarioAutenticado;
+                    var formInicio = host.Services.GetRequiredService<FormInicio>();
 
-                // 6. Iniciamos el ciclo de vida de la app con el formulario principal
-                System.Windows.Forms.Application.Run(formInicio);
+                    // 5. Le pasamos el empleado al menú principal
+                    if (usuario != null)
+                    {
+                        formInicio.EstablecerUsuario(usuario);
+                    }
+
+                    // 6. Iniciamos el ciclo de vida de la app con el formulario principal
+                    System.Windows.Forms.Application.Run(formInicio);
+
+                    // 7. Al cerrarse el formulario principal, verificamos si fue por cierre de sesión
+                    if (formInicio.LogoutRequested)
+                    {
+                        // Limpiamos la sesión global
+                        StockOS.Application.Services.SesionActual.Usuario = null;
+                        continue; // Volvemos a mostrar el login
+                    }
+                    else
+                    {
+                        // Se cerró desde la 'X', por lo tanto salimos de la aplicación
+                        break;
+                    }
+                }
+                else
+                {
+                    // 8. Si cerró la ventana de login (X o botón Salir), salimos de la aplicación
+                    break;
+                }
             }
-            else
-            {
-                // 7. Si cerró la ventana en la "X" sin loguearse, salimos
-                System.Windows.Forms.Application.Exit();
-            }
-            /*// 2. Ejecutamos directamente el formulario de registro
-            var formRegistro = host.Services.GetRequiredService<FormRegistroUsuario>();
-            System.Windows.Forms.Application.Run(formRegistro);*/
         }
     }
 }

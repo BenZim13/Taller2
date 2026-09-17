@@ -58,7 +58,7 @@ namespace StockOS.UI.WinForms.Forms
             lblBuscador.Name = "lblBuscador";
             lblBuscador.Size = new System.Drawing.Size(268, 21);
             lblBuscador.TabIndex = 1;
-            lblBuscador.Text = "Código de Barras (Presione Enter):";
+            lblBuscador.Text = "Código:";
             // 
             // txtCodigoBarra
             // 
@@ -66,7 +66,7 @@ namespace StockOS.UI.WinForms.Forms
             txtCodigoBarra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             txtCodigoBarra.Font = new System.Drawing.Font("Segoe UI", 16F);
             txtCodigoBarra.ForeColor = System.Drawing.Color.White;
-            txtCodigoBarra.Location = new System.Drawing.Point(300, 22);
+            txtCodigoBarra.Location = new System.Drawing.Point(100, 22);
             txtCodigoBarra.Name = "txtCodigoBarra";
             txtCodigoBarra.Size = new System.Drawing.Size(400, 36);
             txtCodigoBarra.TabIndex = 0;

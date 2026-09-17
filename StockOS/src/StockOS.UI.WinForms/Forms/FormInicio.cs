@@ -16,11 +16,14 @@ namespace StockOS.UI.WinForms.Forms
         private RoundedPanel? dockPanel;
         private Panel pnlContenedor;
         private Empleado? _usuarioActual;
+        public bool LogoutRequested { get; private set; } = false;
 
         public FormInicio(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
             InitializeComponent();
+            
+            btnSalirApp.Click += BtnCerrarSesion_Click;
 
             // Inicializar el contenedor principal donde cargarán las vistas
             pnlContenedor = new Panel();
@@ -33,6 +36,19 @@ namespace StockOS.UI.WinForms.Forms
             // pnlContenedor must be BringToFront so it evaluates last for Dock=Fill
             pnlContenedor.BringToFront();
             pnlHeader.SendToBack();
+
+            // Establecer el tamaño mínimo dinámicamente a la mitad del ancho y el total del alto de la pantalla
+            var screen = Screen.PrimaryScreen;
+            if (screen != null)
+            {
+                var areaTrabajo = screen.WorkingArea;
+                this.MinimumSize = new Size(areaTrabajo.Width / 2, areaTrabajo.Height);
+                this.Size = this.MinimumSize; // Para que al desmaximizar tome este tamaño por defecto
+            }
+            else
+            {
+                this.MinimumSize = new Size(960, 1080);
+            }
 
             this.Resize += FormInicio_Resize;
         }
@@ -63,6 +79,15 @@ namespace StockOS.UI.WinForms.Forms
             }
         }
 
+        private void BtnCerrarSesion_Click(object? sender, EventArgs e)
+        {
+            var result = MessageBox.Show("¿Está seguro de que desea cerrar sesión?", "Confirmar Cierre de Sesión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                LogoutRequested = true;
+                this.Close();
+            }
+        }
 
         private void InicializarDock()
         {
@@ -73,8 +98,7 @@ namespace StockOS.UI.WinForms.Forms
                 dockPanel = null;
             }
 
-            // Todos los perfiles ven al menos el Inicio
-            var secciones = new List<string> { "Inicio" };
+            var secciones = new List<string>();
 
             // Agregamos los botones según el rol del usuario actual
             if (_usuarioActual != null)
@@ -84,22 +108,22 @@ namespace StockOS.UI.WinForms.Forms
                 if (idRol == (int)RolUsuario.Gerente)
                 {
                     // El gerente ve todo
-                    secciones.AddRange(new[] { "Inventario", "Ventas", "Reportes", "Usuarios", "Config." });
+                    secciones.AddRange(new[] { "Inicio", "Inventario", "Ventas", "Reportes", "Usuarios", "Config." });
                 }
                 else if (idRol == (int)RolUsuario.Cajero)
                 {
-                    // El cajero no ve reportes ni configuraciones
-                    secciones.AddRange(new[] { "Inventario", "Ventas" });
+                    // El cajero no ve Inicio, primero Ventas, luego Inventario
+                    secciones.AddRange(new[] { "Ventas", "Inventario" });
                 }
                 else if (idRol == (int)RolUsuario.EncargadoDeposito)
                 {
-                    // EncargadoDeposito solo ve el inventario
-                    secciones.AddRange(new[] { "Inventario" });
+                    // EncargadoDeposito solo ve el inventario (e Inicio)
+                    secciones.AddRange(new[] { "Inicio", "Inventario" });
                 }
                 else if (idRol == (int)RolUsuario.Repositor)
                 {
-                    // Repositor solo ve el inventario
-                    secciones.AddRange(new[] { "Inventario" });
+                    // Repositor solo ve el inventario (e Inicio)
+                    secciones.AddRange(new[] { "Inicio", "Inventario" });
                 }
             }
 
@@ -162,14 +186,27 @@ namespace StockOS.UI.WinForms.Forms
             {
                 case "Inicio":
                     lblTitulo.Text = $"Bienvenido a StockOS — {_usuarioActual?.Nombre} {_usuarioActual?.Apellido}";
-                    nuevaVista = new UcInicio();
+                    var ucInicio = new UcInicio();
+                    if (_usuarioActual != null)
+                    {
+                        ucInicio.SetUsuario(_usuarioActual);
+                    }
+                    nuevaVista = ucInicio;
                     break;
                 case "Inventario":
                     lblTitulo.Text = "Inventario";
                     nuevaVista = _serviceProvider.GetRequiredService<UcInventario>();
                     break;
                 case "Ventas":
-                    lblTitulo.Text = "Ventas";
+                    if (_usuarioActual != null)
+                    {
+                        string rolVentas = _usuarioActual.IdRol == (int)RolUsuario.Gerente ? "Administrador" : "Cajero";
+                        lblTitulo.Text = $"Ventas     |     {rolVentas}: {_usuarioActual.Nombre} {_usuarioActual.Apellido}";
+                    }
+                    else
+                    {
+                        lblTitulo.Text = "Ventas";
+                    }
                     nuevaVista = _serviceProvider.GetRequiredService<UcVentas>();
                     break;
                 case "Reportes":

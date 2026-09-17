@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormIngresoStock
     {
@@ -78,7 +78,7 @@
             this.lblCodigo.Name = "lblCodigo";
             this.lblCodigo.Size = new System.Drawing.Size(117, 19);
             this.lblCodigo.TabIndex = 1;
-            this.lblCodigo.Text = "Código de Barras";
+            this.lblCodigo.Text = "Código";
             // 
             // txtCodigo
             // 
