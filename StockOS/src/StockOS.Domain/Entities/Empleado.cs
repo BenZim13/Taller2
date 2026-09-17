@@ -15,6 +15,8 @@ public partial class Empleado
 
     public string Email { get; set; } = null!;
 
+    public string Direccion { get; set; } = null!;
+
     public string Telefono { get; set; } = null!;
 
     public string PasswordHash { get; set; } = null!;
@@ -33,3 +35,5 @@ public partial class Empleado
 
     public virtual Sucursal IdSucursalNavigation { get; set; } = null!;
 }
+
+

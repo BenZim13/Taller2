@@ -40,6 +40,24 @@
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "Apertura de Caja";
             // 
+            // btnSalirApp
+            // 
+            this.btnSalirApp = new System.Windows.Forms.Button();
+            this.btnSalirApp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.btnSalirApp.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
+            this.btnSalirApp.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSalirApp.FlatAppearance.BorderSize = 0;
+            this.btnSalirApp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalirApp.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSalirApp.ForeColor = System.Drawing.Color.White;
+            this.btnSalirApp.Location = new System.Drawing.Point(250, 10);
+            this.btnSalirApp.Name = "btnSalirApp";
+            this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
+            this.btnSalirApp.TabIndex = 99;
+            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.UseVisualStyleBackColor = false;
+            this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
+            // 
             // pnlHeader
             // 
             pnlHeader.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
@@ -169,6 +187,7 @@
         #endregion
 
         private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Button btnSalirApp;
         private System.Windows.Forms.Label lblTitulo;
         private System.Windows.Forms.Label lblCaja;
         private System.Windows.Forms.ComboBox cmbCaja;

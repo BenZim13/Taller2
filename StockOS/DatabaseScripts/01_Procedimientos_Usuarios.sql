@@ -1,4 +1,4 @@
-USE StockOS;
+﻿USE StockOS;
 GO
 
 -- 1. Insertar Usuario
@@ -7,6 +7,7 @@ CREATE OR ALTER PROCEDURE sp_Usuarios_Insertar
     @Apellido VARCHAR(50),
     @Dni VARCHAR(20),
     @Email VARCHAR(100),
+    @Direccion VARCHAR(255),
     @Telefono VARCHAR(30),
     @PasswordHash VARCHAR(255),
     @IdRol INT,
@@ -14,8 +15,8 @@ CREATE OR ALTER PROCEDURE sp_Usuarios_Insertar
     @IdEmpleado INT OUTPUT
 AS
 BEGIN
-    INSERT INTO empleado (nombre, apellido, dni, email, telefono, password_hash, estado, id_rol, id_sucursal)
-    VALUES (@Nombre, @Apellido, @Dni, @Email, @Telefono, @PasswordHash, 1, @IdRol, @IdSucursal);
+    INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal)
+    VALUES (@Nombre, @Apellido, @Dni, @Email, @Direccion, @Telefono, @PasswordHash, 1, @IdRol, @IdSucursal);
     
     SET @IdEmpleado = SCOPE_IDENTITY();
 END
@@ -26,7 +27,7 @@ CREATE OR ALTER PROCEDURE sp_Usuarios_Autenticar
     @Dni VARCHAR(20)
 AS
 BEGIN
-    SELECT id_empleado, nombre, apellido, dni, email, telefono, password_hash, estado, id_rol, id_sucursal
+    SELECT id_empleado, nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal
     FROM empleado 
     WHERE dni = @Dni;
 END
@@ -39,6 +40,7 @@ CREATE OR ALTER PROCEDURE sp_Usuarios_Actualizar
     @Apellido VARCHAR(50),
     @Dni VARCHAR(20),
     @Email VARCHAR(100),
+    @Direccion VARCHAR(255),
     @Telefono VARCHAR(30),
     @IdRol INT,
     @IdSucursal INT,
@@ -51,6 +53,7 @@ BEGIN
         apellido = @Apellido, 
         dni = @Dni, 
         email = @Email, 
+        direccion = @Direccion, 
         telefono = @Telefono, 
         id_rol = @IdRol, 
         id_sucursal = @IdSucursal,
@@ -60,7 +63,7 @@ BEGIN
 END
 GO
 
--- 4. Cambiar Estado (Baja Lógica / Suspensión)
+-- 4. Cambiar Estado (Baja LÃ³gica / SuspensiÃ³n)
 CREATE OR ALTER PROCEDURE sp_Usuarios_CambiarEstado
     @IdEmpleado INT,
     @Estado BIT

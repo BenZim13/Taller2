@@ -115,5 +115,12 @@ namespace StockOS.UI.WinForms.Forms
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
+        private void btnSalirApp_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Application.Exit();
+        }
+
+
     }
 }
+

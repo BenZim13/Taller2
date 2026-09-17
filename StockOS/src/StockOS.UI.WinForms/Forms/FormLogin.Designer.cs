@@ -57,6 +57,7 @@ namespace StockOS.UI.WinForms.Forms
             btnSalir.BackColor = Color.FromArgb(239, 68, 68);
             btnSalir.Cursor = Cursors.Hand;
             btnSalir.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
+            btnSalir.FlatAppearance.BorderSize = 0;
             btnSalir.FlatStyle = FlatStyle.Flat;
             btnSalir.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnSalir.ForeColor = Color.White;
@@ -206,8 +207,4 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblError;
     }
 }
-
-
-
-
 

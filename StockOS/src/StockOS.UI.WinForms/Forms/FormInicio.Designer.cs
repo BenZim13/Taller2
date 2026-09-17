@@ -1,4 +1,4 @@
-namespace StockOS.UI.WinForms.Forms
+﻿namespace StockOS.UI.WinForms.Forms
 {
     partial class FormInicio
     {
@@ -18,6 +18,7 @@ namespace StockOS.UI.WinForms.Forms
         private void InitializeComponent()
         {
             pnlHeader = new Panel();
+            btnSalirApp = new Button();
             lblTitulo = new Label();
             pnlHeader.SuspendLayout();
             SuspendLayout();
@@ -26,6 +27,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             pnlHeader.BackColor = Color.FromArgb(16, 185, 129);
             pnlHeader.Controls.Add(lblTitulo);
+            pnlHeader.Controls.Add(btnSalirApp);
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Location = new Point(0, 0);
             pnlHeader.Name = "pnlHeader";
@@ -42,6 +44,24 @@ namespace StockOS.UI.WinForms.Forms
             lblTitulo.Size = new Size(261, 32);
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "Bienvenido a StockOS";
+            
+            // 
+            // btnSalirApp
+            // 
+            btnSalirApp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnSalirApp.BackColor = Color.FromArgb(239, 68, 68);
+            btnSalirApp.Cursor = Cursors.Hand;
+            btnSalirApp.FlatAppearance.BorderSize = 0;
+            btnSalirApp.FlatStyle = FlatStyle.Flat;
+            btnSalirApp.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnSalirApp.ForeColor = Color.White;
+            btnSalirApp.Location = new Point(670, 20);
+            btnSalirApp.Name = "btnSalirApp";
+            btnSalirApp.Size = new Size(100, 40);
+            btnSalirApp.TabIndex = 1;
+            btnSalirApp.Text = "Salir";
+            btnSalirApp.UseVisualStyleBackColor = false;
+            btnSalirApp.Click += (s, e) => System.Windows.Forms.Application.Exit();
             // 
             // FormInicio
             // 
@@ -63,8 +83,12 @@ namespace StockOS.UI.WinForms.Forms
 
         #endregion
 
+        private System.Windows.Forms.Button btnSalirApp;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitulo;
     }
 }
+
+
+
 

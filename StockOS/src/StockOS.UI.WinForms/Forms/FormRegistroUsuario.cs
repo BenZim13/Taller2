@@ -71,6 +71,7 @@ namespace StockOS.UI.WinForms.Forms
                 txtNombre.Text = _empleadoEdicion.Nombre;
                 textApellido.Text = _empleadoEdicion.Apellido;
                 textEmail.Text = _empleadoEdicion.Email;
+                txtDireccion.Text = _empleadoEdicion.Direccion;
                 txtCelular.Text = _empleadoEdicion.Telefono;
                 txtPassword.Clear();
 
@@ -124,6 +125,7 @@ namespace StockOS.UI.WinForms.Forms
                 txtNombre.Text = _empleadoEdicion.Nombre;
                 textApellido.Text = _empleadoEdicion.Apellido;
                 textEmail.Text = _empleadoEdicion.Email;
+                txtDireccion.Text = _empleadoEdicion.Direccion;
                 txtCelular.Text = _empleadoEdicion.Telefono;
                 txtPassword.Clear();
 
@@ -145,6 +147,7 @@ namespace StockOS.UI.WinForms.Forms
             string apellido = textApellido.Text.Trim();
             string dni = txtDNI.Text.Trim();
             string email = textEmail.Text.Trim();
+            string direccion = txtDireccion.Text.Trim();
             string celular = txtCelular.Text.Trim();
             string password = txtPassword.Text;
 
@@ -152,10 +155,12 @@ namespace StockOS.UI.WinForms.Forms
                 string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(dni) ||
                 string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(direccion) ||
+                string.IsNullOrWhiteSpace(celular) ||
                 cmbRol.SelectedValue == null ||
                 cmbSucursal.SelectedValue == null)
             {
-                MessageBox.Show("Nombre, Apellido, DNI, Email, Rol y Sucursal son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Todos los campos (Nombre, Apellido, DNI, Email, Dirección, Celular, Rol y Sucursal) son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -179,6 +184,7 @@ namespace StockOS.UI.WinForms.Forms
                     Apellido = apellido,
                     Dni = dni,
                     Email = email,
+                    Direccion = direccion,
                     Telefono = celular,
                     PasswordHash = password, // Se manda plana, el AuthService la encripta
                     Estado = true,
@@ -186,7 +192,6 @@ namespace StockOS.UI.WinForms.Forms
                     IdSucursal = idSucursal
                 };
 
-                // 2. CAMBIO AQUÍ: Usamos _authService en lugar de _empleadoService
                 bool exito = await _authService.RegistrarAsync(nuevoEmpleado);
 
                 if (exito)
@@ -210,13 +215,13 @@ namespace StockOS.UI.WinForms.Forms
                 _empleadoEdicion.Apellido = apellido;
                 _empleadoEdicion.Dni = dni;
                 _empleadoEdicion.Email = email;
+                _empleadoEdicion.Direccion = direccion;
                 _empleadoEdicion.Telefono = celular;
                 _empleadoEdicion.IdRol = idRol;
                 _empleadoEdicion.IdSucursal = idSucursal;
 
                 if (!string.IsNullOrWhiteSpace(password))
                 {
-                    // 3. CAMBIO AQUÍ: Encriptamos la nueva contraseña antes de guardarla
                     _empleadoEdicion.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
                 }
 
@@ -237,9 +242,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnCancelar_Click(object? sender, EventArgs e)
         {
-            OperacionTerminada?.Invoke();
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            LimpiarFormulario();
+            MessageBox.Show("Se limpiaron los campos.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void FormRegistroUsuario_Load_1(object sender, EventArgs e)
@@ -248,3 +252,4 @@ namespace StockOS.UI.WinForms.Forms
         }
     }
 }
+

@@ -18,6 +18,7 @@
         private void InitializeComponent()
         {
             this.pnlHeader = new System.Windows.Forms.Panel();
+            this.btnSalirApp = new System.Windows.Forms.Button();
             this.lblTitulo = new System.Windows.Forms.Label();
             this.lblCodigo = new System.Windows.Forms.Label();
             this.txtCodigo = new System.Windows.Forms.TextBox();
@@ -29,10 +30,29 @@
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
+            // btnSalirApp
+            // 
+            this.btnSalirApp = new System.Windows.Forms.Button();
+            this.btnSalirApp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.btnSalirApp.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
+            this.btnSalirApp.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSalirApp.FlatAppearance.BorderSize = 0;
+            this.btnSalirApp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalirApp.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSalirApp.ForeColor = System.Drawing.Color.White;
+            this.btnSalirApp.Location = new System.Drawing.Point(300, 10);
+            this.btnSalirApp.Name = "btnSalirApp";
+            this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
+            this.btnSalirApp.TabIndex = 99;
+            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.UseVisualStyleBackColor = false;
+            this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
+            // 
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
             this.pnlHeader.Controls.Add(this.lblTitulo);
+            this.pnlHeader.Controls.Add(this.btnSalirApp);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
@@ -162,6 +182,7 @@
         #endregion
 
         private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Button btnSalirApp;
         private System.Windows.Forms.Label lblTitulo;
         private System.Windows.Forms.Label lblCodigo;
         private System.Windows.Forms.TextBox txtCodigo;

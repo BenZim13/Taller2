@@ -1,4 +1,4 @@
-namespace StockOS.UI.WinForms.Forms
+﻿namespace StockOS.UI.WinForms.Forms
 {
     partial class FormRegistroProducto
     {
@@ -18,6 +18,7 @@ namespace StockOS.UI.WinForms.Forms
         private void InitializeComponent()
         {
             this.pnlHeader = new System.Windows.Forms.Panel();
+            this.btnSalirApp = new System.Windows.Forms.Button();
             this.lblTitulo = new System.Windows.Forms.Label();
             this.lblCodigoBarra = new System.Windows.Forms.Label();
             this.txtCodigoBarra = new System.Windows.Forms.TextBox();
@@ -34,10 +35,29 @@ namespace StockOS.UI.WinForms.Forms
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
+            // btnSalirApp
+            // 
+            this.btnSalirApp = new System.Windows.Forms.Button();
+            this.btnSalirApp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.btnSalirApp.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
+            this.btnSalirApp.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSalirApp.FlatAppearance.BorderSize = 0;
+            this.btnSalirApp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalirApp.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSalirApp.ForeColor = System.Drawing.Color.White;
+            this.btnSalirApp.Location = new System.Drawing.Point(380, 10);
+            this.btnSalirApp.Name = "btnSalirApp";
+            this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
+            this.btnSalirApp.TabIndex = 99;
+            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.UseVisualStyleBackColor = false;
+            this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
+            // 
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
             this.pnlHeader.Controls.Add(this.lblTitulo);
+            this.pnlHeader.Controls.Add(this.btnSalirApp);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
@@ -63,7 +83,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblCodigoBarra.Name = "lblCodigoBarra";
             this.lblCodigoBarra.Size = new System.Drawing.Size(117, 19);
             this.lblCodigoBarra.TabIndex = 1;
-            this.lblCodigoBarra.Text = "Código de Barras";
+            this.lblCodigoBarra.Text = "CÃ³digo de Barras";
             // 
             // txtCodigoBarra
             // 
@@ -103,7 +123,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblCategoria.Name = "lblCategoria";
             this.lblCategoria.Size = new System.Drawing.Size(68, 19);
             this.lblCategoria.TabIndex = 5;
-            this.lblCategoria.Text = "Categoría";
+            this.lblCategoria.Text = "CategorÃ­a";
             // 
             // cmbCategoria
             // 
@@ -145,7 +165,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblDescripcion.Name = "lblDescripcion";
             this.lblDescripcion.Size = new System.Drawing.Size(79, 19);
             this.lblDescripcion.TabIndex = 9;
-            this.lblDescripcion.Text = "Descripción";
+            this.lblDescripcion.Text = "DescripciÃ³n";
             // 
             // txtDescripcion
             // 
@@ -226,6 +246,7 @@ namespace StockOS.UI.WinForms.Forms
         #endregion
 
         private System.Windows.Forms.Panel pnlHeader;
+        private System.Windows.Forms.Button btnSalirApp;
         private System.Windows.Forms.Label lblTitulo;
         private System.Windows.Forms.Label lblCodigoBarra;
         private System.Windows.Forms.TextBox txtCodigoBarra;

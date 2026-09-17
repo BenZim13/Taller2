@@ -71,11 +71,12 @@ namespace StockOS.DataAccess.Repositories
             };
 
             _context.Database.ExecuteSqlRaw(
-                "EXEC sp_Usuarios_Insertar @Nombre, @Apellido, @Dni, @Email, @Telefono, @PasswordHash, @IdRol, @IdSucursal, @IdEmpleado OUTPUT",
+                "EXEC sp_Usuarios_Insertar @Nombre, @Apellido, @Dni, @Email, @Direccion, @Telefono, @PasswordHash, @IdRol, @IdSucursal, @IdEmpleado OUTPUT",
                 new SqlParameter("@Nombre", empleado.Nombre),
                 new SqlParameter("@Apellido", empleado.Apellido),
                 new SqlParameter("@Dni", empleado.Dni),
                 new SqlParameter("@Email", empleado.Email),
+                new SqlParameter("@Direccion", empleado.Direccion ?? (object)DBNull.Value),
                 new SqlParameter("@Telefono", empleado.Telefono ?? (object)DBNull.Value),
                 new SqlParameter("@PasswordHash", empleado.PasswordHash),
                 new SqlParameter("@IdRol", empleado.IdRol),
@@ -89,12 +90,13 @@ namespace StockOS.DataAccess.Repositories
         {
             // [Procedimiento 4: sp_Usuarios_Actualizar]
             _context.Database.ExecuteSqlRaw(
-                "EXEC sp_Usuarios_Actualizar @IdEmpleado, @Nombre, @Apellido, @Dni, @Email, @Telefono, @IdRol, @IdSucursal, @Estado, @PasswordHash",
+                "EXEC sp_Usuarios_Actualizar @IdEmpleado, @Nombre, @Apellido, @Dni, @Email, @Direccion, @Telefono, @IdRol, @IdSucursal, @Estado, @PasswordHash",
                 new SqlParameter("@IdEmpleado", empleado.IdEmpleado),
                 new SqlParameter("@Nombre", empleado.Nombre),
                 new SqlParameter("@Apellido", empleado.Apellido),
                 new SqlParameter("@Dni", empleado.Dni),
                 new SqlParameter("@Email", empleado.Email),
+                new SqlParameter("@Direccion", empleado.Direccion ?? (object)DBNull.Value),
                 new SqlParameter("@Telefono", empleado.Telefono ?? (object)DBNull.Value),
                 new SqlParameter("@IdRol", empleado.IdRol),
                 new SqlParameter("@IdSucursal", empleado.IdSucursal),
@@ -133,3 +135,4 @@ namespace StockOS.DataAccess.Repositories
         }
     }
 }
+

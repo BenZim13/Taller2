@@ -291,6 +291,10 @@ public partial class StockOsContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("email");
+            entity.Property(e => e.Direccion)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("direccion");
             entity.Property(e => e.Estado)
                 .HasDefaultValue(true)
                 .HasColumnName("estado");
@@ -614,3 +618,4 @@ public partial class StockOsContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

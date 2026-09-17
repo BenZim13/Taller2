@@ -73,5 +73,12 @@ namespace StockOS.UI.WinForms.Forms
                 e.Handled = true;
             }
         }
+        private void btnSalirApp_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Application.Exit();
+        }
+
+
     }
 }
+
