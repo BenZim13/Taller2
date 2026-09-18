@@ -1,14 +1,13 @@
-﻿using StockOS.Domain.Entities;
-using System;
+using StockOS.Domain.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StockOS.Domain.Interfaces
 {
     public interface ICategoriaRepository
     {
         IEnumerable<Categoria> ObtenerTodos();
+        void Agregar(Categoria categoria);
+        void Actualizar(Categoria categoria);
     }
 }
+

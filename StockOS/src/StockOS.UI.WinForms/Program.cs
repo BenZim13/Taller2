@@ -56,6 +56,7 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddTransient<UcUsuarios>();
                     services.AddTransient<FormRegistroProducto>();
                     services.AddTransient<FormIngresoStock>();
+                    services.AddTransient<FormCategoria>();
                     services.AddTransient<FormAperturaCaja>();
                     
 

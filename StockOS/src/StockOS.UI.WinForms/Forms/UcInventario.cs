@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using StockOS.Application.Services;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Enums;
@@ -62,8 +62,10 @@ namespace StockOS.UI.WinForms.Forms
 
             // Botones
             btnRecargar.Click += (s, e) => CargarDatos();
+            dgvProductos.SelectionChanged += DgvProductos_SelectionChanged;
             btnNuevo.Click += BtnNuevo_Click;
             btnIngresarStock.Click += BtnIngresarStock_Click;
+            btnCategorias.Click += BtnCategorias_Click;
             btnEditar.Click += (s, e) => EditarSeleccionado();
             btnEliminar.Click += BtnEliminar_Click;
             // Capturar cuando la lectora de barras presiona ENTER
@@ -80,6 +82,7 @@ namespace StockOS.UI.WinForms.Forms
             {
                 btnNuevo.Visible = false;
                 btnIngresarStock.Visible = false;
+                btnCategorias.Visible = false;
                 btnEditar.Visible = false;
                 btnEliminar.Visible = false;
             }
@@ -167,20 +170,41 @@ namespace StockOS.UI.WinForms.Forms
                 CargarDatos();
             }
         }
+        private void DgvProductos_SelectionChanged(object? sender, EventArgs e)
+        {
+            var producto = ObtenerProductoSeleccionadoSilencioso();
+            if (producto != null)
+            {
+                if (producto.Activo == true)
+                {
+                    btnEliminar.Text = "Dar de Baja";
+                    btnEliminar.BackColor = Color.FromArgb(239, 68, 68); // Rojo
+                }
+                else
+                {
+                    btnEliminar.Text = "Reactivar";
+                    btnEliminar.BackColor = Color.FromArgb(16, 185, 129); // Verde
+                }
+            }
+        }
+
+        private Producto? ObtenerProductoSeleccionadoSilencioso()
+        {
+            if (dgvProductos.CurrentRow == null || dgvProductos.CurrentRow.Index < 0) return null;
+            if (dgvProductos.CurrentRow.Cells["colId"].Value == null) return null;
+            
+            int idProducto = Convert.ToInt32(dgvProductos.CurrentRow.Cells["colId"].Value);
+            return _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
+        }
+
         private Producto? ObtenerProductoSeleccionado()
         {
-            // Verificamos que haya una fila seleccionada
-            if (dgvProductos.CurrentRow == null || dgvProductos.CurrentRow.Index < 0)
+            var p = ObtenerProductoSeleccionadoSilencioso();
+            if (p == null)
             {
                 MessageBox.Show("Por favor seleccione un producto de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return null;
             }
-
-            // Buscamos el ID en la columna oculta ("colId")
-            int idProducto = Convert.ToInt32(dgvProductos.CurrentRow.Cells["colId"].Value);
-
-            // Devolvemos el producto buscándolo en la lista cargada en memoria
-            return _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
+            return p;
         }
         private void EditarSeleccionado()
         {
@@ -264,6 +288,15 @@ namespace StockOS.UI.WinForms.Forms
                 }
             }
         }
+        private void BtnCategorias_Click(object? sender, EventArgs e)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var formCategoria = scope.ServiceProvider.GetRequiredService<FormCategoria>();
+            formCategoria.ShowDialog();
+            // Al cerrar, recargamos la grilla por si se cambió alguna categoría
+            CargarDatos();
+        }
+
         private void BtnIngresarStock_Click(object? sender, EventArgs e)
         {
             using var scope = _serviceProvider.CreateScope();

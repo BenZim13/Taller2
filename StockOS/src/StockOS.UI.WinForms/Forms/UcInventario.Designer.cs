@@ -21,6 +21,7 @@ namespace StockOS.UI.WinForms.Forms
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlHeaderLista = new System.Windows.Forms.Panel();
             this.btnIngresarStock = new System.Windows.Forms.Button();
+            this.btnCategorias = new System.Windows.Forms.Button();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.btnRecargar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
@@ -41,6 +42,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             this.pnlHeaderLista.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.pnlHeaderLista.Controls.Add(this.btnIngresarStock);
+            this.pnlHeaderLista.Controls.Add(this.btnCategorias);
             this.pnlHeaderLista.Controls.Add(this.btnNuevo);
             this.pnlHeaderLista.Controls.Add(this.btnRecargar);
             this.pnlHeaderLista.Controls.Add(this.btnEliminar);
@@ -67,6 +69,21 @@ namespace StockOS.UI.WinForms.Forms
             this.btnIngresarStock.TabIndex = 5;
             this.btnIngresarStock.Text = "📦 Ingresar Stock";
             this.btnIngresarStock.UseVisualStyleBackColor = false;
+            // 
+            // btnCategorias
+            // 
+            this.btnCategorias.BackColor = System.Drawing.Color.FromArgb(245, 158, 11);
+            this.btnCategorias.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCategorias.FlatAppearance.BorderSize = 0;
+            this.btnCategorias.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCategorias.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnCategorias.ForeColor = System.Drawing.Color.White;
+            this.btnCategorias.Location = new System.Drawing.Point(305, 10);
+            this.btnCategorias.Name = "btnCategorias";
+            this.btnCategorias.Size = new System.Drawing.Size(130, 32);
+            this.btnCategorias.TabIndex = 6;
+            this.btnCategorias.Text = "🗂 Categorías";
+            this.btnCategorias.UseVisualStyleBackColor = false;
             // 
             // btnNuevo
             // 
@@ -284,6 +301,7 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Button btnRecargar;
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Button btnIngresarStock;
+        private System.Windows.Forms.Button btnCategorias;
         private System.Windows.Forms.Panel pnlFiltros;
         private System.Windows.Forms.TextBox txtBuscar;
         private System.Windows.Forms.Label lblBuscar;

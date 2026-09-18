@@ -28,16 +28,21 @@ namespace StockOS.UI.WinForms.Forms
             this.cmbCategoria = new System.Windows.Forms.ComboBox();
             this.lblPrecio = new System.Windows.Forms.Label();
             this.txtPrecio = new System.Windows.Forms.TextBox();
-            this.lblDescripcion = new System.Windows.Forms.Label();
-            this.txtDescripcion = new System.Windows.Forms.TextBox();
+            
+            // Nuevos controles en reemplazo de Descripción
+            this.lblStock = new System.Windows.Forms.Label();
+            this.txtStock = new System.Windows.Forms.TextBox();
+            this.lblEstado = new System.Windows.Forms.Label();
+            this.cmbEstado = new System.Windows.Forms.ComboBox();
+
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
+            
             // 
             // btnSalirApp
             // 
-            this.btnSalirApp = new System.Windows.Forms.Button();
             this.btnSalirApp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.btnSalirApp.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
             this.btnSalirApp.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -55,7 +60,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // pnlHeader
             // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
+            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
             this.pnlHeader.Controls.Add(this.lblTitulo);
             this.pnlHeader.Controls.Add(this.btnSalirApp);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
@@ -78,7 +83,7 @@ namespace StockOS.UI.WinForms.Forms
             // lblCodigoBarra
             // 
             this.lblCodigoBarra.AutoSize = true;
-            this.lblCodigoBarra.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.lblCodigoBarra.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblCodigoBarra.Location = new System.Drawing.Point(40, 80);
             this.lblCodigoBarra.Name = "lblCodigoBarra";
             this.lblCodigoBarra.Size = new System.Drawing.Size(117, 19);
@@ -87,7 +92,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtCodigoBarra
             // 
-            this.txtCodigoBarra.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.txtCodigoBarra.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtCodigoBarra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtCodigoBarra.ForeColor = System.Drawing.Color.White;
             this.txtCodigoBarra.Location = new System.Drawing.Point(40, 105);
@@ -98,7 +103,7 @@ namespace StockOS.UI.WinForms.Forms
             // lblNombre
             // 
             this.lblNombre.AutoSize = true;
-            this.lblNombre.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.lblNombre.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblNombre.Location = new System.Drawing.Point(40, 145);
             this.lblNombre.Name = "lblNombre";
             this.lblNombre.Size = new System.Drawing.Size(143, 19);
@@ -107,7 +112,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtNombre
             // 
-            this.txtNombre.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.txtNombre.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtNombre.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtNombre.ForeColor = System.Drawing.Color.White;
             this.txtNombre.Location = new System.Drawing.Point(40, 170);
@@ -118,7 +123,7 @@ namespace StockOS.UI.WinForms.Forms
             // lblCategoria
             // 
             this.lblCategoria.AutoSize = true;
-            this.lblCategoria.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.lblCategoria.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblCategoria.Location = new System.Drawing.Point(40, 210);
             this.lblCategoria.Name = "lblCategoria";
             this.lblCategoria.Size = new System.Drawing.Size(68, 19);
@@ -127,7 +132,7 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // cmbCategoria
             // 
-            this.cmbCategoria.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.cmbCategoria.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.cmbCategoria.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCategoria.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbCategoria.ForeColor = System.Drawing.Color.White;
@@ -140,7 +145,7 @@ namespace StockOS.UI.WinForms.Forms
             // lblPrecio
             // 
             this.lblPrecio.AutoSize = true;
-            this.lblPrecio.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.lblPrecio.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblPrecio.Location = new System.Drawing.Point(40, 275);
             this.lblPrecio.Name = "lblPrecio";
             this.lblPrecio.Size = new System.Drawing.Size(104, 19);
@@ -149,62 +154,78 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // txtPrecio
             // 
-            this.txtPrecio.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.txtPrecio.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtPrecio.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPrecio.ForeColor = System.Drawing.Color.White;
             this.txtPrecio.Location = new System.Drawing.Point(40, 300);
             this.txtPrecio.Name = "txtPrecio";
             this.txtPrecio.Size = new System.Drawing.Size(400, 25);
             this.txtPrecio.TabIndex = 8;
-            // 
-            // lblDescripcion
-            // 
-            this.lblDescripcion.AutoSize = true;
-            this.lblDescripcion.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
-            this.lblDescripcion.Location = new System.Drawing.Point(40, 340);
-            this.lblDescripcion.Name = "lblDescripcion";
-            this.lblDescripcion.Size = new System.Drawing.Size(79, 19);
-            this.lblDescripcion.TabIndex = 9;
-            this.lblDescripcion.Text = "Descripción";
-            // 
-            // txtDescripcion
-            // 
-            this.txtDescripcion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.txtDescripcion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDescripcion.ForeColor = System.Drawing.Color.White;
-            this.txtDescripcion.Location = new System.Drawing.Point(40, 365);
-            this.txtDescripcion.Multiline = true;
-            this.txtDescripcion.Name = "txtDescripcion";
-            this.txtDescripcion.Size = new System.Drawing.Size(400, 60);
-            this.txtDescripcion.TabIndex = 10;
+            
+            // --- NUEVOS CAMPOS: Stock y Estado ---
+            this.lblStock.AutoSize = true;
+            this.lblStock.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblStock.Location = new System.Drawing.Point(40, 340);
+            this.lblStock.Name = "lblStock";
+            this.lblStock.Size = new System.Drawing.Size(104, 19);
+            this.lblStock.TabIndex = 9;
+            this.lblStock.Text = "Stock Actual";
+
+            this.txtStock.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.txtStock.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtStock.ForeColor = System.Drawing.Color.White;
+            this.txtStock.Location = new System.Drawing.Point(40, 365);
+            this.txtStock.Name = "txtStock";
+            this.txtStock.Size = new System.Drawing.Size(190, 25);
+            this.txtStock.TabIndex = 10;
+
+            this.lblEstado.AutoSize = true;
+            this.lblEstado.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblEstado.Location = new System.Drawing.Point(250, 340);
+            this.lblEstado.Name = "lblEstado";
+            this.lblEstado.Size = new System.Drawing.Size(50, 19);
+            this.lblEstado.TabIndex = 11;
+            this.lblEstado.Text = "Estado";
+
+            this.cmbEstado.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.cmbEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEstado.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbEstado.ForeColor = System.Drawing.Color.White;
+            this.cmbEstado.FormattingEnabled = true;
+            this.cmbEstado.Items.AddRange(new object[] { "Activo", "Inactivo" });
+            this.cmbEstado.Location = new System.Drawing.Point(250, 365);
+            this.cmbEstado.Name = "cmbEstado";
+            this.cmbEstado.Size = new System.Drawing.Size(190, 25);
+            this.cmbEstado.TabIndex = 12;
+
             // 
             // btnGuardar
             // 
-            this.btnGuardar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
+            this.btnGuardar.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
             this.btnGuardar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnGuardar.FlatAppearance.BorderSize = 0;
             this.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGuardar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnGuardar.ForeColor = System.Drawing.Color.White;
-            this.btnGuardar.Location = new System.Drawing.Point(220, 450);
+            this.btnGuardar.Location = new System.Drawing.Point(220, 420);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(100, 35);
-            this.btnGuardar.TabIndex = 11;
+            this.btnGuardar.TabIndex = 13;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = false;
             // 
             // btnCancelar
             // 
-            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(71, 85, 105);
             this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCancelar.FlatAppearance.BorderSize = 0;
             this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnCancelar.ForeColor = System.Drawing.Color.White;
-            this.btnCancelar.Location = new System.Drawing.Point(340, 450);
+            this.btnCancelar.Location = new System.Drawing.Point(340, 420);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(100, 35);
-            this.btnCancelar.TabIndex = 12;
+            this.btnCancelar.TabIndex = 14;
             this.btnCancelar.Text = "Cancelar";
             this.btnCancelar.UseVisualStyleBackColor = false;
             // 
@@ -212,12 +233,14 @@ namespace StockOS.UI.WinForms.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.ClientSize = new System.Drawing.Size(480, 520);
+            this.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.ClientSize = new System.Drawing.Size(480, 480);
             this.Controls.Add(this.btnCancelar);
             this.Controls.Add(this.btnGuardar);
-            this.Controls.Add(this.txtDescripcion);
-            this.Controls.Add(this.lblDescripcion);
+            this.Controls.Add(this.cmbEstado);
+            this.Controls.Add(this.lblEstado);
+            this.Controls.Add(this.txtStock);
+            this.Controls.Add(this.lblStock);
             this.Controls.Add(this.txtPrecio);
             this.Controls.Add(this.lblPrecio);
             this.Controls.Add(this.cmbCategoria);
@@ -234,8 +257,6 @@ namespace StockOS.UI.WinForms.Forms
             this.Name = "FormRegistroProducto";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Registro de Producto";
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);
@@ -256,9 +277,12 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.ComboBox cmbCategoria;
         private System.Windows.Forms.Label lblPrecio;
         private System.Windows.Forms.TextBox txtPrecio;
-        private System.Windows.Forms.Label lblDescripcion;
-        private System.Windows.Forms.TextBox txtDescripcion;
+        private System.Windows.Forms.Label lblStock;
+        private System.Windows.Forms.TextBox txtStock;
+        private System.Windows.Forms.Label lblEstado;
+        private System.Windows.Forms.ComboBox cmbEstado;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
     }
 }
+

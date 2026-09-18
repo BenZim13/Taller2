@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows.Forms;
 using StockOS.Application.Services;
@@ -10,13 +10,16 @@ namespace StockOS.UI.WinForms.Forms
     {
         private readonly IProductoService _productoService;
         private readonly ICategoriaService _categoriaService;
+        private readonly IStockService _stockService;
         private Producto? _productoEdicion; // Si es null, es modo "Nuevo"
+        private int _stockOriginal = 0; // Para calcular la diferencia al guardar
 
-        public FormRegistroProducto(IProductoService productoService, ICategoriaService categoriaService)
+        public FormRegistroProducto(IProductoService productoService, ICategoriaService categoriaService, IStockService stockService)
         {
             InitializeComponent();
             _productoService = productoService;
             _categoriaService = categoriaService;
+            _stockService = stockService;
 
             this.Load += FormRegistroProducto_Load;
             btnGuardar.Click += BtnGuardar_Click;
@@ -26,11 +29,15 @@ namespace StockOS.UI.WinForms.Forms
         private void FormRegistroProducto_Load(object? sender, EventArgs e)
         {
             CargarCategorias();
+            if (_productoEdicion == null)
+            {
+                cmbEstado.SelectedIndex = 0; // "Activo" por defecto
+                txtStock.Text = "0";
+            }
         }
 
         private void CargarCategorias()
         {
-            // Traemos las categorías de la BD para el ComboBox
             var categorias = _categoriaService.ObtenerTodos().ToList();
             if (categorias.Any())
             {
@@ -41,7 +48,6 @@ namespace StockOS.UI.WinForms.Forms
             }
         }
 
-        // Este método lo llamaremos desde UcInventario cuando queramos editar
         public void PrepararParaEdicion(Producto producto)
         {
             _productoEdicion = producto;
@@ -49,18 +55,22 @@ namespace StockOS.UI.WinForms.Forms
 
             txtCodigoBarra.Text = producto.CodigoBarra;
             txtNombre.Text = producto.Nombre;
-            txtDescripcion.Text = producto.Descripcion;
-            txtPrecio.Text = producto.PrecioVentaActual.ToString();
+            txtPrecio.Text = producto.PrecioVentaActual.ToString("0.00");
 
             if (cmbCategoria.DataSource != null)
             {
                 cmbCategoria.SelectedValue = producto.IdCategoria;
             }
+
+            cmbEstado.SelectedItem = (producto.Activo == true) ? "Activo" : "Inactivo";
+
+            // Cargar Stock actual
+            _stockOriginal = _stockService.ObtenerCantidadActual(producto.IdProducto, SesionActual.IdSucursal);
+            txtStock.Text = _stockOriginal.ToString();
         }
 
         private void BtnGuardar_Click(object? sender, EventArgs e)
         {
-            // 1. Validaciones básicas
             if (string.IsNullOrWhiteSpace(txtNombre.Text) || string.IsNullOrWhiteSpace(txtPrecio.Text))
             {
                 MessageBox.Show("El nombre y el precio son obligatorios.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -73,54 +83,72 @@ namespace StockOS.UI.WinForms.Forms
                 return;
             }
 
-            // Validar que se haya seleccionado una categoría válida
             if (cmbCategoria.SelectedValue == null || Convert.ToInt32(cmbCategoria.SelectedValue) <= 0)
             {
-                MessageBox.Show("Debe seleccionar una categoría de la lista. Si está vacía, debe crear categorías en el sistema primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe seleccionar una categoría de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 2. Si _productoEdicion es NULL, estamos creando uno nuevo
+            if (!int.TryParse(txtStock.Text, out int stockFinal))
+            {
+                MessageBox.Show("El stock debe ser un número entero válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            bool esActivo = cmbEstado.SelectedItem?.ToString() == "Activo";
+
             if (_productoEdicion == null)
             {
+                // MODO NUEVO
                 var nuevoProducto = new Producto
                 {
                     CodigoBarra = txtCodigoBarra.Text.Trim(),
                     Nombre = txtNombre.Text.Trim(),
-                    Descripcion = txtDescripcion.Text.Trim(),
+                    Descripcion = "", // Se quitó la descripción, se guarda vacía
                     PrecioVentaActual = precio,
                     IdCategoria = Convert.ToInt32(cmbCategoria.SelectedValue),
-                    Activo = true
+                    Activo = esActivo
                 };
 
-                // Guardar en la BD (Asumiendo que tienes un método Agregar en tu servicio)
                 _productoService.Agregar(nuevoProducto);
+
+                if (stockFinal != 0)
+                {
+                    _stockService.AgregarStock(nuevoProducto.IdProducto, SesionActual.IdSucursal, stockFinal);
+                }
+
                 MessageBox.Show("Producto creado exitosamente.");
             }
             else
             {
-                // 3. Si no es NULL, estamos modificando
+                // MODO EDICIÓN
                 _productoEdicion.CodigoBarra = txtCodigoBarra.Text.Trim();
                 _productoEdicion.Nombre = txtNombre.Text.Trim();
-                _productoEdicion.Descripcion = txtDescripcion.Text.Trim();
+                _productoEdicion.Descripcion = ""; // Mantiene vacío
                 _productoEdicion.PrecioVentaActual = precio;
                 _productoEdicion.IdCategoria = Convert.ToInt32(cmbCategoria.SelectedValue);
+                _productoEdicion.Activo = esActivo;
 
-                // Actualizar en BD
                 _productoService.Actualizar(_productoEdicion);
+
+                // Calcular diferencia de stock si se modificó manualmente
+                int diferencia = stockFinal - _stockOriginal;
+                if (diferencia != 0)
+                {
+                    _stockService.AgregarStock(_productoEdicion.IdProducto, SesionActual.IdSucursal, diferencia);
+                }
+
                 MessageBox.Show("Producto actualizado exitosamente.");
             }
 
-            // Cerramos la ventana indicando que todo salió OK
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
+
         private void btnSalirApp_Click(object sender, EventArgs e)
         {
             System.Windows.Forms.Application.Exit();
         }
-
-
     }
 }
 

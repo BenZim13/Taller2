@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.SqlClient;
@@ -45,7 +45,7 @@ namespace StockOS.DataAccess.Repositories
                 "EXEC sp_Productos_Insertar @CodigoBarra={0}, @Nombre={1}, @Descripcion={2}, @PrecioVentaActual={3}, @PorcentajeIva={4}, @IdCategoria={5}, @IdProducto=@IdProducto OUTPUT",
                 producto.CodigoBarra,
                 producto.Nombre,
-                producto.Descripcion ?? (object)DBNull.Value, // Manejo de nulos por si no tiene descripción
+                producto.Descripcion ?? "", // Manejo de nulos por si no tiene descripción
                 producto.PrecioVentaActual,
                 producto.PorcentajeIva,
                 producto.IdCategoria,
@@ -63,7 +63,7 @@ namespace StockOS.DataAccess.Repositories
                 producto.IdProducto,
                 producto.CodigoBarra,
                 producto.Nombre,
-                producto.Descripcion ?? (object)DBNull.Value,
+                producto.Descripcion ?? "",
                 producto.PrecioVentaActual,
                 producto.PorcentajeIva,
                 producto.IdCategoria,
