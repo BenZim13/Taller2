@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using StockOS.Application;
 using StockOS.Application.Services;
 
 namespace StockOS.UI.WinForms.Forms
@@ -8,6 +9,7 @@ namespace StockOS.UI.WinForms.Forms
     {
         private readonly ICajaService _cajaService;
 
+        // Quitamos SesionActual del constructor
         public FormAperturaCaja(ICajaService cajaService)
         {
             InitializeComponent();
@@ -47,7 +49,11 @@ namespace StockOS.UI.WinForms.Forms
                 int idEmpleado = SesionActual.Usuario!.IdEmpleado;
                 int idCaja = Convert.ToInt32(cmbCaja.SelectedValue); // <-- Tomamos la caja elegida
 
+                // 1. Abrimos la caja en la base de datos y obtenemos el ID real generado
                 int idCajaSesion = _cajaService.AbrirCaja(idCaja, idEmpleado, montoApertura);
+
+                // 2.Guardamos ese ID en nuestra memoria global para que UcVentas lo pueda leer
+                SesionActual.IdCajaSesionAbierta = idCajaSesion;
 
                 MessageBox.Show($"¡Caja abierta exitosamente!\nSesión N°: {idCajaSesion}", "Apertura Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -73,12 +79,10 @@ namespace StockOS.UI.WinForms.Forms
                 e.Handled = true;
             }
         }
+
         private void btnSalirApp_Click(object sender, EventArgs e)
         {
             System.Windows.Forms.Application.Exit();
         }
-
-
     }
 }
-

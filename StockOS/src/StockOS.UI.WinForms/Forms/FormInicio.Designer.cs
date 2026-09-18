@@ -87,7 +87,3 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblTitulo;
     }
 }
-
-
-
-

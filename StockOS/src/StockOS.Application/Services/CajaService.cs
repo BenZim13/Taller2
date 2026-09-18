@@ -32,5 +32,17 @@ namespace StockOS.Application.Services
         {
             return _cajaSesionRepo.VerificarCajaAbierta(idEmpleado);
         }
+        public void CerrarCaja(int idCajaSesion, decimal montoCierreReal)
+        {
+            if (montoCierreReal < 0) throw new Exception("El monto no puede ser negativo.");
+            _cajaRepo.CerrarCaja(idCajaSesion, montoCierreReal);
+        }
+        public void RegistrarMovimiento(int idCajaSesion, string tipo, decimal monto, string descripcion)
+        {
+            if (monto <= 0) throw new Exception("El monto debe ser mayor a cero.");
+            if (string.IsNullOrWhiteSpace(descripcion)) throw new Exception("Debe ingresar una descripción.");
+
+            _cajaRepo.RegistrarMovimiento(idCajaSesion, tipo, monto, descripcion);
+        }
     }
 }

@@ -22,6 +22,9 @@ namespace StockOS.UI.WinForms.Forms
             pnlTop = new System.Windows.Forms.Panel();
             lblBuscador = new System.Windows.Forms.Label();
             txtCodigoBarra = new System.Windows.Forms.TextBox();
+            btnAbrirCaja = new System.Windows.Forms.Button();
+            btnMovimientoCaja = new System.Windows.Forms.Button();
+            btnCerrarCaja = new System.Windows.Forms.Button();
             pnlBottom = new System.Windows.Forms.Panel();
             lblTextoTotal = new System.Windows.Forms.Label();
             lblTotal = new System.Windows.Forms.Label();
@@ -43,6 +46,9 @@ namespace StockOS.UI.WinForms.Forms
             // pnlTop
             // 
             pnlTop.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            pnlTop.Controls.Add(btnCerrarCaja);
+            pnlTop.Controls.Add(btnMovimientoCaja);
+            pnlTop.Controls.Add(btnAbrirCaja);
             pnlTop.Controls.Add(lblBuscador);
             pnlTop.Controls.Add(txtCodigoBarra);
             pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
@@ -58,7 +64,7 @@ namespace StockOS.UI.WinForms.Forms
             lblBuscador.ForeColor = System.Drawing.Color.White;
             lblBuscador.Location = new System.Drawing.Point(20, 30);
             lblBuscador.Name = "lblBuscador";
-            lblBuscador.Size = new System.Drawing.Size(268, 21);
+            lblBuscador.Size = new System.Drawing.Size(70, 21);
             lblBuscador.TabIndex = 1;
             lblBuscador.Text = "Código:";
             // 
@@ -70,9 +76,60 @@ namespace StockOS.UI.WinForms.Forms
             txtCodigoBarra.ForeColor = System.Drawing.Color.White;
             txtCodigoBarra.Location = new System.Drawing.Point(100, 22);
             txtCodigoBarra.Name = "txtCodigoBarra";
-            txtCodigoBarra.Size = new System.Drawing.Size(400, 36);
+            txtCodigoBarra.Size = new System.Drawing.Size(320, 36);
             txtCodigoBarra.TabIndex = 0;
             txtCodigoBarra.KeyDown += txtCodigoBarra_KeyDown;
+            // 
+            // btnAbrirCaja
+            // 
+            btnAbrirCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnAbrirCaja.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
+            btnAbrirCaja.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnAbrirCaja.FlatAppearance.BorderSize = 0;
+            btnAbrirCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnAbrirCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            btnAbrirCaja.ForeColor = System.Drawing.Color.White;
+            btnAbrirCaja.Location = new System.Drawing.Point(440, 20);
+            btnAbrirCaja.Name = "btnAbrirCaja";
+            btnAbrirCaja.Size = new System.Drawing.Size(120, 40);
+            btnAbrirCaja.TabIndex = 2;
+            btnAbrirCaja.Text = "🔓 Abrir Caja";
+            btnAbrirCaja.UseVisualStyleBackColor = false;
+            btnAbrirCaja.Click += btnAbrirCaja_Click;
+            // 
+            // btnMovimientoCaja
+            // 
+            btnMovimientoCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnMovimientoCaja.BackColor = System.Drawing.Color.FromArgb(59, 130, 246);
+            btnMovimientoCaja.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnMovimientoCaja.FlatAppearance.BorderSize = 0;
+            btnMovimientoCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnMovimientoCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            btnMovimientoCaja.ForeColor = System.Drawing.Color.White;
+            btnMovimientoCaja.Location = new System.Drawing.Point(570, 20);
+            btnMovimientoCaja.Name = "btnMovimientoCaja";
+            btnMovimientoCaja.Size = new System.Drawing.Size(130, 40);
+            btnMovimientoCaja.TabIndex = 4;
+            btnMovimientoCaja.Text = "📝 Movimiento";
+            btnMovimientoCaja.UseVisualStyleBackColor = false;
+            btnMovimientoCaja.Click += btnMovimientoCaja_Click;
+            // 
+            // btnCerrarCaja
+            // 
+            btnCerrarCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnCerrarCaja.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
+            btnCerrarCaja.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnCerrarCaja.FlatAppearance.BorderSize = 0;
+            btnCerrarCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCerrarCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            btnCerrarCaja.ForeColor = System.Drawing.Color.White;
+            btnCerrarCaja.Location = new System.Drawing.Point(710, 20);
+            btnCerrarCaja.Name = "btnCerrarCaja";
+            btnCerrarCaja.Size = new System.Drawing.Size(120, 40);
+            btnCerrarCaja.TabIndex = 3;
+            btnCerrarCaja.Text = "🔒 Cerrar Caja";
+            btnCerrarCaja.UseVisualStyleBackColor = false;
+            btnCerrarCaja.Click += btnCerrarCaja_Click;
             // 
             // pnlBottom
             // 
@@ -250,9 +307,13 @@ namespace StockOS.UI.WinForms.Forms
         }
 
         #endregion
+
         private System.Windows.Forms.Panel pnlTop;
         private System.Windows.Forms.Label lblBuscador;
         private System.Windows.Forms.TextBox txtCodigoBarra;
+        private System.Windows.Forms.Button btnAbrirCaja;
+        private System.Windows.Forms.Button btnCerrarCaja;
+        private System.Windows.Forms.Button btnMovimientoCaja;
         private System.Windows.Forms.Panel pnlBottom;
         private System.Windows.Forms.DataGridView dgvTicket;
         private System.Windows.Forms.Label lblTextoTotal;

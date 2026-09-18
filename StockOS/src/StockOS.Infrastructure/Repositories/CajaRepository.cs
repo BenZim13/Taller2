@@ -23,7 +23,18 @@ namespace StockOS.DataAccess.Repositories
                 .FromSqlRaw("EXEC sp_Cajas_ObtenerPorSucursal @IdSucursal={0}", idSucursal)
                 .ToList();
         }
+        public void CerrarCaja(int idCajaSesion, decimal montoCierreReal)
+        {
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_CajaSesion_Cerrar @IdCajaSesion={0}, @MontoCierreReal={1}",
+                idCajaSesion, montoCierreReal);
+        }
+        public void RegistrarMovimiento(int idCajaSesion, string tipo, decimal monto, string descripcion)
+        {
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_MovimientoCaja_Insertar @IdCajaSesion={0}, @Tipo={1}, @Monto={2}, @Descripcion={3}",
+                idCajaSesion, tipo, monto, descripcion);
+        }
 
-        
     }
 }
