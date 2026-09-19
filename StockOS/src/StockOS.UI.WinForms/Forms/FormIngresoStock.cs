@@ -90,17 +90,17 @@ namespace StockOS.UI.WinForms.Forms
 
         private void BuscarProductoPorCodigo()
         {
-            string codigo = txtCodigo.Text.Trim();
-            if (string.IsNullOrWhiteSpace(codigo)) return;
+            string codigoBuscar = txtCodigo.Text.Trim();
+            if (string.IsNullOrWhiteSpace(codigoBuscar)) return;
 
-            var prod = _productoService.ObtenerTodos().FirstOrDefault(p => p.CodigoBarra.Equals(codigo, StringComparison.OrdinalIgnoreCase));
-            if (prod != null)
+            var producto = _productoService.BuscarPorCodigoBarra(codigoBuscar);
+            if (producto != null)
             {
                 string nombreActual = txtNombreProducto.Text.Trim();
-                if (!string.IsNullOrWhiteSpace(nombreActual) && !prod.Nombre.Equals(nombreActual, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrWhiteSpace(nombreActual) && !producto.Nombre.Equals(nombreActual, StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(
-                        $"El código '{codigo}' ya está en uso por el producto '{prod.Nombre}'.\n\nIngrese un código diferente.",
+                        $"El código '{codigoBuscar}' ya está en uso por el producto '{producto.Nombre}'.\n\nIngrese un código diferente.",
                         "Código en uso",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -110,15 +110,15 @@ namespace StockOS.UI.WinForms.Forms
                     return;
                 }
 
-                txtNombreProducto.Text = prod.Nombre;
-                cmbCategoria.SelectedValue = prod.IdCategoria;
+                txtNombreProducto.Text = producto.Nombre;
+                cmbCategoria.SelectedValue = producto.IdCategoria;
 
-                if (prod.IdProveedor.HasValue)
+                if (producto.IdProveedor.HasValue)
                 {
-                    cmbProveedor.SelectedValue = prod.IdProveedor.Value;
+                    cmbProveedor.SelectedValue = producto.IdProveedor.Value;
                 }
 
-                decimal? ultimoPrecio = _compraService.ObtenerUltimoPrecioCompra(prod.IdProducto);
+                decimal? ultimoPrecio = _compraService.ObtenerUltimoPrecioCompra(producto.IdProducto);
                 if (ultimoPrecio.HasValue && ultimoPrecio.Value > 0)
                 {
                     txtPrecioCompra.Text = ultimoPrecio.Value.ToString("0.00");

@@ -65,7 +65,7 @@ namespace StockOS.UI.WinForms.Forms
 
                 if (string.IsNullOrEmpty(codigoBuscar)) return;
 
-                var producto = _productoService.ObtenerTodos().FirstOrDefault(p => p.CodigoBarra == codigoBuscar);
+                var producto = _productoService.BuscarPorCodigoBarra(codigoBuscar);
 
                 if (producto != null)
                 {
@@ -138,7 +138,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnCobrar_Click(object sender, EventArgs e)
         {
-            if (SesionActual.IdCajaSesionAbierta == 0)
+            // Corrección: ahora validamos que no sea nulo además de 0
+            if (!SesionActual.IdCajaSesionAbierta.HasValue || SesionActual.IdCajaSesionAbierta.Value == 0)
             {
                 MessageBox.Show("No puedes cobrar porque no has abierto la caja. Haz clic en 'Abrir Caja' en la barra superior.",
                                 "Caja Cerrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -158,6 +159,24 @@ namespace StockOS.UI.WinForms.Forms
                 if (resultado == DialogResult.OK)
                 {
                     string metodoPago = formCobro.MetodoPagoSeleccionado;
+
+                    // Mapeamos el string al ID de la base de datos
+                    int idMetodoPago = 1; // Efectivo por defecto
+                    string metodoLower = metodoPago.ToLower();
+
+                    if (metodoLower.Contains("débito") || metodoLower.Contains("debito"))
+                    {
+                        idMetodoPago = 2;
+                    }
+                    else if (metodoLower.Contains("crédito") || metodoLower.Contains("credito") || metodoLower == "tarjeta")
+                    {
+                        idMetodoPago = 3;
+                    }
+                    else if (metodoLower.Contains("mercado") || metodoLower.Contains("mp"))
+                    {
+                        idMetodoPago = 4;
+                    }
+
                     try
                     {
                         var nuevaVenta = new Venta
@@ -165,7 +184,7 @@ namespace StockOS.UI.WinForms.Forms
                             Subtotal = _subtotalVenta,
                             DescuentoTotal = _descuentoTotal,
                             TotalVenta = _totalFinal,
-                            IdCajaSesion = SesionActual.IdCajaSesionAbierta,
+                            IdCajaSesion = SesionActual.IdCajaSesionAbierta.Value,
                             IdCliente = null
                         };
 
@@ -184,7 +203,9 @@ namespace StockOS.UI.WinForms.Forms
                         }
 
                         int idSucursal = SesionActual.Usuario!.IdSucursal;
-                        int idVenta = _ventaService.RegistrarVenta(nuevaVenta, detalles, idSucursal);
+
+                        // Le pasamos el idMetodoPago al servicio
+                        int idVenta = _ventaService.RegistrarVenta(nuevaVenta, detalles, idSucursal, idMetodoPago);
 
                         var itemsParaTicket = new List<ItemTicket>();
                         foreach (DataGridViewRow row in dgvTicket.Rows)

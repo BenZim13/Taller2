@@ -13,5 +13,6 @@ namespace StockOS.Domain.Interfaces
         void Agregar(Producto producto);
         void Actualizar(Producto producto);
         void CambiarEstado(int idProducto, bool activo);
+        Producto BuscarPorCodigoBarra(string codigoBarra);
     }
 }

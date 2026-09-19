@@ -5,7 +5,6 @@ namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormCobro : Form
     {
-        // Propiedad pública para que UcVentas sepa qué eligió el cajero
         public string MetodoPagoSeleccionado { get; private set; } = "";
 
         public FormCobro(decimal totalCobrar)
@@ -21,9 +20,16 @@ namespace StockOS.UI.WinForms.Forms
             this.Close();
         }
 
-        private void btnTarjeta_Click(object sender, EventArgs e)
+        private void btnTarjetaDebito_Click(object sender, EventArgs e)
         {
-            MetodoPagoSeleccionado = "Tarjeta";
+            MetodoPagoSeleccionado = "Tarjeta de Débito";
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void btnTarjetaCredito_Click(object sender, EventArgs e)
+        {
+            MetodoPagoSeleccionado = "Tarjeta de Crédito";
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

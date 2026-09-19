@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 
@@ -7,10 +6,8 @@ namespace StockOS.Application.Services
 {
     public class ProductoService : IProductoService
     {
-        // 1. Declaramos 
         private readonly IProductoRepository _productoRepository;
 
-        // 2. recibimos en el constructor
         public ProductoService(IProductoRepository productoRepository)
         {
             _productoRepository = productoRepository;
@@ -18,25 +15,25 @@ namespace StockOS.Application.Services
 
         public IEnumerable<Producto> ObtenerTodos()
         {
-            return _productoRepository.ObtenerTodos(); 
+            return _productoRepository.ObtenerTodos();
         }
+
+        // NUEVO: Método rápido expuesto para las pantallas
+        public Producto BuscarPorCodigoBarra(string codigoBarra)
+        {
+            if (string.IsNullOrWhiteSpace(codigoBarra)) return null;
+            return _productoRepository.BuscarPorCodigoBarra(codigoBarra.Trim());
+        }
+
         public void Agregar(Producto producto)
         {
-            if (producto == null)
-                throw new System.ArgumentNullException(nameof(producto));
+            if (producto == null) throw new System.ArgumentNullException(nameof(producto));
+            if (string.IsNullOrWhiteSpace(producto.CodigoBarra)) throw new System.ArgumentException("El código de barra del producto es obligatorio.");
+            if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
+            if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
 
-            if (string.IsNullOrWhiteSpace(producto.CodigoBarra))
-                throw new System.ArgumentException("El código de barra del producto es obligatorio.");
-
-            if (string.IsNullOrWhiteSpace(producto.Nombre))
-                throw new System.ArgumentException("El nombre del producto es obligatorio.");
-
-            if (producto.PrecioVentaActual <= 0)
-                throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
-
-            // Validar unicidad de código de barra
-            var existente = _productoRepository.ObtenerTodos()
-                .FirstOrDefault(p => p.CodigoBarra.Equals(producto.CodigoBarra.Trim(), System.StringComparison.OrdinalIgnoreCase));
+            //Búsqueda ultra-rápida de duplicados
+            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
 
             if (existente != null)
             {
@@ -48,24 +45,16 @@ namespace StockOS.Application.Services
 
         public void Actualizar(Producto producto)
         {
-            if (producto == null)
-                throw new System.ArgumentNullException(nameof(producto));
+            if (producto == null) throw new System.ArgumentNullException(nameof(producto));
+            if (string.IsNullOrWhiteSpace(producto.CodigoBarra)) throw new System.ArgumentException("El código de barra del producto es obligatorio.");
+            if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
+            if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
 
-            if (string.IsNullOrWhiteSpace(producto.CodigoBarra))
-                throw new System.ArgumentException("El código de barra del producto es obligatorio.");
+            //Búsqueda ultra-rápida de duplicados
+            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
 
-            if (string.IsNullOrWhiteSpace(producto.Nombre))
-                throw new System.ArgumentException("El nombre del producto es obligatorio.");
-
-            if (producto.PrecioVentaActual <= 0)
-                throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
-
-            // Validar que el código no colisione con otro producto diferente
-            var existente = _productoRepository.ObtenerTodos()
-                .FirstOrDefault(p => p.IdProducto != producto.IdProducto && 
-                                     p.CodigoBarra.Equals(producto.CodigoBarra.Trim(), System.StringComparison.OrdinalIgnoreCase));
-
-            if (existente != null)
+            // Si encontró uno con ese código, y NO es el mismo producto que estamos editando...
+            if (existente != null && existente.IdProducto != producto.IdProducto)
             {
                 throw new System.InvalidOperationException($"El código '{producto.CodigoBarra}' ya pertenece a otro producto ('{existente.Nombre}').");
             }

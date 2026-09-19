@@ -14,17 +14,18 @@ namespace StockOS.UI.WinForms.Forms
 
         private void InitializeComponent()
         {
-            this.pnlHeader      = new System.Windows.Forms.Panel();
-            this.lblTitulo      = new System.Windows.Forms.Label();
-            this.dgvCategorias  = new System.Windows.Forms.DataGridView();
-            this.pnlFormulario  = new System.Windows.Forms.Panel();
-            this.lblNombre      = new System.Windows.Forms.Label();
-            this.txtNombre      = new System.Windows.Forms.TextBox();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.lblTitulo = new System.Windows.Forms.Label();
+            this.dgvCategorias = new System.Windows.Forms.DataGridView();
+            this.pnlFormulario = new System.Windows.Forms.Panel();
+            this.lblNombre = new System.Windows.Forms.Label();
+            this.txtNombre = new System.Windows.Forms.TextBox();
             this.lblDescripcion = new System.Windows.Forms.Label();
             this.txtDescripcion = new System.Windows.Forms.TextBox();
-            this.btnAgregar     = new System.Windows.Forms.Button();
-            this.btnDarBaja     = new System.Windows.Forms.Button();
-            this.btnCerrar      = new System.Windows.Forms.Button();
+            this.btnAgregar = new System.Windows.Forms.Button();
+            this.btnEditar = new System.Windows.Forms.Button();
+            this.btnDarBaja = new System.Windows.Forms.Button();
+            this.btnCerrar = new System.Windows.Forms.Button();
             this.btnCerrarHeader = new System.Windows.Forms.Button();
 
             this.pnlHeader.SuspendLayout();
@@ -107,7 +108,7 @@ namespace StockOS.UI.WinForms.Forms
             };
             this.dgvCategorias.DefaultCellStyle = rowStyle;
 
-            // PANEL formulario Alta
+            // PANEL formulario Alta/Edición
             this.pnlFormulario.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
             this.pnlFormulario.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlFormulario.Controls.AddRange(new System.Windows.Forms.Control[] {
@@ -155,9 +156,23 @@ namespace StockOS.UI.WinForms.Forms
             this.btnAgregar.Name = "btnAgregar";
             this.btnAgregar.Size = new System.Drawing.Size(130, 32);
             this.btnAgregar.TabIndex = 2;
-            this.btnAgregar.Text = "+ Agregar";
+            this.btnAgregar.Text = "+ Guardar";
             this.btnAgregar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnAgregar.UseVisualStyleBackColor = false;
+
+            // Botón Editar
+            this.btnEditar.BackColor = System.Drawing.Color.FromArgb(245, 158, 11);
+            this.btnEditar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnEditar.FlatAppearance.BorderSize = 0;
+            this.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEditar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnEditar.ForeColor = System.Drawing.Color.White;
+            this.btnEditar.Location = new System.Drawing.Point(20, 425);
+            this.btnEditar.Name = "btnEditar";
+            this.btnEditar.Size = new System.Drawing.Size(130, 32);
+            this.btnEditar.TabIndex = 5;
+            this.btnEditar.Text = "Editar Selección";
+            this.btnEditar.UseVisualStyleBackColor = false;
 
             // Botón Dar de baja
             this.btnDarBaja.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
@@ -166,7 +181,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnDarBaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDarBaja.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnDarBaja.ForeColor = System.Drawing.Color.White;
-            this.btnDarBaja.Location = new System.Drawing.Point(155, 425);
+            this.btnDarBaja.Location = new System.Drawing.Point(160, 425);
             this.btnDarBaja.Name = "btnDarBaja";
             this.btnDarBaja.Size = new System.Drawing.Size(130, 32);
             this.btnDarBaja.TabIndex = 3;
@@ -181,7 +196,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnCerrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCerrar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnCerrar.ForeColor = System.Drawing.Color.White;
-            this.btnCerrar.Location = new System.Drawing.Point(295, 425);
+            this.btnCerrar.Location = new System.Drawing.Point(400, 425);
             this.btnCerrar.Name = "btnCerrar";
             this.btnCerrar.Size = new System.Drawing.Size(100, 32);
             this.btnCerrar.TabIndex = 4;
@@ -196,6 +211,7 @@ namespace StockOS.UI.WinForms.Forms
             this.ClientSize = new System.Drawing.Size(520, 480);
             this.Controls.Add(this.btnCerrar);
             this.Controls.Add(this.btnDarBaja);
+            this.Controls.Add(this.btnEditar);
             this.Controls.Add(this.pnlFormulario);
             this.Controls.Add(this.dgvCategorias);
             this.Controls.Add(this.pnlHeader);
@@ -228,8 +244,8 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblDescripcion;
         private System.Windows.Forms.TextBox txtDescripcion;
         private System.Windows.Forms.Button btnAgregar;
+        private System.Windows.Forms.Button btnEditar;
         private System.Windows.Forms.Button btnDarBaja;
         private System.Windows.Forms.Button btnCerrar;
     }
 }
-

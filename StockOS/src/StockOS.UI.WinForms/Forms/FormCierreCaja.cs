@@ -17,7 +17,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnConfirmarCierre_Click(object sender, EventArgs e)
         {
-            if (SesionActual.IdCajaSesionAbierta == 0)
+            // Corregimos la validación para soportar nulos
+            if (!SesionActual.IdCajaSesionAbierta.HasValue || SesionActual.IdCajaSesionAbierta.Value == 0)
             {
                 MessageBox.Show("No hay ninguna caja abierta actualmente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -31,14 +32,34 @@ namespace StockOS.UI.WinForms.Forms
 
             try
             {
-                // Cerramos en la base de datos
-                _cajaService.CerrarCaja(SesionActual.IdCajaSesionAbierta, montoReal);
+                int idCaja = SesionActual.IdCajaSesionAbierta.Value;
 
-                // Borramos la caja de la memoria de la aplicación
-                SesionActual.IdCajaSesionAbierta = 0;
+                // 1. Calculamos cuánto DEBERÍA haber según el sistema
+                decimal montoEsperado = _cajaService.ObtenerMontoEsperado(idCaja);
 
-                MessageBox.Show("Turno finalizado y caja cerrada correctamente.", "Cierre Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                // 2. Calculamos la diferencia
+                decimal diferencia = montoReal - montoEsperado;
+
+                // 3. Armamos el cuadro de alerta
+                string mensaje = $"Resumen de Liquidación:\n\n" +
+                                 $"- Monto Esperado (Sistema): $ {montoEsperado:N2}\n" +
+                                 $"- Monto Declarado (Cajero): $ {montoReal:N2}\n" +
+                                 $"- Diferencia de Caja: $ {diferencia:N2}\n\n" +
+                                 "¿Desea confirmar el cierre definitivo?";
+
+                var confirmacion = MessageBox.Show(mensaje, "Confirmar Cierre", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (confirmacion == DialogResult.Yes)
+                {
+                    // Cerramos en la base de datos
+                    _cajaService.CerrarCaja(idCaja, montoReal);
+
+                    // IMPORTANTE: Limpiamos la caja llamando al método centralizado
+                    SesionActual.Limpiar();
+
+                    MessageBox.Show("Turno finalizado y caja cerrada correctamente.", "Cierre Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
             }
             catch (Exception ex)
             {

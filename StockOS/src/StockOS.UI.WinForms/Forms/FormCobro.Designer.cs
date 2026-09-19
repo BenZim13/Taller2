@@ -22,7 +22,8 @@ namespace StockOS.UI.WinForms.Forms
             lblTextoTotal = new System.Windows.Forms.Label();
             lblTotal = new System.Windows.Forms.Label();
             btnEfectivo = new System.Windows.Forms.Button();
-            btnTarjeta = new System.Windows.Forms.Button();
+            btnTarjetaDebito = new System.Windows.Forms.Button();
+            btnTarjetaCredito = new System.Windows.Forms.Button();
             btnMercadoPago = new System.Windows.Forms.Button();
             btnCancelar = new System.Windows.Forms.Button();
             pnlHeader.SuspendLayout();
@@ -87,21 +88,37 @@ namespace StockOS.UI.WinForms.Forms
             btnEfectivo.UseVisualStyleBackColor = false;
             btnEfectivo.Click += btnEfectivo_Click;
             // 
-            // btnTarjeta
+            // btnTarjetaDebito
             // 
-            btnTarjeta.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
-            btnTarjeta.Cursor = System.Windows.Forms.Cursors.Hand;
-            btnTarjeta.FlatAppearance.BorderSize = 0;
-            btnTarjeta.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnTarjeta.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            btnTarjeta.ForeColor = System.Drawing.Color.White;
-            btnTarjeta.Location = new System.Drawing.Point(40, 250);
-            btnTarjeta.Name = "btnTarjeta";
-            btnTarjeta.Size = new System.Drawing.Size(300, 50);
-            btnTarjeta.TabIndex = 4;
-            btnTarjeta.Text = "💳 Tarjeta (Débito/Crédito)";
-            btnTarjeta.UseVisualStyleBackColor = false;
-            btnTarjeta.Click += btnTarjeta_Click;
+            btnTarjetaDebito.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            btnTarjetaDebito.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnTarjetaDebito.FlatAppearance.BorderSize = 0;
+            btnTarjetaDebito.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnTarjetaDebito.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            btnTarjetaDebito.ForeColor = System.Drawing.Color.White;
+            btnTarjetaDebito.Location = new System.Drawing.Point(40, 250);
+            btnTarjetaDebito.Name = "btnTarjetaDebito";
+            btnTarjetaDebito.Size = new System.Drawing.Size(300, 50);
+            btnTarjetaDebito.TabIndex = 4;
+            btnTarjetaDebito.Text = "💳 Tarjeta Débito";
+            btnTarjetaDebito.UseVisualStyleBackColor = false;
+            btnTarjetaDebito.Click += btnTarjetaDebito_Click;
+            // 
+            // btnTarjetaCredito
+            // 
+            btnTarjetaCredito.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            btnTarjetaCredito.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnTarjetaCredito.FlatAppearance.BorderSize = 0;
+            btnTarjetaCredito.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnTarjetaCredito.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            btnTarjetaCredito.ForeColor = System.Drawing.Color.White;
+            btnTarjetaCredito.Location = new System.Drawing.Point(40, 310);
+            btnTarjetaCredito.Name = "btnTarjetaCredito";
+            btnTarjetaCredito.Size = new System.Drawing.Size(300, 50);
+            btnTarjetaCredito.TabIndex = 5;
+            btnTarjetaCredito.Text = "💳 Tarjeta Crédito";
+            btnTarjetaCredito.UseVisualStyleBackColor = false;
+            btnTarjetaCredito.Click += btnTarjetaCredito_Click;
             // 
             // btnMercadoPago
             // 
@@ -111,10 +128,10 @@ namespace StockOS.UI.WinForms.Forms
             btnMercadoPago.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMercadoPago.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnMercadoPago.ForeColor = System.Drawing.Color.White;
-            btnMercadoPago.Location = new System.Drawing.Point(40, 310);
+            btnMercadoPago.Location = new System.Drawing.Point(40, 370);
             btnMercadoPago.Name = "btnMercadoPago";
             btnMercadoPago.Size = new System.Drawing.Size(300, 50);
-            btnMercadoPago.TabIndex = 5;
+            btnMercadoPago.TabIndex = 6;
             btnMercadoPago.Text = "📱 Mercado Pago";
             btnMercadoPago.UseVisualStyleBackColor = false;
             btnMercadoPago.Click += btnMercadoPago_Click;
@@ -127,10 +144,10 @@ namespace StockOS.UI.WinForms.Forms
             btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancelar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             btnCancelar.ForeColor = System.Drawing.Color.White;
-            btnCancelar.Location = new System.Drawing.Point(40, 390);
+            btnCancelar.Location = new System.Drawing.Point(40, 440);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new System.Drawing.Size(300, 40);
-            btnCancelar.TabIndex = 6;
+            btnCancelar.TabIndex = 7;
             btnCancelar.Text = "Cancelar Venta";
             btnCancelar.UseVisualStyleBackColor = false;
             btnCancelar.Click += btnCancelar_Click;
@@ -140,10 +157,11 @@ namespace StockOS.UI.WinForms.Forms
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            ClientSize = new System.Drawing.Size(380, 460);
+            ClientSize = new System.Drawing.Size(380, 510);
             Controls.Add(btnCancelar);
             Controls.Add(btnMercadoPago);
-            Controls.Add(btnTarjeta);
+            Controls.Add(btnTarjetaCredito);
+            Controls.Add(btnTarjetaDebito);
             Controls.Add(btnEfectivo);
             Controls.Add(lblTotal);
             Controls.Add(lblTextoTotal);
@@ -152,9 +170,9 @@ namespace StockOS.UI.WinForms.Forms
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormCobro";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Cobro";
-            this.CancelButton = this.btnCancelar;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Cobro";
+            CancelButton = btnCancelar;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);
@@ -168,7 +186,8 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblTextoTotal;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnEfectivo;
-        private System.Windows.Forms.Button btnTarjeta;
+        private System.Windows.Forms.Button btnTarjetaDebito;
+        private System.Windows.Forms.Button btnTarjetaCredito;
         private System.Windows.Forms.Button btnMercadoPago;
         private System.Windows.Forms.Button btnCancelar;
     }

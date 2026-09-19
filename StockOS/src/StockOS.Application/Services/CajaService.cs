@@ -32,6 +32,10 @@ namespace StockOS.Application.Services
         {
             return _cajaSesionRepo.VerificarCajaAbierta(idEmpleado);
         }
+        public decimal ObtenerMontoEsperado(int idCajaSesion)
+        {
+            return _cajaRepo.ObtenerMontoEsperado(idCajaSesion);
+        }
         public void CerrarCaja(int idCajaSesion, decimal montoCierreReal)
         {
             if (montoCierreReal < 0) throw new Exception("El monto no puede ser negativo.");

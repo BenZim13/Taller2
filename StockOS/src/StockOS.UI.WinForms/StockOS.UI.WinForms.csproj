@@ -1,6 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -15,6 +25,10 @@
     <ProjectReference Include="..\StockOS.Infrastructure\StockOS.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -23,6 +37,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Permite compilar la referencia de Windows Forms en Linux/macOS -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UserSecretsId>dbfa0267-7d76-4811-bc0f-b6b9c11f4a8c</UserSecretsId>
   </PropertyGroup>
 
 </Project>

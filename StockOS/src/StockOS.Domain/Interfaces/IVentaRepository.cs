@@ -6,6 +6,6 @@ namespace StockOS.Domain.Interfaces
     public interface IVentaRepository
     {
         // Devuelve el ID de la venta generada
-        int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal);
+        int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal, int idMetodoPago);
     }
 }

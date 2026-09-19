@@ -23,6 +23,23 @@ namespace StockOS.DataAccess.Repositories
                 .FromSqlRaw("EXEC sp_Cajas_ObtenerPorSucursal @IdSucursal={0}", idSucursal)
                 .ToList();
         }
+        public decimal ObtenerMontoEsperado(int idCajaSesion)
+        {
+            var montoEsperadoParam = new Microsoft.Data.SqlClient.SqlParameter
+            {
+                ParameterName = "@MontoEsperado",
+                SqlDbType = System.Data.SqlDbType.Decimal,
+                Direction = System.Data.ParameterDirection.Output,
+                Precision = 18,
+                Scale = 2
+            };
+
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Caja_CalcularMontoEsperado @IdCajaSesion={0}, @MontoEsperado=@MontoEsperado OUTPUT",
+                idCajaSesion, montoEsperadoParam);
+
+            return montoEsperadoParam.Value != DBNull.Value ? (decimal)montoEsperadoParam.Value : 0;
+        }
         public void CerrarCaja(int idCajaSesion, decimal montoCierreReal)
         {
             _context.Database.ExecuteSqlRaw(

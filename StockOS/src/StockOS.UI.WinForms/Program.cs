@@ -7,6 +7,8 @@ using StockOS.DataAccess.Repositories;
 using StockOS.Application.Services;
 using System;
 using System.Windows.Forms;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -17,6 +19,10 @@ namespace StockOS.UI.WinForms.Forms
         {
             // 1. Configuración visual de WinForms (SIEMPRE VA PRIMERO)
             ApplicationConfiguration.Initialize();
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
 
             // 2. Configurar Inyección de Dependencias
             var host = Host.CreateDefaultBuilder()
@@ -24,7 +30,7 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     // Configurar BD con la cadena de conexión
                     services.AddDbContext<StockOsContext>(options =>
-                        options.UseSqlServer("Server=localhost;Database=StockOS;Trusted_Connection=True;TrustServerCertificate=True;"));
+                        options.UseSqlServer(configuration.GetConnectionString("StockOS")));
 
                     // Repositorios
                     services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
@@ -98,8 +104,8 @@ namespace StockOS.UI.WinForms.Forms
                     // 7. Al cerrarse el formulario principal, verificamos si fue por cierre de sesión
                     if (formInicio.LogoutRequested)
                     {
-                        // Limpiamos la sesión global
-                        StockOS.Application.Services.SesionActual.Usuario = null;
+                        // Limpiamos la sesión global usando el método
+                        StockOS.Application.Services.SesionActual.Limpiar();
                         continue; // Volvemos a mostrar el login
                     }
                     else

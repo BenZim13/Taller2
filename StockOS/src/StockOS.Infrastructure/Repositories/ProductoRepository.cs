@@ -17,6 +17,12 @@ namespace StockOS.DataAccess.Repositories
         {
             _context = context;
         }
+        public Producto BuscarPorCodigoBarra(string codigoBarra)
+        {
+            return _context.Productos
+                .AsNoTracking()
+                .FirstOrDefault(p => p.CodigoBarra == codigoBarra);
+        }
 
         public IEnumerable<Producto> ObtenerTodos()
         {

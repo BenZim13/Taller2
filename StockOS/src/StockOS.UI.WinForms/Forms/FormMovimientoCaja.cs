@@ -35,7 +35,7 @@ namespace StockOS.UI.WinForms.Forms
                 string tipo = cmbTipo.SelectedItem?.ToString() ?? "EGRESO";
                 string descripcion = txtDescripcion.Text.Trim();
 
-                _cajaService.RegistrarMovimiento(SesionActual.IdCajaSesionAbierta, tipo, monto, descripcion);
+                _cajaService.RegistrarMovimiento(SesionActual.IdCajaSesionAbierta.Value, tipo, monto, descripcion);
 
                 MessageBox.Show("Movimiento registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();

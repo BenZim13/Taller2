@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using StockOS.DataAccess.Repositories;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
+using System.Collections.Generic;
 
 namespace StockOS.Application.Services
 {
@@ -13,9 +14,9 @@ namespace StockOS.Application.Services
             _ventaRepo = ventaRepo;
         }
 
-        public int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal)
-        {
-            return _ventaRepo.RegistrarVenta(cabecera, detalles, idSucursal);
+        public int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal, int idMetodoPago) 
+        { 
+            return _ventaRepo.RegistrarVenta(cabecera, detalles, idSucursal, idMetodoPago); 
         }
     }
 }
