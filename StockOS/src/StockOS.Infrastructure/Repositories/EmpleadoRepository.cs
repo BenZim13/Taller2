@@ -44,6 +44,28 @@ namespace StockOS.DataAccess.Repositories
             return empleado;
         }
 
+        public bool? ConsultarEstado(string dni)
+        {
+            // [Procedimiento 5: sp_Usuarios_ConsultarEstado]
+            var paramEstado = new SqlParameter
+            {
+                ParameterName = "@Estado",
+                SqlDbType = SqlDbType.Bit,
+                Direction = ParameterDirection.Output
+            };
+
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Usuarios_ConsultarEstado @Dni={0}, @Estado=@Estado OUTPUT",
+                dni, paramEstado);
+
+            if (paramEstado.Value != DBNull.Value && paramEstado.Value != null)
+            {
+                return (bool)paramEstado.Value;
+            }
+
+            return null;
+        }
+
         public Empleado? ObtenerPorId(int id)
         {
             return _context.Empleados

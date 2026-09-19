@@ -22,10 +22,9 @@ namespace StockOS.UI.WinForms.Forms
             this.pnlHeaderLista = new System.Windows.Forms.Panel();
             this.btnIngresarStock = new System.Windows.Forms.Button();
             this.btnCategorias = new System.Windows.Forms.Button();
+            this.btnProveedores = new System.Windows.Forms.Button();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.btnRecargar = new System.Windows.Forms.Button();
-            this.btnEliminar = new System.Windows.Forms.Button();
-            this.btnEditar = new System.Windows.Forms.Button();
             this.lblTituloLista = new System.Windows.Forms.Label();
             this.pnlFiltros = new System.Windows.Forms.Panel();
             this.cmbFiltroEstado = new System.Windows.Forms.ComboBox();
@@ -43,10 +42,9 @@ namespace StockOS.UI.WinForms.Forms
             this.pnlHeaderLista.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             this.pnlHeaderLista.Controls.Add(this.btnIngresarStock);
             this.pnlHeaderLista.Controls.Add(this.btnCategorias);
+            this.pnlHeaderLista.Controls.Add(this.btnProveedores);
             this.pnlHeaderLista.Controls.Add(this.btnNuevo);
             this.pnlHeaderLista.Controls.Add(this.btnRecargar);
-            this.pnlHeaderLista.Controls.Add(this.btnEliminar);
-            this.pnlHeaderLista.Controls.Add(this.btnEditar);
             this.pnlHeaderLista.Controls.Add(this.lblTituloLista);
             this.pnlHeaderLista.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeaderLista.Location = new System.Drawing.Point(0, 0);
@@ -85,6 +83,21 @@ namespace StockOS.UI.WinForms.Forms
             this.btnCategorias.Text = "🗂 Categorías";
             this.btnCategorias.UseVisualStyleBackColor = false;
             // 
+            // btnProveedores
+            // 
+            this.btnProveedores.BackColor = System.Drawing.Color.FromArgb(2, 132, 199);
+            this.btnProveedores.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnProveedores.FlatAppearance.BorderSize = 0;
+            this.btnProveedores.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnProveedores.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnProveedores.ForeColor = System.Drawing.Color.White;
+            this.btnProveedores.Location = new System.Drawing.Point(445, 10);
+            this.btnProveedores.Name = "btnProveedores";
+            this.btnProveedores.Size = new System.Drawing.Size(135, 32);
+            this.btnProveedores.TabIndex = 7;
+            this.btnProveedores.Text = "🏢 Proveedores";
+            this.btnProveedores.UseVisualStyleBackColor = false;
+            // 
             // btnNuevo
             // 
             this.btnNuevo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
@@ -107,46 +120,14 @@ namespace StockOS.UI.WinForms.Forms
             this.btnRecargar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRecargar.FlatAppearance.BorderSize = 0;
             this.btnRecargar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRecargar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnRecargar.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular);
             this.btnRecargar.ForeColor = System.Drawing.Color.White;
-            this.btnRecargar.Location = new System.Drawing.Point(885, 10);
+            this.btnRecargar.Location = new System.Drawing.Point(941, 10);
             this.btnRecargar.Name = "btnRecargar";
-            this.btnRecargar.Size = new System.Drawing.Size(90, 32);
+            this.btnRecargar.Size = new System.Drawing.Size(34, 32);
             this.btnRecargar.TabIndex = 3;
-            this.btnRecargar.Text = "Recargar";
+            this.btnRecargar.Text = "🔄";
             this.btnRecargar.UseVisualStyleBackColor = false;
-            // 
-            // btnEliminar
-            // 
-            this.btnEliminar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEliminar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
-            this.btnEliminar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnEliminar.FlatAppearance.BorderSize = 0;
-            this.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEliminar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnEliminar.ForeColor = System.Drawing.Color.White;
-            this.btnEliminar.Location = new System.Drawing.Point(745, 10);
-            this.btnEliminar.Name = "btnEliminar";
-            this.btnEliminar.Size = new System.Drawing.Size(130, 32);
-            this.btnEliminar.TabIndex = 2;
-            this.btnEliminar.Text = "Dar de Baja";
-            this.btnEliminar.UseVisualStyleBackColor = false;
-            // 
-            // btnEditar
-            // 
-            this.btnEditar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEditar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(59)))), ((int)(((byte)(130)))), ((int)(((byte)(246)))));
-            this.btnEditar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnEditar.FlatAppearance.BorderSize = 0;
-            this.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEditar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnEditar.ForeColor = System.Drawing.Color.White;
-            this.btnEditar.Location = new System.Drawing.Point(635, 10);
-            this.btnEditar.Name = "btnEditar";
-            this.btnEditar.Size = new System.Drawing.Size(100, 32);
-            this.btnEditar.TabIndex = 1;
-            this.btnEditar.Text = "Modificar";
-            this.btnEditar.UseVisualStyleBackColor = false;
             // 
             // lblTituloLista
             // 
@@ -243,7 +224,7 @@ namespace StockOS.UI.WinForms.Forms
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(6, 4, 6, 4);
+            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(12, 0, 4, 0);
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
@@ -254,7 +235,7 @@ namespace StockOS.UI.WinForms.Forms
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(12, 0, 4, 0);
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
@@ -296,12 +277,11 @@ namespace StockOS.UI.WinForms.Forms
 
         private System.Windows.Forms.Panel pnlHeaderLista;
         private System.Windows.Forms.Label lblTituloLista;
-        private System.Windows.Forms.Button btnEditar;
-        private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Button btnRecargar;
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Button btnIngresarStock;
         private System.Windows.Forms.Button btnCategorias;
+        private System.Windows.Forms.Button btnProveedores;
         private System.Windows.Forms.Panel pnlFiltros;
         private System.Windows.Forms.TextBox txtBuscar;
         private System.Windows.Forms.Label lblBuscar;

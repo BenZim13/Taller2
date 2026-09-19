@@ -55,9 +55,9 @@ namespace StockOS.UI.WinForms.Forms
             }
 
             // Llamada al backend real (Base de Datos)
-            var empleado = await _authService.LoginAsync(dni, password);
+            var (exito, empleado, mensajeError) = await _authService.LoginAsync(dni, password);
 
-            if (empleado != null)
+            if (exito && empleado != null)
             {
                 UsuarioAutenticado = empleado;
 
@@ -72,7 +72,7 @@ namespace StockOS.UI.WinForms.Forms
             }
             else
             {
-                MostrarError("Credenciales incorrectas.");
+                MostrarError(mensajeError ?? "Credenciales incorrectas.");
                 _ignorandoCambios = true;
                 txtPassword.SelectAll();
                 txtPassword.Focus();

@@ -20,14 +20,35 @@ namespace StockOS.DataAccess.Repositories
 
         public IEnumerable<Producto> ObtenerTodos()
         {
-            // 1. Cargamos las categorías en la memoria interna de EF usando nuestro SP
-            _context.Categorias.FromSqlRaw("EXEC sp_Categorias_ObtenerTodas").Load();
+            var categorias = _context.Categorias
+                .FromSqlRaw("EXEC sp_Categorias_ObtenerTodas")
+                .AsNoTracking()
+                .ToDictionary(c => c.IdCategoria);
 
-            // 2. Traemos los productos (SIN el .Include). 
-            // EF Core los conectará automáticamente con las categorías que ya están en memoria.
-            return _context.Productos
+            var proveedores = _context.Proveedores
+                .FromSqlRaw("EXEC sp_Proveedores_ObtenerTodos")
+                .AsNoTracking()
+                .ToDictionary(p => p.IdProveedor);
+
+            var productos = _context.Productos
                 .FromSqlRaw("EXEC sp_Productos_ObtenerTodos")
+                .AsNoTracking()
                 .ToList();
+
+            foreach (var p in productos)
+            {
+                if (categorias.TryGetValue(p.IdCategoria, out var cat))
+                {
+                    p.IdCategoriaNavigation = cat;
+                }
+
+                if (p.IdProveedor.HasValue && proveedores.TryGetValue(p.IdProveedor.Value, out var prov))
+                {
+                    p.IdProveedorNavigation = prov;
+                }
+            }
+
+            return productos;
         }
 
         public void Agregar(Producto producto)
@@ -40,15 +61,21 @@ namespace StockOS.DataAccess.Repositories
                 Direction = System.Data.ParameterDirection.Output
             };
 
+            var idProveedorParam = new SqlParameter("@IdProveedor", System.Data.SqlDbType.Int)
+            {
+                Value = producto.IdProveedor.HasValue ? (object)producto.IdProveedor.Value : DBNull.Value
+            };
+
             // Ejecutamos el SP
             _context.Database.ExecuteSqlRaw(
-                "EXEC sp_Productos_Insertar @CodigoBarra={0}, @Nombre={1}, @Descripcion={2}, @PrecioVentaActual={3}, @PorcentajeIva={4}, @IdCategoria={5}, @IdProducto=@IdProducto OUTPUT",
+                "EXEC sp_Productos_Insertar @CodigoBarra={0}, @Nombre={1}, @Descripcion={2}, @PrecioVentaActual={3}, @PorcentajeIva={4}, @IdCategoria={5}, @IdProveedor={6}, @IdProducto=@IdProducto OUTPUT",
                 producto.CodigoBarra,
                 producto.Nombre,
                 producto.Descripcion ?? "", // Manejo de nulos por si no tiene descripción
                 producto.PrecioVentaActual,
                 producto.PorcentajeIva,
                 producto.IdCategoria,
+                idProveedorParam,
                 idParam);
 
             // Asignamos el nuevo ID al objeto
@@ -57,9 +84,14 @@ namespace StockOS.DataAccess.Repositories
 
         public void Actualizar(Producto producto)
         {
+            var idProveedorParam = new SqlParameter("@IdProveedor", System.Data.SqlDbType.Int)
+            {
+                Value = producto.IdProveedor.HasValue ? (object)producto.IdProveedor.Value : DBNull.Value
+            };
+
             // Ejecutamos el SP de actualización (Sirve tanto para modificar datos como para cambiar el estado Activo/Inactivo)
             _context.Database.ExecuteSqlRaw(
-                "EXEC sp_Productos_Actualizar @IdProducto={0}, @CodigoBarra={1}, @Nombre={2}, @Descripcion={3}, @PrecioVentaActual={4}, @PorcentajeIva={5}, @IdCategoria={6}, @Activo={7}",
+                "EXEC sp_Productos_Actualizar @IdProducto={0}, @CodigoBarra={1}, @Nombre={2}, @Descripcion={3}, @PrecioVentaActual={4}, @PorcentajeIva={5}, @IdCategoria={6}, @Activo={7}, @IdProveedor={8}",
                 producto.IdProducto,
                 producto.CodigoBarra,
                 producto.Nombre,
@@ -67,7 +99,16 @@ namespace StockOS.DataAccess.Repositories
                 producto.PrecioVentaActual,
                 producto.PorcentajeIva,
                 producto.IdCategoria,
-                producto.Activo);
+                producto.Activo,
+                idProveedorParam);
+        }
+
+        public void CambiarEstado(int idProducto, bool activo)
+        {
+            // [Procedimiento sp_Productos_CambiarEstado]
+            _context.Database.ExecuteSqlRaw(
+                "EXEC sp_Productos_CambiarEstado @IdProducto={0}, @Activo={1}",
+                idProducto, activo);
         }
     }
 }

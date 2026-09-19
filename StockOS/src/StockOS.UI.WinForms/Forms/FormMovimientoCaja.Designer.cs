@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormMovimientoCaja
     {
@@ -141,8 +141,9 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormMovimientoCaja";
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            Text = "Movimiento de Caja";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Movimiento de Caja";
+            this.CancelButton = this.btnCancelar;
             ResumeLayout(false);
             PerformLayout();
         }

@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormCierreCaja
     {
@@ -58,24 +58,43 @@
             // btnConfirmarCierre
             // 
             btnConfirmarCierre.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
+            btnConfirmarCierre.Cursor = System.Windows.Forms.Cursors.Hand;
             btnConfirmarCierre.FlatAppearance.BorderSize = 0;
             btnConfirmarCierre.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnConfirmarCierre.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            btnConfirmarCierre.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             btnConfirmarCierre.ForeColor = System.Drawing.Color.White;
             btnConfirmarCierre.Location = new System.Drawing.Point(24, 160);
             btnConfirmarCierre.Name = "btnConfirmarCierre";
-            btnConfirmarCierre.Size = new System.Drawing.Size(320, 50);
+            btnConfirmarCierre.Size = new System.Drawing.Size(190, 45);
             btnConfirmarCierre.TabIndex = 3;
             btnConfirmarCierre.Text = "CERRAR TURNO";
             btnConfirmarCierre.UseVisualStyleBackColor = false;
             btnConfirmarCierre.Click += btnConfirmarCierre_Click;
+            // 
+            // btnCancelar
+            // 
+            this.btnCancelar = new System.Windows.Forms.Button();
+            btnCancelar.BackColor = System.Drawing.Color.FromArgb(71, 85, 105);
+            btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnCancelar.FlatAppearance.BorderSize = 0;
+            btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCancelar.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            btnCancelar.ForeColor = System.Drawing.Color.White;
+            btnCancelar.Location = new System.Drawing.Point(224, 160);
+            btnCancelar.Name = "btnCancelar";
+            btnCancelar.Size = new System.Drawing.Size(120, 45);
+            btnCancelar.TabIndex = 4;
+            btnCancelar.Text = "Cancelar";
+            btnCancelar.UseVisualStyleBackColor = false;
+            btnCancelar.Click += (s, e) => this.Close();
             // 
             // FormCierreCaja
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            ClientSize = new System.Drawing.Size(364, 241);
+            ClientSize = new System.Drawing.Size(364, 230);
+            Controls.Add(btnCancelar);
             Controls.Add(btnConfirmarCierre);
             Controls.Add(txtMontoReal);
             Controls.Add(lblIndicacion);
@@ -86,6 +105,7 @@
             Name = "FormCierreCaja";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "Cerrar Caja";
+            CancelButton = btnCancelar;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -94,5 +114,6 @@
         private System.Windows.Forms.Label lblIndicacion;
         private System.Windows.Forms.TextBox txtMontoReal;
         private System.Windows.Forms.Button btnConfirmarCierre;
+        private System.Windows.Forms.Button btnCancelar;
     }
 }

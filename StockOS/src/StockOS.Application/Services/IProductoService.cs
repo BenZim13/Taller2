@@ -1,4 +1,4 @@
-﻿using StockOS.Domain.Entities;
+using StockOS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +12,6 @@ namespace StockOS.Application.Services
         IEnumerable<Producto> ObtenerTodos();
         void Agregar(Producto producto);
         void Actualizar(Producto producto);
+        void CambiarEstado(int idProducto, bool activo);
     }
 }

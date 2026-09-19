@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using StockOS.Domain.Entities;
@@ -474,10 +474,16 @@ public partial class StockOsContext : DbContext
                 .HasColumnType("decimal(12, 2)")
                 .HasColumnName("precio_venta_actual");
 
+            entity.Property(e => e.IdProveedor).HasColumnName("id_proveedor");
+
             entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Productos)
                 .HasForeignKey(d => d.IdCategoria)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__producto__id_cat__628FA481");
+
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.IdProveedor)
+                .HasConstraintName("FK_producto_proveedor");
         });
 
         modelBuilder.Entity<Proveedor>(entity =>

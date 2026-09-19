@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormCobro
     {
@@ -152,8 +152,9 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormCobro";
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            Text = "Cobro";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Cobro";
+            this.CancelButton = this.btnCancelar;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);

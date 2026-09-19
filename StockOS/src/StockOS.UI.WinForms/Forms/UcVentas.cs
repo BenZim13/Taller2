@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -69,6 +69,13 @@ namespace StockOS.UI.WinForms.Forms
 
                 if (producto != null)
                 {
+                    if (producto.Activo == false)
+                    {
+                        MessageBox.Show($"El producto '{producto.Nombre}' está deshabilitado / inactivo y no puede ser vendido.", "Producto Inactivo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtCodigoBarra.SelectAll();
+                        return;
+                    }
+
                     AgregarProductoAlTicket(producto);
                     txtCodigoBarra.Clear();
                 }

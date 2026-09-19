@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace StockOS.Domain.Entities;
@@ -19,6 +19,8 @@ public partial class Producto
 
     public int IdCategoria { get; set; }
 
+    public int? IdProveedor { get; set; }
+
     public bool Activo { get; set; }
 
     public virtual ICollection<DetalleCompra> DetalleCompras { get; set; } = new List<DetalleCompra>();
@@ -26,6 +28,8 @@ public partial class Producto
     public virtual ICollection<DetalleVenta> DetalleVenta { get; set; } = new List<DetalleVenta>();
 
     public virtual Categoria IdCategoriaNavigation { get; set; } = null!;
+
+    public virtual Proveedor? IdProveedorNavigation { get; set; }
 
     public virtual ICollection<StockSucursal> StockSucursals { get; set; } = new List<StockSucursal>();
 }

@@ -26,8 +26,12 @@ namespace StockOS.UI.WinForms.Forms
             this.txtNombre = new System.Windows.Forms.TextBox();
             this.lblCategoria = new System.Windows.Forms.Label();
             this.cmbCategoria = new System.Windows.Forms.ComboBox();
+            this.lblProveedor = new System.Windows.Forms.Label();
+            this.cmbProveedor = new System.Windows.Forms.ComboBox();
             this.lblPrecio = new System.Windows.Forms.Label();
             this.txtPrecio = new System.Windows.Forms.TextBox();
+            this.lblPrecioCompra = new System.Windows.Forms.Label();
+            this.txtPrecioCompra = new System.Windows.Forms.TextBox();
             
             // Nuevos controles en reemplazo de Descripción
             this.lblStock = new System.Windows.Forms.Label();
@@ -54,7 +58,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnSalirApp.Name = "btnSalirApp";
             this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
             this.btnSalirApp.TabIndex = 99;
-            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.Text = "Cerrar";
             this.btnSalirApp.UseVisualStyleBackColor = false;
             this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
             // 
@@ -139,8 +143,30 @@ namespace StockOS.UI.WinForms.Forms
             this.cmbCategoria.FormattingEnabled = true;
             this.cmbCategoria.Location = new System.Drawing.Point(40, 235);
             this.cmbCategoria.Name = "cmbCategoria";
-            this.cmbCategoria.Size = new System.Drawing.Size(400, 25);
-            this.cmbCategoria.TabIndex = 6;
+            this.cmbCategoria.Size = new System.Drawing.Size(190, 25);
+            this.cmbCategoria.TabIndex = 5;
+            // 
+            // lblProveedor
+            // 
+            this.lblProveedor.AutoSize = true;
+            this.lblProveedor.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblProveedor.Location = new System.Drawing.Point(250, 210);
+            this.lblProveedor.Name = "lblProveedor";
+            this.lblProveedor.Size = new System.Drawing.Size(72, 19);
+            this.lblProveedor.TabIndex = 6;
+            this.lblProveedor.Text = "Proveedor";
+            // 
+            // cmbProveedor
+            // 
+            this.cmbProveedor.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.cmbProveedor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbProveedor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbProveedor.ForeColor = System.Drawing.Color.White;
+            this.cmbProveedor.FormattingEnabled = true;
+            this.cmbProveedor.Location = new System.Drawing.Point(250, 235);
+            this.cmbProveedor.Name = "cmbProveedor";
+            this.cmbProveedor.Size = new System.Drawing.Size(190, 25);
+            this.cmbProveedor.TabIndex = 6;
             // 
             // lblPrecio
             // 
@@ -159,8 +185,28 @@ namespace StockOS.UI.WinForms.Forms
             this.txtPrecio.ForeColor = System.Drawing.Color.White;
             this.txtPrecio.Location = new System.Drawing.Point(40, 300);
             this.txtPrecio.Name = "txtPrecio";
-            this.txtPrecio.Size = new System.Drawing.Size(400, 25);
+            this.txtPrecio.Size = new System.Drawing.Size(190, 25);
             this.txtPrecio.TabIndex = 8;
+            // 
+            // lblPrecioCompra
+            // 
+            this.lblPrecioCompra.AutoSize = true;
+            this.lblPrecioCompra.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblPrecioCompra.Location = new System.Drawing.Point(250, 275);
+            this.lblPrecioCompra.Name = "lblPrecioCompra";
+            this.lblPrecioCompra.Size = new System.Drawing.Size(117, 19);
+            this.lblPrecioCompra.TabIndex = 15;
+            this.lblPrecioCompra.Text = "Precio de Compra";
+            // 
+            // txtPrecioCompra
+            // 
+            this.txtPrecioCompra.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.txtPrecioCompra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPrecioCompra.ForeColor = System.Drawing.Color.White;
+            this.txtPrecioCompra.Location = new System.Drawing.Point(250, 300);
+            this.txtPrecioCompra.Name = "txtPrecioCompra";
+            this.txtPrecioCompra.Size = new System.Drawing.Size(190, 25);
+            this.txtPrecioCompra.TabIndex = 9;
             
             // --- NUEVOS CAMPOS: Stock y Estado ---
             this.lblStock.AutoSize = true;
@@ -241,8 +287,12 @@ namespace StockOS.UI.WinForms.Forms
             this.Controls.Add(this.lblEstado);
             this.Controls.Add(this.txtStock);
             this.Controls.Add(this.lblStock);
+            this.Controls.Add(this.txtPrecioCompra);
+            this.Controls.Add(this.lblPrecioCompra);
             this.Controls.Add(this.txtPrecio);
             this.Controls.Add(this.lblPrecio);
+            this.Controls.Add(this.cmbProveedor);
+            this.Controls.Add(this.lblProveedor);
             this.Controls.Add(this.cmbCategoria);
             this.Controls.Add(this.lblCategoria);
             this.Controls.Add(this.txtNombre);
@@ -257,6 +307,7 @@ namespace StockOS.UI.WinForms.Forms
             this.Name = "FormRegistroProducto";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Registro de Producto";
+            this.CancelButton = this.btnCancelar;
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);
@@ -275,8 +326,12 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.TextBox txtNombre;
         private System.Windows.Forms.Label lblCategoria;
         private System.Windows.Forms.ComboBox cmbCategoria;
+        private System.Windows.Forms.Label lblProveedor;
+        private System.Windows.Forms.ComboBox cmbProveedor;
         private System.Windows.Forms.Label lblPrecio;
         private System.Windows.Forms.TextBox txtPrecio;
+        private System.Windows.Forms.Label lblPrecioCompra;
+        private System.Windows.Forms.TextBox txtPrecioCompra;
         private System.Windows.Forms.Label lblStock;
         private System.Windows.Forms.TextBox txtStock;
         private System.Windows.Forms.Label lblEstado;

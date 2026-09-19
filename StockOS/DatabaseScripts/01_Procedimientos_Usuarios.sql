@@ -1,4 +1,4 @@
-﻿USE StockOS;
+USE StockOS;
 GO
 
 -- 1. Insertar Usuario
@@ -63,7 +63,7 @@ BEGIN
 END
 GO
 
--- 4. Cambiar Estado (Baja LÃ³gica / SuspensiÃ³n)
+-- 4. Cambiar Estado (Baja Lógica / Suspensión)
 CREATE OR ALTER PROCEDURE sp_Usuarios_CambiarEstado
     @IdEmpleado INT,
     @Estado BIT
@@ -74,3 +74,19 @@ BEGIN
     WHERE id_empleado = @IdEmpleado;
 END
 GO
+
+-- 5. Consultar Estado de Usuario (Login / Verificación)
+CREATE OR ALTER PROCEDURE sp_Usuarios_ConsultarEstado
+    @Dni VARCHAR(20),
+    @Estado BIT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @Estado = NULL;
+
+    SELECT @Estado = estado
+    FROM empleado
+    WHERE dni = @Dni;
+END
+GO
+

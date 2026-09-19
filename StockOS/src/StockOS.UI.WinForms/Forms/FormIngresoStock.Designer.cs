@@ -27,6 +27,8 @@ namespace StockOS.UI.WinForms.Forms
             this.txtNombreProducto  = new System.Windows.Forms.TextBox();
             this.lblCategoria       = new System.Windows.Forms.Label();
             this.cmbCategoria       = new System.Windows.Forms.ComboBox();
+            this.lblProveedor       = new System.Windows.Forms.Label();
+            this.cmbProveedor       = new System.Windows.Forms.ComboBox();
             this.lblCantidad        = new System.Windows.Forms.Label();
             this.txtCantidad        = new System.Windows.Forms.TextBox();
             this.lblFecha           = new System.Windows.Forms.Label();
@@ -75,7 +77,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnSalirApp.Name = "btnSalirApp";
             this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
             this.btnSalirApp.TabIndex = 99;
-            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.Text = "Cerrar";
             this.btnSalirApp.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnSalirApp.UseVisualStyleBackColor = false;
             this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
@@ -114,7 +116,7 @@ namespace StockOS.UI.WinForms.Forms
             this.txtNombreProducto.TabIndex = 1;
 
             // ======================
-            // FILA 2: Categoría (ancho completo)
+            // FILA 2: Categoría (izq) | Proveedor (der)
             // ======================
             this.lblCategoria.AutoSize = true;
             this.lblCategoria.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
@@ -129,8 +131,24 @@ namespace StockOS.UI.WinForms.Forms
             this.cmbCategoria.ForeColor = System.Drawing.Color.White;
             this.cmbCategoria.Location = new System.Drawing.Point(40, 160);
             this.cmbCategoria.Name = "cmbCategoria";
-            this.cmbCategoria.Size = new System.Drawing.Size(340, 25);
+            this.cmbCategoria.Size = new System.Drawing.Size(155, 25);
             this.cmbCategoria.TabIndex = 2;
+
+            this.lblProveedor.AutoSize = true;
+            this.lblProveedor.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblProveedor.Location = new System.Drawing.Point(225, 140);
+            this.lblProveedor.Name = "lblProveedor";
+            this.lblProveedor.TabIndex = 13;
+            this.lblProveedor.Text = "Proveedor";
+
+            this.cmbProveedor.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.cmbProveedor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbProveedor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbProveedor.ForeColor = System.Drawing.Color.White;
+            this.cmbProveedor.Location = new System.Drawing.Point(225, 160);
+            this.cmbProveedor.Name = "cmbProveedor";
+            this.cmbProveedor.Size = new System.Drawing.Size(155, 25);
+            this.cmbProveedor.TabIndex = 3;
 
             // ======================
             // FILA 3: Cantidad (izq) | Fecha (der)
@@ -290,6 +308,8 @@ namespace StockOS.UI.WinForms.Forms
             this.Controls.Add(this.lblFecha);
             this.Controls.Add(this.txtCantidad);
             this.Controls.Add(this.lblCantidad);
+            this.Controls.Add(this.cmbProveedor);
+            this.Controls.Add(this.lblProveedor);
             this.Controls.Add(this.cmbCategoria);
             this.Controls.Add(this.lblCategoria);
             this.Controls.Add(this.txtNombreProducto);
@@ -304,6 +324,7 @@ namespace StockOS.UI.WinForms.Forms
             this.Name = "FormIngresoStock";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Ingreso de Stock";
+            this.CancelButton = this.btnCancelar;
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.ResumeLayout(false);
@@ -321,6 +342,8 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.TextBox txtNombreProducto;
         private System.Windows.Forms.Label lblCategoria;
         private System.Windows.Forms.ComboBox cmbCategoria;
+        private System.Windows.Forms.Label lblProveedor;
+        private System.Windows.Forms.ComboBox cmbProveedor;
         private System.Windows.Forms.Label lblCantidad;
         private System.Windows.Forms.TextBox txtCantidad;
         private System.Windows.Forms.Label lblFecha;

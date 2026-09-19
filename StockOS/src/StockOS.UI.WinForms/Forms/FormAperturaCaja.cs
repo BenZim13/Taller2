@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using StockOS.Application;
 using StockOS.Application.Services;
@@ -82,7 +82,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnSalirApp_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.Application.Exit();
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
     }
 }

@@ -38,14 +38,112 @@ namespace StockOS.UI.WinForms.Forms
         {
             dgvProductos.Columns.Clear();
 
+            // Garantizar alineación a la izquierda y padding uniforme para todo el encabezado y las celdas
+            var paddingUniforme = new Padding(12, 0, 4, 0);
+
+            dgvProductos.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgvProductos.ColumnHeadersDefaultCellStyle.Padding = paddingUniforme;
+            dgvProductos.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgvProductos.DefaultCellStyle.Padding = paddingUniforme;
+
             dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colId", HeaderText = "ID", DataPropertyName = "IdProducto", Visible = false });
 
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colCodigo", HeaderText = "Cód. Barra", FillWeight = 100 });
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colNombre", HeaderText = "Nombre Producto", FillWeight = 180 });
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colCategoria", HeaderText = "Categoría", FillWeight = 120 });
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colPrecio", HeaderText = "Precio Venta", FillWeight = 90, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colStock", HeaderText = "Stock", FillWeight = 70 });
-            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn { Name = "colEstado", HeaderText = "Estado", FillWeight = 75 });
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colCodigo", 
+                HeaderText = "Cód. Barra", 
+                FillWeight = 85,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colNombre", 
+                HeaderText = "Nombre Producto", 
+                FillWeight = 165,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colCategoria", 
+                HeaderText = "Categoría", 
+                FillWeight = 100,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colProveedor", 
+                HeaderText = "Proveedor", 
+                FillWeight = 100,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colPrecio", 
+                HeaderText = "Precio Venta", 
+                FillWeight = 75, 
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colStock", 
+                HeaderText = "Stock", 
+                FillWeight = 65,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            dgvProductos.Columns.Add(new DataGridViewTextBoxColumn 
+            { 
+                Name = "colEstado", 
+                HeaderText = "Estado", 
+                FillWeight = 70,
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft, Padding = paddingUniforme }
+            });
+
+            // Columna Modificar (solo texto, link clickable alineado a la izquierda)
+            var colModificar = new DataGridViewLinkColumn
+            {
+                Name = "colModificar",
+                HeaderText = "Modificar",
+                FillWeight = 75,
+                LinkBehavior = LinkBehavior.HoverUnderline,
+                TrackVisitedState = false,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleLeft,
+                    Padding = paddingUniforme,
+                    Font = new Font("Segoe UI", 9.5f, FontStyle.Bold)
+                }
+            };
+            dgvProductos.Columns.Add(colModificar);
+
+            // Columna Dar de Baja / Reactivar (solo texto, link clickable alineado a la izquierda)
+            var colAccionEstado = new DataGridViewLinkColumn
+            {
+                Name = "colAccionEstado",
+                HeaderText = "Dar de Baja",
+                FillWeight = 85,
+                LinkBehavior = LinkBehavior.HoverUnderline,
+                TrackVisitedState = false,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleLeft,
+                    Padding = paddingUniforme,
+                    Font = new Font("Segoe UI", 9.5f, FontStyle.Bold)
+                }
+            };
+            dgvProductos.Columns.Add(colAccionEstado);
+
+            // Asegurar que todas las celdas de encabezado tengan explícitamente alineación a la izquierda y padding uniforme
+            foreach (DataGridViewColumn col in dgvProductos.Columns)
+            {
+                col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                col.HeaderCell.Style.Padding = paddingUniforme;
+            }
         }
 
         private void ConfigurarEventos()
@@ -62,15 +160,23 @@ namespace StockOS.UI.WinForms.Forms
 
             // Botones
             btnRecargar.Click += (s, e) => CargarDatos();
-            dgvProductos.SelectionChanged += DgvProductos_SelectionChanged;
             btnNuevo.Click += BtnNuevo_Click;
             btnIngresarStock.Click += BtnIngresarStock_Click;
             btnCategorias.Click += BtnCategorias_Click;
-            btnEditar.Click += (s, e) => EditarSeleccionado();
-            btnEliminar.Click += BtnEliminar_Click;
+            btnProveedores.Click += BtnProveedores_Click;
+
+            // Tooltip para el botón de recargar compacto
+            var toolTip = new ToolTip();
+            toolTip.SetToolTip(btnRecargar, "Recargar inventario");
+
+            // Acciones por fila en la grilla
+            dgvProductos.CellClick += DgvProductos_CellClick;
+            dgvProductos.CellDoubleClick += DgvProductos_CellDoubleClick;
+
             // Capturar cuando la lectora de barras presiona ENTER
             txtBuscar.KeyDown += TxtBuscar_KeyDown;
         }
+
         private void ConfigurarPermisosModulo()
         {
             if (SesionActual.Usuario == null) return;
@@ -83,8 +189,11 @@ namespace StockOS.UI.WinForms.Forms
                 btnNuevo.Visible = false;
                 btnIngresarStock.Visible = false;
                 btnCategorias.Visible = false;
-                btnEditar.Visible = false;
-                btnEliminar.Visible = false;
+                btnProveedores.Visible = false;
+                if (dgvProductos.Columns.Contains("colModificar"))
+                    dgvProductos.Columns["colModificar"].Visible = false;
+                if (dgvProductos.Columns.Contains("colAccionEstado"))
+                    dgvProductos.Columns["colAccionEstado"].Visible = false;
             }
         }
         private void CargarDatos()
@@ -111,7 +220,8 @@ namespace StockOS.UI.WinForms.Forms
             {
                 filtrados = filtrados.Where(p =>
                     (p.CodigoBarra != null && p.CodigoBarra.ToLowerInvariant().Contains(texto)) ||
-                    (p.Nombre != null && p.Nombre.ToLowerInvariant().Contains(texto)));
+                    (p.Nombre != null && p.Nombre.ToLowerInvariant().Contains(texto)) ||
+                    (p.IdProveedorNavigation?.RazonSocial != null && p.IdProveedorNavigation.RazonSocial.ToLowerInvariant().Contains(texto)));
             }
 
             if (filtroEstado == "Solo Activos")
@@ -128,19 +238,24 @@ namespace StockOS.UI.WinForms.Forms
             foreach (var prod in filtrados)
             {
                 string categoriaNombre = prod.IdCategoriaNavigation?.Nombre ?? $"Categoría {prod.IdCategoria}";
+                string proveedorNombre = prod.IdProveedorNavigation?.RazonSocial ?? "S/P";
                 string estadoTexto = (prod.Activo == true) ? "Activo" : "Inactivo";
+                string textoAccion = (prod.Activo == true) ? "Dar de baja" : "Reactivar";
 
                 // Le preguntamos al servicio de stock cuántas unidades hay (usando nuestra sesión dinámica)
                 int stockActual = _stockService.ObtenerCantidadActual(prod.IdProducto, SesionActual.IdSucursal);
 
                 int index = dgvProductos.Rows.Add(
-                    prod.IdProducto.ToString(), // <-- Convertimos a texto
+                    prod.IdProducto.ToString(),
                     prod.CodigoBarra,
                     prod.Nombre,
                     categoriaNombre,
-                    $"$ {prod.PrecioVentaActual:N2}", // <-- Convertimos a texto con formato de moneda
-                    stockActual.ToString(), // <-- Convertimos a texto
-                    estadoTexto
+                    proveedorNombre,
+                    $"$ {prod.PrecioVentaActual:N2}",
+                    stockActual.ToString(),
+                    estadoTexto,
+                    "Modificar",
+                    textoAccion
                 );
 
                 // Colorear el estado 
@@ -153,122 +268,134 @@ namespace StockOS.UI.WinForms.Forms
                     dgvProductos.Rows[index].Cells["colEstado"].Style.ForeColor = Color.FromArgb(52, 211, 153); // Color esmeralda
                 }
 
-            }
+                // Estilo para el link "Modificar"
+                if (dgvProductos.Rows[index].Cells["colModificar"] is DataGridViewLinkCell cellModificar)
+                {
+                    cellModificar.LinkColor = Color.FromArgb(56, 189, 248); // Azul celeste
+                    cellModificar.ActiveLinkColor = Color.FromArgb(147, 197, 253);
+                    cellModificar.VisitedLinkColor = Color.FromArgb(56, 189, 248);
+                }
 
+                // Estilo para el link "Dar de baja" / "Reactivar"
+                if (dgvProductos.Rows[index].Cells["colAccionEstado"] is DataGridViewLinkCell cellAccion)
+                {
+                    if (prod.Activo == true)
+                    {
+                        cellAccion.LinkColor = Color.FromArgb(248, 113, 113); // Rojo suave / coral
+                        cellAccion.ActiveLinkColor = Color.FromArgb(252, 165, 165);
+                        cellAccion.VisitedLinkColor = Color.FromArgb(248, 113, 113);
+                    }
+                    else
+                    {
+                        cellAccion.LinkColor = Color.FromArgb(52, 211, 153); // Verde esmeralda
+                        cellAccion.ActiveLinkColor = Color.FromArgb(110, 231, 183);
+                        cellAccion.VisitedLinkColor = Color.FromArgb(52, 211, 153);
+                    }
+                }
+            }
         }
 
         private void BtnNuevo_Click(object? sender, EventArgs e)
         {
-            // Pedimos prestado el ServiceProvider para abrir la ventana con sus dependencias
             using var scope = _serviceProvider.CreateScope();
             var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
 
-            // Lo mostramos como una ventana de diálogo (bloqueante)
-            if (formRegistro.ShowDialog() == DialogResult.OK)
-            {
-                // Si el usuario guardó, recargamos la grilla para ver el nuevo producto
-                CargarDatos();
-            }
-        }
-        private void DgvProductos_SelectionChanged(object? sender, EventArgs e)
-        {
-            var producto = ObtenerProductoSeleccionadoSilencioso();
-            if (producto != null)
-            {
-                if (producto.Activo == true)
-                {
-                    btnEliminar.Text = "Dar de Baja";
-                    btnEliminar.BackColor = Color.FromArgb(239, 68, 68); // Rojo
-                }
-                else
-                {
-                    btnEliminar.Text = "Reactivar";
-                    btnEliminar.BackColor = Color.FromArgb(16, 185, 129); // Verde
-                }
-            }
-        }
-
-        private Producto? ObtenerProductoSeleccionadoSilencioso()
-        {
-            if (dgvProductos.CurrentRow == null || dgvProductos.CurrentRow.Index < 0) return null;
-            if (dgvProductos.CurrentRow.Cells["colId"].Value == null) return null;
-            
-            int idProducto = Convert.ToInt32(dgvProductos.CurrentRow.Cells["colId"].Value);
-            return _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
-        }
-
-        private Producto? ObtenerProductoSeleccionado()
-        {
-            var p = ObtenerProductoSeleccionadoSilencioso();
-            if (p == null)
-            {
-                MessageBox.Show("Por favor seleccione un producto de la lista.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            return p;
-        }
-        private void EditarSeleccionado()
-        {
-            // 1. Obtenemos el producto de la grilla
-            var productoSeleccionado = ObtenerProductoSeleccionado();
-
-            // Si no seleccionó nada (es null), salimos y no hacemos nada
-            if (productoSeleccionado == null) return;
-
-            // 2. Abrimos el formulario inyectándolo desde el ServiceProvider
-            using var scope = _serviceProvider.CreateScope();
-            var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
-
-            // 3. Le pasamos el producto para que los TextBoxes se llenen solos
-            formRegistro.PrepararParaEdicion(productoSeleccionado);
-
-            // 4. Mostramos el formulario y si el usuario da click en "Guardar" (DialogResult.OK), recargamos la grilla
             if (formRegistro.ShowDialog() == DialogResult.OK)
             {
                 CargarDatos();
             }
         }
-        private void BtnEliminar_Click(object? sender, EventArgs e)
+
+        private void DgvProductos_CellClick(object? sender, DataGridViewCellEventArgs e)
         {
-            // 1. Obtenemos el producto seleccionado de la grilla
-            var producto = ObtenerProductoSeleccionado();
+            if (e.RowIndex < 0 || e.RowIndex >= dgvProductos.Rows.Count) return;
 
-            // Si no seleccionó nada, salimos
-            if (producto == null) return;
+            string colName = dgvProductos.Columns[e.ColumnIndex].Name;
 
-            // 2. Determinamos qué mensaje mostrar
-            // (Usamos producto.Activo == true para saber si está activo)
+            if (colName == "colModificar")
+            {
+                if (int.TryParse(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value?.ToString(), out int idProducto))
+                {
+                    var producto = _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
+                    if (producto != null)
+                    {
+                        AbrirFormularioEdicion(producto);
+                    }
+                }
+            }
+            else if (colName == "colAccionEstado")
+            {
+                if (int.TryParse(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value?.ToString(), out int idProducto))
+                {
+                    var producto = _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
+                    if (producto != null)
+                    {
+                        CambiarEstadoProducto(producto);
+                    }
+                }
+            }
+        }
+
+        private void DgvProductos_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.RowIndex >= dgvProductos.Rows.Count) return;
+            string colName = dgvProductos.Columns[e.ColumnIndex].Name;
+            if (colName == "colModificar" || colName == "colAccionEstado") return;
+
+            if (int.TryParse(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value?.ToString(), out int idProducto))
+            {
+                var producto = _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
+                if (producto != null)
+                {
+                    AbrirFormularioEdicion(producto);
+                }
+            }
+        }
+
+        private void AbrirFormularioEdicion(Producto producto)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
+            formRegistro.PrepararParaEdicion(producto);
+
+            if (formRegistro.ShowDialog() == DialogResult.OK)
+            {
+                CargarDatos();
+            }
+        }
+
+        private void CambiarEstadoProducto(Producto producto)
+        {
             bool estaActivo = producto.Activo == true;
             string accion = estaActivo ? "dar de baja (desactivar)" : "reactivar";
 
-            // 3. confirmación del usuario
             var confirmacion = MessageBox.Show(
                 $"¿Está seguro de que desea {accion} el producto '{producto.Nombre}'?",
                 "Confirmación",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            // 4. Si el usuario dice que "Sí"
             if (confirmacion == DialogResult.Yes)
             {
                 try
                 {
-                    // Invertimos el estado (si era true pasa a false, y viceversa)
-                    producto.Activo = !estaActivo;
+                    bool nuevoEstado = !estaActivo;
+                    _productoService.CambiarEstado(producto.IdProducto, nuevoEstado);
+                    producto.Activo = nuevoEstado;
 
-                    // Usamos el método Actualizar que creamos en el paso anterior para guardarlo
-                    _productoService.Actualizar(producto);
+                    MessageBox.Show($"Producto {(estaActivo ? "dado de baja" : "reactivado")} correctamente.",
+                        "Operación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    MessageBox.Show($"Producto {(estaActivo ? "dado de baja" : "reactivado")} correctamente.", "Operación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // Recargamos la grilla para que se actualice el color (gris o verde)
                     CargarDatos();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ocurrió un error al intentar cambiar el estado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Ocurrió un error al intentar cambiar el estado: {ex.Message}",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
+
         private void TxtBuscar_KeyDown(object? sender, KeyEventArgs e)
         {
             // Si la tecla presionada es ENTER (lo que manda la pistola al final del código)
@@ -294,6 +421,15 @@ namespace StockOS.UI.WinForms.Forms
             var formCategoria = scope.ServiceProvider.GetRequiredService<FormCategoria>();
             formCategoria.ShowDialog();
             // Al cerrar, recargamos la grilla por si se cambió alguna categoría
+            CargarDatos();
+        }
+
+        private void BtnProveedores_Click(object? sender, EventArgs e)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var formProveedor = scope.ServiceProvider.GetRequiredService<FormProveedor>();
+            formProveedor.ShowDialog();
+            // Al cerrar, recargamos la grilla por si se cambió algún proveedor
             CargarDatos();
         }
 

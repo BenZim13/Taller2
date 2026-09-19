@@ -1,6 +1,6 @@
 namespace StockOS.UI.WinForms.Forms
 {
-    partial class FormCategoria
+    partial class FormProveedor
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -14,22 +14,22 @@ namespace StockOS.UI.WinForms.Forms
 
         private void InitializeComponent()
         {
-            this.pnlHeader      = new System.Windows.Forms.Panel();
-            this.lblTitulo      = new System.Windows.Forms.Label();
-            this.dgvCategorias  = new System.Windows.Forms.DataGridView();
-            this.pnlFormulario  = new System.Windows.Forms.Panel();
-            this.lblNombre      = new System.Windows.Forms.Label();
-            this.txtNombre      = new System.Windows.Forms.TextBox();
-            this.lblDescripcion = new System.Windows.Forms.Label();
-            this.txtDescripcion = new System.Windows.Forms.TextBox();
-            this.btnAgregar     = new System.Windows.Forms.Button();
-            this.btnDarBaja     = new System.Windows.Forms.Button();
-            this.btnCerrar      = new System.Windows.Forms.Button();
+            this.pnlHeader = new System.Windows.Forms.Panel();
+            this.lblTitulo = new System.Windows.Forms.Label();
             this.btnCerrarHeader = new System.Windows.Forms.Button();
+            this.dgvProveedores = new System.Windows.Forms.DataGridView();
+            this.pnlFormulario = new System.Windows.Forms.Panel();
+            this.lblNombre = new System.Windows.Forms.Label();
+            this.txtNombre = new System.Windows.Forms.TextBox();
+            this.lblCuit = new System.Windows.Forms.Label();
+            this.txtCuit = new System.Windows.Forms.TextBox();
+            this.btnAgregar = new System.Windows.Forms.Button();
+            this.btnDarBaja = new System.Windows.Forms.Button();
+            this.btnCerrar = new System.Windows.Forms.Button();
 
             this.pnlHeader.SuspendLayout();
             this.pnlFormulario.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvCategorias)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvProveedores)).BeginInit();
             this.SuspendLayout();
 
             // HEADER
@@ -56,46 +56,49 @@ namespace StockOS.UI.WinForms.Forms
             this.btnCerrarHeader.UseVisualStyleBackColor = false;
             this.btnCerrarHeader.Click += (s, e) => this.Close();
 
+            // lblTitulo
             this.lblTitulo.AutoSize = true;
             this.lblTitulo.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblTitulo.ForeColor = System.Drawing.Color.White;
             this.lblTitulo.Location = new System.Drawing.Point(20, 14);
             this.lblTitulo.Name = "lblTitulo";
-            this.lblTitulo.Text = "Gestión de Categorías";
+            this.lblTitulo.Text = "Gestión de Proveedores";
 
-            // GRILLA de categorías existentes
-            var colId = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colId", HeaderText = "ID", DataPropertyName = "IdCategoria", Visible = false };
-            var colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colNombre", HeaderText = "Nombre", DataPropertyName = "Nombre", FillWeight = 150 };
-            var colDesc = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colDescripcion", HeaderText = "Descripción", DataPropertyName = "Descripcion", FillWeight = 250 };
-            var colActivo = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colActivo", HeaderText = "Estado", FillWeight = 70 };
+            // GRILLA de proveedores
+            var colId = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colId", HeaderText = "ID", DataPropertyName = "IdProveedor", Visible = false };
+            var colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colNombre", HeaderText = "Nombre / Razón Social", DataPropertyName = "RazonSocial", FillWeight = 160 };
+            var colCuit = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colCuit", HeaderText = "CUIT", DataPropertyName = "Cuit", FillWeight = 120 };
+            var colEstado = new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "colEstado", HeaderText = "Estado", FillWeight = 70 };
 
-            this.dgvCategorias.AllowUserToAddRows = false;
-            this.dgvCategorias.AllowUserToDeleteRows = false;
-            this.dgvCategorias.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvCategorias.BackgroundColor = System.Drawing.Color.FromArgb(15, 23, 42);
-            this.dgvCategorias.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvCategorias.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            this.dgvCategorias.ColumnHeadersHeight = 34;
-            this.dgvCategorias.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.dgvCategorias.Columns.AddRange(colId, colNombre, colDesc, colActivo);
-            this.dgvCategorias.EnableHeadersVisualStyles = false;
-            this.dgvCategorias.GridColor = System.Drawing.Color.FromArgb(51, 65, 85);
-            this.dgvCategorias.Location = new System.Drawing.Point(20, 65);
-            this.dgvCategorias.MultiSelect = false;
-            this.dgvCategorias.Name = "dgvCategorias";
-            this.dgvCategorias.ReadOnly = true;
-            this.dgvCategorias.RowHeadersVisible = false;
-            this.dgvCategorias.RowTemplate.Height = 30;
-            this.dgvCategorias.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvCategorias.Size = new System.Drawing.Size(480, 200);
+            this.dgvProveedores.AllowUserToAddRows = false;
+            this.dgvProveedores.AllowUserToDeleteRows = false;
+            this.dgvProveedores.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvProveedores.BackgroundColor = System.Drawing.Color.FromArgb(15, 23, 42);
+            this.dgvProveedores.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvProveedores.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.dgvProveedores.ColumnHeadersHeight = 34;
+            this.dgvProveedores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dgvProveedores.Columns.AddRange(colId, colNombre, colCuit, colEstado);
+            this.dgvProveedores.EnableHeadersVisualStyles = false;
+            this.dgvProveedores.GridColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.dgvProveedores.Location = new System.Drawing.Point(20, 65);
+            this.dgvProveedores.MultiSelect = false;
+            this.dgvProveedores.Name = "dgvProveedores";
+            this.dgvProveedores.ReadOnly = true;
+            this.dgvProveedores.RowHeadersVisible = false;
+            this.dgvProveedores.RowTemplate.Height = 30;
+            this.dgvProveedores.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvProveedores.Size = new System.Drawing.Size(480, 200);
 
             var headerStyle = new System.Windows.Forms.DataGridViewCellStyle
             {
                 BackColor = System.Drawing.Color.FromArgb(16, 185, 129),
                 ForeColor = System.Drawing.Color.White,
-                Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold)
+                Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold),
+                Padding = new System.Windows.Forms.Padding(8, 0, 4, 0),
+                Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
             };
-            this.dgvCategorias.ColumnHeadersDefaultCellStyle = headerStyle;
+            this.dgvProveedores.ColumnHeadersDefaultCellStyle = headerStyle;
 
             var rowStyle = new System.Windows.Forms.DataGridViewCellStyle
             {
@@ -103,48 +106,55 @@ namespace StockOS.UI.WinForms.Forms
                 ForeColor = System.Drawing.Color.White,
                 SelectionBackColor = System.Drawing.Color.FromArgb(51, 65, 85),
                 SelectionForeColor = System.Drawing.Color.White,
-                Font = new System.Drawing.Font("Segoe UI", 9.5F)
+                Font = new System.Drawing.Font("Segoe UI", 9.5F),
+                Padding = new System.Windows.Forms.Padding(8, 0, 4, 0),
+                Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
             };
-            this.dgvCategorias.DefaultCellStyle = rowStyle;
+            this.dgvProveedores.DefaultCellStyle = rowStyle;
 
             // PANEL formulario Alta
             this.pnlFormulario.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
             this.pnlFormulario.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlFormulario.Controls.AddRange(new System.Windows.Forms.Control[] {
-                this.lblNombre, this.txtNombre, this.lblDescripcion, this.txtDescripcion, this.btnAgregar
+                this.lblNombre, this.txtNombre, this.lblCuit, this.txtCuit, this.btnAgregar
             });
             this.pnlFormulario.Location = new System.Drawing.Point(20, 280);
             this.pnlFormulario.Name = "pnlFormulario";
             this.pnlFormulario.Size = new System.Drawing.Size(480, 130);
 
+            // lblNombre
             this.lblNombre.AutoSize = true;
             this.lblNombre.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblNombre.Location = new System.Drawing.Point(15, 15);
             this.lblNombre.Name = "lblNombre";
-            this.lblNombre.Text = "Nombre";
+            this.lblNombre.Text = "Nombre / Razón Social";
 
+            // txtNombre
             this.txtNombre.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtNombre.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtNombre.ForeColor = System.Drawing.Color.White;
             this.txtNombre.Location = new System.Drawing.Point(15, 35);
             this.txtNombre.Name = "txtNombre";
-            this.txtNombre.Size = new System.Drawing.Size(180, 25);
+            this.txtNombre.Size = new System.Drawing.Size(220, 25);
             this.txtNombre.TabIndex = 0;
 
-            this.lblDescripcion.AutoSize = true;
-            this.lblDescripcion.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
-            this.lblDescripcion.Location = new System.Drawing.Point(210, 15);
-            this.lblDescripcion.Name = "lblDescripcion";
-            this.lblDescripcion.Text = "Descripción";
+            // lblCuit
+            this.lblCuit.AutoSize = true;
+            this.lblCuit.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.lblCuit.Location = new System.Drawing.Point(250, 15);
+            this.lblCuit.Name = "lblCuit";
+            this.lblCuit.Text = "CUIT";
 
-            this.txtDescripcion.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
-            this.txtDescripcion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDescripcion.ForeColor = System.Drawing.Color.White;
-            this.txtDescripcion.Location = new System.Drawing.Point(210, 35);
-            this.txtDescripcion.Name = "txtDescripcion";
-            this.txtDescripcion.Size = new System.Drawing.Size(250, 25);
-            this.txtDescripcion.TabIndex = 1;
+            // txtCuit
+            this.txtCuit.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.txtCuit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCuit.ForeColor = System.Drawing.Color.White;
+            this.txtCuit.Location = new System.Drawing.Point(250, 35);
+            this.txtCuit.Name = "txtCuit";
+            this.txtCuit.Size = new System.Drawing.Size(210, 25);
+            this.txtCuit.TabIndex = 1;
 
+            // btnAgregar
             this.btnAgregar.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
             this.btnAgregar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAgregar.FlatAppearance.BorderSize = 0;
@@ -159,7 +169,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnAgregar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnAgregar.UseVisualStyleBackColor = false;
 
-            // Botón Dar de baja
+            // Botón Dar de baja / Reactivar
             this.btnDarBaja.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
             this.btnDarBaja.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnDarBaja.FlatAppearance.BorderSize = 0;
@@ -197,22 +207,22 @@ namespace StockOS.UI.WinForms.Forms
             this.Controls.Add(this.btnCerrar);
             this.Controls.Add(this.btnDarBaja);
             this.Controls.Add(this.pnlFormulario);
-            this.Controls.Add(this.dgvCategorias);
+            this.Controls.Add(this.dgvProveedores);
             this.Controls.Add(this.pnlHeader);
             this.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FormCategoria";
+            this.Name = "FormProveedor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Gestión de Categorías";
+            this.Text = "Gestión de Proveedores";
             this.CancelButton = this.btnCerrar;
 
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.pnlFormulario.ResumeLayout(false);
             this.pnlFormulario.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvCategorias)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvProveedores)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -221,12 +231,12 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Button btnCerrarHeader;
         private System.Windows.Forms.Label lblTitulo;
-        private System.Windows.Forms.DataGridView dgvCategorias;
+        private System.Windows.Forms.DataGridView dgvProveedores;
         private System.Windows.Forms.Panel pnlFormulario;
         private System.Windows.Forms.Label lblNombre;
         private System.Windows.Forms.TextBox txtNombre;
-        private System.Windows.Forms.Label lblDescripcion;
-        private System.Windows.Forms.TextBox txtDescripcion;
+        private System.Windows.Forms.Label lblCuit;
+        private System.Windows.Forms.TextBox txtCuit;
         private System.Windows.Forms.Button btnAgregar;
         private System.Windows.Forms.Button btnDarBaja;
         private System.Windows.Forms.Button btnCerrar;

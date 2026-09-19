@@ -36,6 +36,8 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddScoped<ICajaSesionRepository, CajaSesionRepository>();
                     services.AddScoped<ICajaRepository, CajaRepository>();
                     services.AddScoped<IVentaRepository, VentaRepository>();
+                    services.AddScoped<ICompraRepository, CompraRepository>();
+                    services.AddScoped<IProveedorRepository, ProveedorRepository>();
 
                     // Servicios de Negocio
                     services.AddScoped<IAuthService, AuthService>();
@@ -47,6 +49,8 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddScoped<IStockService, StockService>();
                     services.AddScoped<ICajaService, CajaService>();
                     services.AddScoped<IVentaService, VentaService>();
+                    services.AddScoped<ICompraService, CompraService>();
+                    services.AddScoped<IProveedorService, ProveedorService>();
 
                     // Formularios y Vistas
                     services.AddTransient<FormLogin>();
@@ -57,6 +61,7 @@ namespace StockOS.UI.WinForms.Forms
                     services.AddTransient<FormRegistroProducto>();
                     services.AddTransient<FormIngresoStock>();
                     services.AddTransient<FormCategoria>();
+                    services.AddTransient<FormProveedor>();
                     services.AddTransient<FormAperturaCaja>();
                     
 

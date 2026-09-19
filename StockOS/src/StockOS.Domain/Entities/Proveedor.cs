@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace StockOS.Domain.Entities;
@@ -20,4 +20,6 @@ public partial class Proveedor
     public bool Activo { get; set; }
 
     public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
+
+    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
 }

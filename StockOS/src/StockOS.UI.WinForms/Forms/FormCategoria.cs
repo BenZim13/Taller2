@@ -15,6 +15,9 @@ namespace StockOS.UI.WinForms.Forms
             InitializeComponent();
             _categoriaService = categoriaService;
 
+            txtNombre.MaxLength = 50;
+            txtDescripcion.MaxLength = 100;
+
             btnAgregar.Click += BtnAgregar_Click;
             btnDarBaja.Click += BtnDarBaja_Click;
             btnCerrar.Click += (s, e) => this.Close();
@@ -45,7 +48,7 @@ namespace StockOS.UI.WinForms.Forms
         {
             if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                MessageBox.Show("Ingrese el nombre de la categoría.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Ingrese el nombre de la categoría.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombre.Focus();
                 return;
             }
@@ -56,7 +59,7 @@ namespace StockOS.UI.WinForms.Forms
 
             if (existe)
             {
-                MessageBox.Show("Ya existe una categoría con ese nombre.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Ya existe una categoría registrada con ese nombre.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombre.Focus();
                 return;
             }
@@ -68,14 +71,21 @@ namespace StockOS.UI.WinForms.Forms
                 Activo      = true
             };
 
-            _categoriaService.Agregar(nueva);
+            try
+            {
+                _categoriaService.Agregar(nueva);
 
-            txtNombre.Clear();
-            txtDescripcion.Clear();
-            txtNombre.Focus();
+                txtNombre.Clear();
+                txtDescripcion.Clear();
+                txtNombre.Focus();
 
-            CargarCategorias();
-            MessageBox.Show("Categoría agregada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CargarCategorias();
+                MessageBox.Show("Categoría agregada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al agregar la categoría: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void BtnDarBaja_Click(object? sender, EventArgs e)

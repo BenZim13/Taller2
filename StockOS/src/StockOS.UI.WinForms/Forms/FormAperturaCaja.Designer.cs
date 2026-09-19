@@ -1,4 +1,4 @@
-﻿namespace StockOS.UI.WinForms.Forms
+namespace StockOS.UI.WinForms.Forms
 {
     partial class FormAperturaCaja
     {
@@ -54,7 +54,7 @@
             this.btnSalirApp.Name = "btnSalirApp";
             this.btnSalirApp.Size = new System.Drawing.Size(80, 40);
             this.btnSalirApp.TabIndex = 99;
-            this.btnSalirApp.Text = "Salir";
+            this.btnSalirApp.Text = "Cerrar";
             this.btnSalirApp.UseVisualStyleBackColor = false;
             this.btnSalirApp.Click += new System.EventHandler(this.btnSalirApp_Click);
             // 
@@ -176,9 +176,10 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormAperturaCaja";
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            Text = "Abrir Caja";
-            pnlHeader.ResumeLayout(false);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Abrir Caja";
+            this.CancelButton = this.btnCancelar;
+            this.pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
