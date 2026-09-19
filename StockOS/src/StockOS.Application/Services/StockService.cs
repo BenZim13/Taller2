@@ -1,24 +1,28 @@
 ﻿using StockOS.Domain.Interfaces;
+using StockOS.Domain.Enums; // Mapeo de permisos
 
 namespace StockOS.Application.Services
 {
     public class StockService : IStockService
     {
         private readonly IStockSucursalRepository _stockRepo;
+        private readonly IAuthorizationService _authService; // Guardián
 
-        public StockService(IStockSucursalRepository stockRepo)
+        public StockService(IStockSucursalRepository stockRepo, IAuthorizationService authService)
         {
             _stockRepo = stockRepo;
+            _authService = authService;
         }
 
         public void AgregarStock(int idProducto, int idSucursal, int cantidadAAgregar)
         {
-            // El servicio ahora es un simple "pasamanos", la base de datos hace la magia
+            _authService.ValidarPermiso(Permisos.STOCK_INGRESAR);
             _stockRepo.IngresarMercaderia(idProducto, idSucursal, cantidadAAgregar);
         }
 
         public int ObtenerCantidadActual(int idProducto, int idSucursal)
         {
+            _authService.ValidarPermiso(Permisos.STOCK_VER);
             return _stockRepo.ObtenerCantidadActual(idProducto, idSucursal);
         }
     }

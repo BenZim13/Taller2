@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StockOS.Domain\StockOS.Domain.csproj" />
-    <ProjectReference Include="..\StockOS.Infrastructure\StockOS.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

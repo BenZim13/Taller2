@@ -9,6 +9,7 @@ using System;
 using System.Windows.Forms;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Serilog;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -19,106 +20,125 @@ namespace StockOS.UI.WinForms.Forms
         {
             // 1. Configuración visual de WinForms (SIEMPRE VA PRIMERO)
             ApplicationConfiguration.Initialize();
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
 
-            // 2. Configurar Inyección de Dependencias
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
-                {
-                    // Configurar BD con la cadena de conexión
-                    services.AddDbContext<StockOsContext>(options =>
-                        options.UseSqlServer(configuration.GetConnectionString("StockOS")));
+            // 2. Configurar el archivo de Logs de Serilog
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("logs/stockos-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
-                    // Repositorios
-                    services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
-                    services.AddScoped<ISucursalRepository, SucursalRepository>();
-                    services.AddScoped<IRolRepository, RolRepository>();
-                    services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-                    services.AddScoped<IProductoRepository, ProductoRepository>();
-                    services.AddScoped<IStockSucursalRepository, StockSucursalRepository>();
-                    services.AddScoped<ICajaSesionRepository, CajaSesionRepository>();
-                    services.AddScoped<ICajaRepository, CajaRepository>();
-                    services.AddScoped<IVentaRepository, VentaRepository>();
-                    services.AddScoped<ICompraRepository, CompraRepository>();
-                    services.AddScoped<IProveedorRepository, ProveedorRepository>();
-
-                    // Servicios de Negocio
-                    services.AddScoped<IAuthService, AuthService>();
-                    services.AddScoped<ISucursalService, SucursalService>();
-                    services.AddScoped<IRolService, RolService>();
-                    services.AddScoped<IEmpleadoService, EmpleadoService>();
-                    services.AddScoped<ICategoriaService, CategoriaService>();
-                    services.AddScoped<IProductoService, ProductoService>();
-                    services.AddScoped<IStockService, StockService>();
-                    services.AddScoped<ICajaService, CajaService>();
-                    services.AddScoped<IVentaService, VentaService>();
-                    services.AddScoped<ICompraService, CompraService>();
-                    services.AddScoped<IProveedorService, ProveedorService>();
-
-                    // Formularios y Vistas
-                    services.AddTransient<FormLogin>();
-                    services.AddTransient<FormInicio>();
-                    services.AddTransient<FormRegistroUsuario>();
-                    services.AddTransient<UcListarUsuarios>();
-                    services.AddTransient<UcUsuarios>();
-                    services.AddTransient<FormRegistroProducto>();
-                    services.AddTransient<FormIngresoStock>();
-                    services.AddTransient<FormCategoria>();
-                    services.AddTransient<FormProveedor>();
-                    services.AddTransient<FormAperturaCaja>();
-                    
-
-                    // --- ACA AGREGAMOS LAS VISTAS FALTANTES DEL MENÚ ---
-                    services.AddTransient<UcInicio>();
-                    services.AddTransient<UcInventario>();
-                    services.AddTransient<UcVentas>();
-                    services.AddTransient<UcReportes>();
-                    services.AddTransient<UcConfig>();
-
-                }).Build();
-            
-            // 3. Bucle principal para soportar cierre de sesión y cambio de usuario
-            while (true)
+            try
             {
-                var formLogin = host.Services.GetRequiredService<FormLogin>();
+                Log.Information("Iniciando la aplicación StockOS...");
 
-                // Mostrar el login como un cuadro de diálogo (bloqueante)
-                if (formLogin.ShowDialog() == DialogResult.OK)
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+                // 3. Configurar Inyección de Dependencias
+                var host = Host.CreateDefaultBuilder()
+                    .UseSerilog() // <-- Le decimos al Host que también use Serilog internamente
+                    .ConfigureServices((context, services) =>
+                    {
+                        // Configurar BD con la cadena de conexión
+                        services.AddDbContext<StockOsContext>(options =>
+                            options.UseSqlServer(configuration.GetConnectionString("StockOS")));
+
+                        // Repositorios
+                        services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+                        services.AddScoped<ISucursalRepository, SucursalRepository>();
+                        services.AddScoped<IRolRepository, RolRepository>();
+                        services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+                        services.AddScoped<IProductoRepository, ProductoRepository>();
+                        services.AddScoped<IStockSucursalRepository, StockSucursalRepository>();
+                        services.AddScoped<ICajaSesionRepository, CajaSesionRepository>();
+                        services.AddScoped<ICajaRepository, CajaRepository>();
+                        services.AddScoped<IVentaRepository, VentaRepository>();
+                        services.AddScoped<ICompraRepository, CompraRepository>();
+                        services.AddScoped<IProveedorRepository, ProveedorRepository>();
+
+                        // Servicios de Negocio
+                        services.AddScoped<IAuthService, AuthService>();
+                        services.AddScoped<ISucursalService, SucursalService>();
+                        services.AddScoped<IRolService, RolService>();
+                        services.AddScoped<IEmpleadoService, EmpleadoService>();
+                        services.AddScoped<ICategoriaService, CategoriaService>();
+                        services.AddScoped<IProductoService, ProductoService>();
+                        services.AddScoped<IStockService, StockService>();
+                        services.AddScoped<ICajaService, CajaService>();
+                        services.AddScoped<IVentaService, VentaService>();
+                        services.AddScoped<ICompraService, CompraService>();
+                        services.AddScoped<IProveedorService, ProveedorService>();
+                        services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+                        // Formularios y Vistas
+                        services.AddTransient<FormLogin>();
+                        services.AddTransient<FormInicio>();
+                        services.AddTransient<FormRegistroUsuario>();
+                        services.AddTransient<UcListarUsuarios>();
+                        services.AddTransient<UcUsuarios>();
+                        services.AddTransient<FormRegistroProducto>();
+                        services.AddTransient<FormIngresoStock>();
+                        services.AddTransient<FormCategoria>();
+                        services.AddTransient<FormProveedor>();
+                        services.AddTransient<FormAperturaCaja>();
+
+                        // Vistas Faltantes del Menú
+                        services.AddTransient<UcInicio>();
+                        services.AddTransient<UcInventario>();
+                        services.AddTransient<UcVentas>();
+                        services.AddTransient<UcReportes>();
+                        services.AddTransient<UcConfig>();
+
+                    }).Build();
+
+                // 4. Bucle principal para soportar cierre de sesión y cambio de usuario
+                while (true)
                 {
-                    // 4. Capturamos el usuario logueado
-                    var usuario = formLogin.UsuarioAutenticado;
-                    var formInicio = host.Services.GetRequiredService<FormInicio>();
+                    var formLogin = host.Services.GetRequiredService<FormLogin>();
 
-                    // 5. Le pasamos el empleado al menú principal
-                    if (usuario != null)
+                    if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        formInicio.EstablecerUsuario(usuario);
-                    }
+                        var usuario = formLogin.UsuarioAutenticado;
+                        var formInicio = host.Services.GetRequiredService<FormInicio>();
 
-                    // 6. Iniciamos el ciclo de vida de la app con el formulario principal
-                    System.Windows.Forms.Application.Run(formInicio);
+                        if (usuario != null)
+                        {
+                            formInicio.EstablecerUsuario(usuario);
+                            Log.Information("Usuario autenticado correctamente: {Nombre} {Apellido} (Rol: {IdRol})", usuario.Nombre, usuario.Apellido, usuario.IdRol);
+                        }
 
-                    // 7. Al cerrarse el formulario principal, verificamos si fue por cierre de sesión
-                    if (formInicio.LogoutRequested)
-                    {
-                        // Limpiamos la sesión global usando el método
-                        StockOS.Application.Services.SesionActual.Limpiar();
-                        continue; // Volvemos a mostrar el login
+                        System.Windows.Forms.Application.Run(formInicio);
+
+                        if (formInicio.LogoutRequested)
+                        {
+                            Log.Information("Cierre de sesión solicitado por el usuario.");
+                            StockOS.Application.Services.SesionActual.Limpiar();
+                            continue;
+                        }
+                        else
+                        {
+                            Log.Information("Cerrando la aplicación desde la ventana principal.");
+                            break;
+                        }
                     }
                     else
                     {
-                        // Se cerró desde la 'X', por lo tanto salimos de la aplicación
                         break;
                     }
                 }
-                else
-                {
-                    // 8. Si cerró la ventana de login (X o botón Salir), salimos de la aplicación
-                    break;
-                }
+            }
+            catch (Exception ex)
+            {
+                // Si algo explota y rompe toda la aplicación, queda registrado acá
+                Log.Fatal(ex, "La aplicación sufrió un error fatal y se cerró inesperadamente.");
+                MessageBox.Show("Ocurrió un error crítico. Revise el archivo de registro (logs) para más detalles.", "Error Fatal", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Guarda físicamente el archivo antes de que el proceso muera en la memoria
+                Log.CloseAndFlush();
             }
         }
     }

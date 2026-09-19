@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace StockOS.Domain.Interfaces
+{
+    public interface IAuthorizationService
+    {
+        bool TienePermiso(string permiso);
+        void ValidarPermiso(string permiso);
+    }
+}

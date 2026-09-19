@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using StockOS.Application;
 using StockOS.Application.Services;
-
+using Serilog;
 namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormCierreCaja : Form
@@ -63,7 +63,11 @@ namespace StockOS.UI.WinForms.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cerrar la caja: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // 1. Guardamos el error real y la línea exacta en el archivo oculto (para el programador)
+                Log.Error(ex, "Error crítico al intentar cerrar la caja. Usuario ID: {UsuarioId}", SesionActual.Usuario?.IdEmpleado);
+
+                // 2. Le mostramos un mensaje genérico y amigable al usuario
+                MessageBox.Show("Ocurrió un error interno al cerrar la caja. Por favor, contacte al administrador.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
