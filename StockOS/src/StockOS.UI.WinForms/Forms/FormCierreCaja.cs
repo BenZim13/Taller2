@@ -55,7 +55,7 @@ namespace StockOS.UI.WinForms.Forms
                     _cajaService.CerrarCaja(idCaja, montoReal);
 
                     // IMPORTANTE: Limpiamos la caja llamando al método centralizado
-                    SesionActual.Limpiar();
+                    SesionActual.IdCajaSesionAbierta = null;
 
                     MessageBox.Show("Turno finalizado y caja cerrada correctamente.", "Cierre Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();

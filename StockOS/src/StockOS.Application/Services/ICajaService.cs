@@ -11,5 +11,6 @@ namespace StockOS.Application.Services
         decimal ObtenerMontoEsperado(int idCajaSesion);
         void CerrarCaja(int idCajaSesion, decimal montoCierreReal);
         void RegistrarMovimiento(int idCajaSesion, string tipo, decimal monto, string descripcion);
+        int? ObtenerIdSesionAbierta(int idEmpleado);
     }
 }

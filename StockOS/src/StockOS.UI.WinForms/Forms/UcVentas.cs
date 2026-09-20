@@ -1,13 +1,11 @@
-using StockOS.Application;
-using StockOS.Application.Reports;
-using StockOS.Application.Services;
-using StockOS.Domain.Entities;
-using StockOS.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-
+using StockOS.Application;
+using StockOS.Application.Services;
+using StockOS.Domain.Entities;
+using StockOS.Domain.Interfaces;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -16,21 +14,25 @@ namespace StockOS.UI.WinForms.Forms
         private readonly IProductoService _productoService;
         private readonly IVentaService _ventaService;
         private readonly ICajaService _cajaService;
+        private readonly ITicketService _ticketService;
+        private readonly IConfiguracionService _configuracionService;
 
         private decimal _subtotalVenta = 0;
         private decimal _descuentoTotal = 0;
         private decimal _totalFinal = 0;
-        private readonly ITicketService _ticketService;
 
-        // Inyectamos ICajaService en el constructor
-        public UcVentas(IProductoService productoService, IVentaService ventaService,
-                            ICajaService cajaService, ITicketService ticketService)
+        // Diccionario para rastrear el IVA de cada producto en el ticket
+        private readonly Dictionary<int, decimal> _ivaProductos = new Dictionary<int, decimal>();
+
+        // Inyectamos todas las dependencias necesarias en el constructor
+        public UcVentas(IProductoService productoService, IVentaService ventaService, ICajaService cajaService, ITicketService ticketService, IConfiguracionService configuracionService)
         {
             InitializeComponent();
             _productoService = productoService;
             _ventaService = ventaService;
             _cajaService = cajaService;
             _ticketService = ticketService;
+            _configuracionService = configuracionService;
 
             this.Load += (s, e) => txtCodigoBarra.Focus();
         }
@@ -45,6 +47,7 @@ namespace StockOS.UI.WinForms.Forms
                 formApertura.ShowDialog();
             }
         }
+
         private void btnMovimientoCaja_Click(object sender, EventArgs e)
         {
             using (var formMov = new FormMovimientoCaja(_cajaService))
@@ -60,7 +63,6 @@ namespace StockOS.UI.WinForms.Forms
                 formCierre.ShowDialog();
             }
         }
-        
 
         private void txtCodigoBarra_KeyDown(object sender, KeyEventArgs e)
         {
@@ -109,6 +111,13 @@ namespace StockOS.UI.WinForms.Forms
             }
 
             dgvTicket.Rows.Add(prod.IdProducto, prod.Nombre, 1, prod.PrecioVentaActual, prod.PrecioVentaActual);
+
+            // Guardamos el IVA del producto para usarlo en el ticket
+            if (!_ivaProductos.ContainsKey(prod.IdProducto))
+            {
+                _ivaProductos[prod.IdProducto] = prod.PorcentajeIva;
+            }
+
             ActualizarTotal();
         }
 
@@ -144,7 +153,6 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnCobrar_Click(object sender, EventArgs e)
         {
-            // Corrección: ahora validamos que no sea nulo además de 0
             if (!SesionActual.IdCajaSesionAbierta.HasValue || SesionActual.IdCajaSesionAbierta.Value == 0)
             {
                 MessageBox.Show("No puedes cobrar porque no has abierto la caja. Haz clic en 'Abrir Caja' en la barra superior.",
@@ -166,7 +174,6 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     string metodoPago = formCobro.MetodoPagoSeleccionado;
 
-                    // Mapeamos el string al ID de la base de datos
                     int idMetodoPago = 1; // Efectivo por defecto
                     string metodoLower = metodoPago.ToLower();
 
@@ -210,28 +217,42 @@ namespace StockOS.UI.WinForms.Forms
 
                         int idSucursal = SesionActual.Usuario!.IdSucursal;
 
-                        // Le pasamos el idMetodoPago al servicio
+                        // 1. Registramos la venta en la base de datos
                         int idVenta = _ventaService.RegistrarVenta(nuevaVenta, detalles, idSucursal, idMetodoPago);
 
-                        // --- NUEVA LÓGICA DE TICKET PDF ---
-                        // 1. Preparamos los datos visuales que necesita el PDF
+                        // 2. Preparamos los datos visuales que necesita el PDF
                         nuevaVenta.IdVenta = idVenta;
                         nuevaVenta.FechaHora = DateTime.Now;
 
                         for (int i = 0; i < dgvTicket.Rows.Count; i++)
                         {
+                            int idProd = Convert.ToInt32(dgvTicket.Rows[i].Cells["IdProducto"].Value);
+                            decimal ivaProducto = _ivaProductos.ContainsKey(idProd) ? _ivaProductos[idProd] : 21m;
+
                             detalles[i].IdProductoNavigation = new Producto
                             {
-                                Nombre = dgvTicket.Rows[i].Cells["Producto"].Value?.ToString() ?? "Producto"
+                                Nombre = dgvTicket.Rows[i].Cells["Producto"].Value?.ToString() ?? "Producto",
+                                PorcentajeIva = ivaProducto
                             };
                         }
                         nuevaVenta.DetalleVenta = detalles;
 
-                        // 2. Generamos el archivo
-                        string nombreCajero = $"{SesionActual.Usuario!.Nombre} {SesionActual.Usuario!.Apellido}";
-                        byte[] pdfBytes = _ticketService.GenerarTicketPdf(nuevaVenta, nombreCajero);
+                        // 3. Obtenemos los datos del comercio desde la configuración (appsettings.json)
+                        var datosComercio = _configuracionService.ObtenerDatosComercio();
 
-                        // 3. Lo guardamos en una carpeta temporal y lo abrimos automáticamente
+                        // 4. Preparamos los datos del pago con el monto recibido y vuelto real
+                        var datosPago = new DatosPago
+                        {
+                            MetodoPago = metodoPago,
+                            MontoRecibido = formCobro.MontoRecibido,
+                            Vuelto = formCobro.Vuelto
+                        };
+
+                        // 5. Generamos el archivo PDF con todos los parámetros
+                        string nombreCajero = $"{SesionActual.Usuario!.Nombre} {SesionActual.Usuario!.Apellido}";
+                        byte[] pdfBytes = _ticketService.GenerarTicketPdf(nuevaVenta, nombreCajero, datosComercio, datosPago);
+
+                        // 5. Lo guardamos en temporales y lo abrimos automáticamente
                         string rutaTemp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"Ticket_{idVenta}.pdf");
                         System.IO.File.WriteAllBytes(rutaTemp, pdfBytes);
 
@@ -239,24 +260,24 @@ namespace StockOS.UI.WinForms.Forms
                         {
                             UseShellExecute = true
                         });
-                        // -----------------------------------
-
+                        //---------------
                         MessageBox.Show($"¡Venta procesada con {metodoPago}!\nTicket N°: {idVenta}",
                                          "Cobro Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         dgvTicket.Rows.Clear();
+                        _ivaProductos.Clear();
                         txtDescuento.Clear();
                         ActualizarTotal();
                         txtCodigoBarra.Focus();
                     }
                     catch (Exception excepcion)
                     {
-                        MessageBox.Show($"Error al procesar la venta: {excepcion.Message}",
-                                            "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Error al procesar la venta: {excepcion.Message}", "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
         }
+
         private void txtDescuento_TextChanged(object sender, EventArgs e)
         {
             ActualizarTotal();

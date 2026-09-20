@@ -11,13 +11,14 @@ namespace StockOS.UI.WinForms.Forms
     {
         private readonly IAuthService _authService;
         private bool _ignorandoCambios = false;
-
+        private readonly ICajaService _cajaService;
         public Empleado? UsuarioAutenticado { get; private set; }
 
-        public FormLogin(IAuthService authService)
+        public FormLogin(IAuthService authService, ICajaService cajaService)
         {
             InitializeComponent();
             _authService = authService;
+            _cajaService = cajaService;
 
             txtUsuario.TextChanged += (s, e) => { if (!_ignorandoCambios) OcultarError(); };
             txtPassword.TextChanged += (s, e) => { if (!_ignorandoCambios) OcultarError(); };
@@ -63,7 +64,8 @@ namespace StockOS.UI.WinForms.Forms
 
                 //Guardamo el usuario en la memoria global
                 SesionActual.Usuario = empleado;
-
+                // Recuperamos la sesión de caja si el usuario la había dejado abierta
+                SesionActual.IdCajaSesionAbierta = _cajaService.ObtenerIdSesionAbierta(empleado.IdEmpleado);
                 MostrarExito("Ingreso exitoso");
                 btnIngresar.Enabled = false;
                 await Task.Delay(1200);

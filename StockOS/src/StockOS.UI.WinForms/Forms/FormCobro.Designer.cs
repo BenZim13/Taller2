@@ -21,6 +21,10 @@ namespace StockOS.UI.WinForms.Forms
             lblTitulo = new System.Windows.Forms.Label();
             lblTextoTotal = new System.Windows.Forms.Label();
             lblTotal = new System.Windows.Forms.Label();
+            lblMontoRecibido = new System.Windows.Forms.Label();
+            txtMontoRecibido = new System.Windows.Forms.TextBox();
+            lblVuelto = new System.Windows.Forms.Label();
+            lblVueltoValor = new System.Windows.Forms.Label();
             btnEfectivo = new System.Windows.Forms.Button();
             btnTarjetaDebito = new System.Windows.Forms.Button();
             btnTarjetaCredito = new System.Windows.Forms.Button();
@@ -72,6 +76,52 @@ namespace StockOS.UI.WinForms.Forms
             lblTotal.Text = "$ 0.00";
             lblTotal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // lblMontoRecibido
+            // 
+            lblMontoRecibido.AutoSize = true;
+            lblMontoRecibido.Font = new System.Drawing.Font("Segoe UI", 10F);
+            lblMontoRecibido.ForeColor = System.Drawing.Color.White;
+            lblMontoRecibido.Location = new System.Drawing.Point(40, 180);
+            lblMontoRecibido.Name = "lblMontoRecibido";
+            lblMontoRecibido.Size = new System.Drawing.Size(175, 19);
+            lblMontoRecibido.TabIndex = 8;
+            lblMontoRecibido.Text = "Monto Recibido (Efectivo):";
+            // 
+            // txtMontoRecibido
+            // 
+            txtMontoRecibido.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            txtMontoRecibido.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtMontoRecibido.Font = new System.Drawing.Font("Segoe UI", 14F);
+            txtMontoRecibido.ForeColor = System.Drawing.Color.White;
+            txtMontoRecibido.Location = new System.Drawing.Point(40, 202);
+            txtMontoRecibido.Name = "txtMontoRecibido";
+            txtMontoRecibido.Size = new System.Drawing.Size(145, 32);
+            txtMontoRecibido.TabIndex = 9;
+            txtMontoRecibido.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            txtMontoRecibido.TextChanged += txtMontoRecibido_TextChanged;
+            // 
+            // lblVuelto
+            // 
+            lblVuelto.AutoSize = true;
+            lblVuelto.Font = new System.Drawing.Font("Segoe UI", 10F);
+            lblVuelto.ForeColor = System.Drawing.Color.White;
+            lblVuelto.Location = new System.Drawing.Point(200, 180);
+            lblVuelto.Name = "lblVuelto";
+            lblVuelto.Size = new System.Drawing.Size(52, 19);
+            lblVuelto.TabIndex = 10;
+            lblVuelto.Text = "Vuelto:";
+            // 
+            // lblVueltoValor
+            // 
+            lblVueltoValor.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            lblVueltoValor.ForeColor = System.Drawing.Color.White;
+            lblVueltoValor.Location = new System.Drawing.Point(200, 202);
+            lblVueltoValor.Name = "lblVueltoValor";
+            lblVueltoValor.Size = new System.Drawing.Size(140, 32);
+            lblVueltoValor.TabIndex = 11;
+            lblVueltoValor.Text = "$ 0,00";
+            lblVueltoValor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // btnEfectivo
             // 
             btnEfectivo.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
@@ -80,7 +130,7 @@ namespace StockOS.UI.WinForms.Forms
             btnEfectivo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnEfectivo.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnEfectivo.ForeColor = System.Drawing.Color.White;
-            btnEfectivo.Location = new System.Drawing.Point(40, 190);
+            btnEfectivo.Location = new System.Drawing.Point(40, 250);
             btnEfectivo.Name = "btnEfectivo";
             btnEfectivo.Size = new System.Drawing.Size(300, 50);
             btnEfectivo.TabIndex = 3;
@@ -96,7 +146,7 @@ namespace StockOS.UI.WinForms.Forms
             btnTarjetaDebito.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnTarjetaDebito.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnTarjetaDebito.ForeColor = System.Drawing.Color.White;
-            btnTarjetaDebito.Location = new System.Drawing.Point(40, 250);
+            btnTarjetaDebito.Location = new System.Drawing.Point(40, 310);
             btnTarjetaDebito.Name = "btnTarjetaDebito";
             btnTarjetaDebito.Size = new System.Drawing.Size(300, 50);
             btnTarjetaDebito.TabIndex = 4;
@@ -112,7 +162,7 @@ namespace StockOS.UI.WinForms.Forms
             btnTarjetaCredito.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnTarjetaCredito.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnTarjetaCredito.ForeColor = System.Drawing.Color.White;
-            btnTarjetaCredito.Location = new System.Drawing.Point(40, 310);
+            btnTarjetaCredito.Location = new System.Drawing.Point(40, 370);
             btnTarjetaCredito.Name = "btnTarjetaCredito";
             btnTarjetaCredito.Size = new System.Drawing.Size(300, 50);
             btnTarjetaCredito.TabIndex = 5;
@@ -128,7 +178,7 @@ namespace StockOS.UI.WinForms.Forms
             btnMercadoPago.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMercadoPago.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             btnMercadoPago.ForeColor = System.Drawing.Color.White;
-            btnMercadoPago.Location = new System.Drawing.Point(40, 370);
+            btnMercadoPago.Location = new System.Drawing.Point(40, 430);
             btnMercadoPago.Name = "btnMercadoPago";
             btnMercadoPago.Size = new System.Drawing.Size(300, 50);
             btnMercadoPago.TabIndex = 6;
@@ -144,7 +194,7 @@ namespace StockOS.UI.WinForms.Forms
             btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancelar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             btnCancelar.ForeColor = System.Drawing.Color.White;
-            btnCancelar.Location = new System.Drawing.Point(40, 440);
+            btnCancelar.Location = new System.Drawing.Point(40, 500);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new System.Drawing.Size(300, 40);
             btnCancelar.TabIndex = 7;
@@ -157,7 +207,11 @@ namespace StockOS.UI.WinForms.Forms
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            ClientSize = new System.Drawing.Size(380, 510);
+            ClientSize = new System.Drawing.Size(380, 570);
+            Controls.Add(lblVueltoValor);
+            Controls.Add(lblVuelto);
+            Controls.Add(txtMontoRecibido);
+            Controls.Add(lblMontoRecibido);
             Controls.Add(btnCancelar);
             Controls.Add(btnMercadoPago);
             Controls.Add(btnTarjetaCredito);
@@ -185,6 +239,10 @@ namespace StockOS.UI.WinForms.Forms
         private System.Windows.Forms.Label lblTitulo;
         private System.Windows.Forms.Label lblTextoTotal;
         private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.Label lblMontoRecibido;
+        private System.Windows.Forms.TextBox txtMontoRecibido;
+        private System.Windows.Forms.Label lblVuelto;
+        private System.Windows.Forms.Label lblVueltoValor;
         private System.Windows.Forms.Button btnEfectivo;
         private System.Windows.Forms.Button btnTarjetaDebito;
         private System.Windows.Forms.Button btnTarjetaCredito;

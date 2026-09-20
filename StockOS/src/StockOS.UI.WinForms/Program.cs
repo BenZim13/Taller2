@@ -22,6 +22,10 @@ namespace StockOS.UI.WinForms.Forms
         {
             // 1. Configuración visual de WinForms (SIEMPRE VA PRIMERO)
             ApplicationConfiguration.Initialize();
+        
+            //Configuracion global pal QuestPDF que genera los reports y tickets 
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+            QuestPDF.Settings.UseSystemFonts = true;
 
             // 2. Configurar el archivo de Logs de Serilog
             Log.Logger = new LoggerConfiguration()
@@ -79,6 +83,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddScoped<IReporteService, ReporteService>();
                         services.AddScoped<IAuthorizationService, AuthorizationService>();
                         services.AddScoped<ITicketService, TicketService>();
+                        services.AddScoped<IConfiguracionService, ConfiguracionService>();
 
                         // Formularios y Vistas
                         services.AddTransient<FormLogin>();

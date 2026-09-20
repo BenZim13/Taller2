@@ -22,6 +22,14 @@ namespace StockOS.Application.Services
         public int AbrirCaja(int idCaja, int idEmpleado, decimal montoApertura)
         {
             _authService.ValidarPermiso(Permisos.CAJA_ABRIR);
+
+            // 1. BLOQUEO: Usamos tu método existente para verificar si ya tiene un turno abierto
+            if (_cajaSesionRepo.VerificarCajaAbierta(idEmpleado))
+            {
+                throw new InvalidOperationException("Ya tienes un turno de caja abierto. Debes cerrarlo antes de iniciar uno nuevo.");
+            }
+
+            // 2. Si pasó el control, abrimos la caja pasándole los 3 parámetros como lo tenías
             return _cajaSesionRepo.AbrirCaja(idCaja, idEmpleado, montoApertura);
         }
 
@@ -56,6 +64,10 @@ namespace StockOS.Application.Services
             if (string.IsNullOrWhiteSpace(descripcion)) throw new Exception("Debe ingresar una descripción.");
 
             _cajaRepo.RegistrarMovimiento(idCajaSesion, tipo, monto, descripcion);
+        }
+        public int? ObtenerIdSesionAbierta(int idEmpleado)
+        {
+            return _cajaSesionRepo.ObtenerIdSesionAbierta(idEmpleado);
         }
     }
 }

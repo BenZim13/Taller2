@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using StockOS.DataAccess.Persistence;
+using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 
 namespace StockOS.DataAccess.Repositories
@@ -44,6 +45,13 @@ namespace StockOS.DataAccess.Repositories
                 idEmpleado, paramAbierta);
 
             return (bool)paramAbierta.Value;
+        }
+        public int? ObtenerIdSesionAbierta(int idEmpleado)
+        {
+            var sesion = _context.Set<CajaSesion>()
+                                 .FirstOrDefault(c => c.IdEmpleado == idEmpleado && c.Estado == 1);
+
+            return sesion?.IdCajaSesion;
         }
     }
 }

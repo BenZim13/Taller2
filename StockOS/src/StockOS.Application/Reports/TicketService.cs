@@ -11,97 +11,170 @@ namespace StockOS.Application.Reports
     {
         public TicketService()
         {
-            // Requisito obligatorio de QuestPDF para la licencia comunitaria
             QuestPDF.Settings.License = LicenseType.Community;
+            QuestPDF.Settings.UseSystemFonts = true;
         }
 
-        public byte[] GenerarTicketPdf(Venta venta, string cajeroNombre)
+        public byte[] GenerarTicketPdf(Venta venta, string cajeroNombre, DatosComercio comercio, DatosPago pago)
         {
             var documento = Document.Create(container =>
             {
-                // Formato ticket térmico: 80mm de ancho (equivale a 226.8 puntos continuos)
                 container.Page(page =>
                 {
-                    page.ContinuousSize(226.8f);
-                    page.Margin(15);
+                    page.ContinuousSize(226.8f); // 80mm
+                    page.Margin(12);
                     page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Arial"));
+                    page.DefaultTextStyle(x => x.FontSize(8.5f).FontFamily("Consolas"));
 
-                    page.Header().Element(ComposeHeader);
-                    page.Content().Element(x => ComposeContent(x, venta, cajeroNombre));
-                    page.Footer().Element(ComposeFooter);
+                    // Le pasamos la info del comercio, cajero y pago al Header y al Content
+                    page.Header().Element(x => ComposeHeader(x, comercio));
+                    page.Content().Element(x => ComposeContent(x, venta, cajeroNombre, comercio, pago));
                 });
             });
 
             return documento.GeneratePdf();
         }
 
-        private void ComposeHeader(IContainer container)
+        private void ComposeHeader(IContainer container, DatosComercio comercio)
         {
             container.Column(col =>
             {
-                col.Item().AlignCenter().Text("STOCK OS").Bold().FontSize(16);
-                col.Item().AlignCenter().Text("Tu comercio de confianza");
-                col.Item().AlignCenter().Text("CUIT: 30-12345678-9");
-                col.Item().PaddingTop(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                // Datos dinámicos inyectados
+                col.Item().AlignCenter().Text(comercio.Nombre).FontSize(14).Bold();
+                col.Item().Text($"C.U.I.T. Nro.: {comercio.Cuit}");
+                col.Item().Text($"Ing. Brutos: {comercio.IngresosBrutos}");
+                col.Item().Text($"Domicilio: {comercio.Direccion}");
+                col.Item().Text($"Inicio de Actividades: {comercio.InicioActividades}");
+                col.Item().Text(comercio.CondicionIva);
+                col.Item().Text("A CONSUMIDOR FINAL");
+
+                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
             });
         }
 
-        private void ComposeContent(IContainer container, Venta venta, string cajeroNombre)
+        private void ComposeContent(IContainer container, Venta venta, string cajeroNombre, DatosComercio comercio, DatosPago pago)
         {
-            container.PaddingVertical(10).Column(col =>
+            container.Column(col =>
             {
-                col.Item().Text($"Ticket N°: {venta.IdVenta:D8}").Bold();
-                col.Item().Text($"Fecha: {venta.FechaHora:dd/MM/yyyy HH:mm}");
+                // Encabezado del ticket con datos dinámicos
+                col.Item().Text($"TIQUE (Cod.083)    P.V. N° {comercio.PuntoVenta} Nro. T. {venta.IdVenta:D8}");
+                col.Item().Text($"Fecha {venta.FechaHora:dd/MM/yyyy} Hora {venta.FechaHora:HH:mm:ss}");
                 col.Item().Text($"Cajero: {cajeroNombre}");
 
-                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
 
-                // Tabla de productos
-                col.Item().Table(table =>
+                // Detalle de productos
+                if (venta.DetalleVenta != null)
                 {
-                    table.ColumnsDefinition(columns =>
+                    foreach (var detalle in venta.DetalleVenta)
                     {
-                        columns.RelativeColumn(3); // Cantidad + Nombre
-                        columns.RelativeColumn(1); // Subtotal
-                    });
+                        string nombreProd = detalle.IdProductoNavigation?.Nombre?.ToUpper() ?? "PRODUCTO";
+                        decimal subtotalItem = (detalle.Cantidad * detalle.PrecioUnitarioHistorico) - detalle.Descuento;
 
-                    table.Header(header =>
-                    {
-                        header.Cell().Text("Cant x Producto").Bold();
-                        header.Cell().AlignRight().Text("Subtotal").Bold();
-                    });
+                        col.Item().Text($"{detalle.Cantidad:N2} (00) x {detalle.PrecioUnitarioHistorico:N2}");
 
-                    // Iteramos sobre tu colección "DetalleVenta"
-                    if (venta.DetalleVenta != null)
-                    {
-                        foreach (var detalle in venta.DetalleVenta)
+                        col.Item().Row(row =>
                         {
-                            // Navegamos al producto usando "IdProductoNavigation"
-                            string nombreProd = detalle.IdProductoNavigation?.Nombre ?? "Producto";
-
-                            // Calculamos el subtotal del renglón
-                            decimal subtotal = (detalle.Cantidad * detalle.PrecioUnitarioHistorico) - detalle.Descuento;
-
-                            table.Cell().Text($"{detalle.Cantidad} x {nombreProd}");
-                            table.Cell().AlignRight().Text($"${subtotal:N2}");
-                        }
+                            row.RelativeItem().Text($"{nombreProd} (0)");
+                            row.ConstantItem(50).AlignRight().Text($"{subtotalItem:N2}");
+                        });
                     }
+                }
+
+                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
+
+                // Subtotal (antes de descuentos)
+                col.Item().Row(row =>
+                {
+                    row.RelativeItem().Text("Subtotal");
+                    row.ConstantItem(60).AlignRight().Text($"{venta.Subtotal:N2}");
                 });
 
-                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                // Mostrar descuento solo si existe
+                if (venta.DescuentoTotal > 0)
+                {
+                    col.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text("Descuento");
+                        row.ConstantItem(60).AlignRight().Text($"-{venta.DescuentoTotal:N2}");
+                    });
+                }
 
-                // Total usando tu propiedad "TotalVenta"
-                col.Item().AlignRight().Text($"TOTAL: ${venta.TotalVenta:N2}").Bold().FontSize(12);
-            });
-        }
+                col.Item().PaddingVertical(3);
 
-        private void ComposeFooter(IContainer container)
-        {
-            container.AlignCenter().Column(col =>
-            {
-                col.Item().Text("¡Gracias por su compra!").Bold();
-                col.Item().Text("Conserve este ticket para devoluciones").FontSize(8);
+                // Total final
+                col.Item().Row(row =>
+                {
+                    row.RelativeItem().Text("TOTAL").FontSize(13).Bold();
+                    row.ConstantItem(80).AlignRight().Text($"{venta.TotalVenta:N2}").FontSize(13).Bold();
+                });
+
+                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
+
+                // Sección de pago - ahora dinámica
+                col.Item().Text("RECIBI/MOS");
+                col.Item().Row(row => 
+                { 
+                    row.RelativeItem().Text(pago.MetodoPago); 
+                    row.ConstantItem(60).AlignRight().Text($"{pago.MontoRecibido:N2}"); 
+                });
+                col.Item().Row(row => 
+                { 
+                    row.RelativeItem().Text("Suma de sus pagos"); 
+                    row.ConstantItem(60).AlignRight().Text($"{pago.MontoRecibido:N2}"); 
+                });
+                col.Item().Row(row => 
+                { 
+                    row.RelativeItem().Text("Su Vuelto").Bold(); 
+                    row.ConstantItem(60).AlignRight().Text($"{pago.Vuelto:N2}").Bold(); 
+                });
+
+                col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
+
+                // Información fiscal - Calcular IVA por alícuota según cada producto
+                col.Item().Text("REGIMEN TRANSPARENCIA FISCAL CONSUMIDOR");
+
+                if (venta.DetalleVenta != null && venta.DetalleVenta.Any())
+                {
+                    // Agrupar por alícuota de IVA
+                    var ivasPorAlicuota = venta.DetalleVenta
+                        .GroupBy(d => d.IdProductoNavigation?.PorcentajeIva ?? 21m)
+                        .Select(g => new
+                        {
+                            Alicuota = g.Key,
+                            MontoIva = g.Sum(d =>
+                            {
+                                decimal subtotalItem = (d.Cantidad * d.PrecioUnitarioHistorico) - d.Descuento;
+                                return subtotalItem - (subtotalItem / (1 + g.Key / 100m));
+                            })
+                        })
+                        .OrderByDescending(x => x.Alicuota);
+
+                    foreach (var iva in ivasPorAlicuota)
+                    {
+                        col.Item().Row(row =>
+                        {
+                            row.RelativeItem().Text($"Alicuota {iva.Alicuota:N0}%");
+                            row.ConstantItem(60).AlignRight().Text($"{iva.MontoIva:N2}");
+                        });
+                    }
+                }
+                else
+                {
+                    // Fallback si no hay detalles
+                    decimal ivaCalculado = venta.TotalVenta - (venta.TotalVenta / 1.21m);
+                    col.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text("Alicuota 21%");
+                        row.ConstantItem(60).AlignRight().Text($"{ivaCalculado:N2}");
+                    });
+                }
+
+                // Registro fiscal dinámico (si está configurado)
+                if (!string.IsNullOrWhiteSpace(comercio.RegistroFiscal))
+                {
+                    col.Item().AlignCenter().Text($"REGISTRO: {comercio.RegistroFiscal}");
+                }
             });
         }
     }
