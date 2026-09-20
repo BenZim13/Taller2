@@ -1,10 +1,13 @@
+using StockOS.Application;
+using StockOS.Application.Reports;
+using StockOS.Application.Services;
+using StockOS.Domain.Entities;
+using StockOS.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using StockOS.Application;
-using StockOS.Application.Services;
-using StockOS.Domain.Entities;
+
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -17,14 +20,17 @@ namespace StockOS.UI.WinForms.Forms
         private decimal _subtotalVenta = 0;
         private decimal _descuentoTotal = 0;
         private decimal _totalFinal = 0;
+        private readonly ITicketService _ticketService;
 
         // Inyectamos ICajaService en el constructor
-        public UcVentas(IProductoService productoService, IVentaService ventaService, ICajaService cajaService)
+        public UcVentas(IProductoService productoService, IVentaService ventaService,
+                            ICajaService cajaService, ITicketService ticketService)
         {
             InitializeComponent();
             _productoService = productoService;
             _ventaService = ventaService;
             _cajaService = cajaService;
+            _ticketService = ticketService;
 
             this.Load += (s, e) => txtCodigoBarra.Focus();
         }
@@ -207,19 +213,33 @@ namespace StockOS.UI.WinForms.Forms
                         // Le pasamos el idMetodoPago al servicio
                         int idVenta = _ventaService.RegistrarVenta(nuevaVenta, detalles, idSucursal, idMetodoPago);
 
-                        var itemsParaTicket = new List<ItemTicket>();
-                        foreach (DataGridViewRow row in dgvTicket.Rows)
-                        {
-                            itemsParaTicket.Add(new ItemTicket
-                            {
-                                Producto = row.Cells["Producto"].Value.ToString() ?? "Producto",
-                                Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
-                                PrecioTotal = Convert.ToDecimal(row.Cells["Subtotal"].Value)
-                            });
-                        }
+                        // --- NUEVA LÓGICA DE TICKET PDF ---
+                        // 1. Preparamos los datos visuales que necesita el PDF
+                        nuevaVenta.IdVenta = idVenta;
+                        nuevaVenta.FechaHora = DateTime.Now;
 
+                        for (int i = 0; i < dgvTicket.Rows.Count; i++)
+                        {
+                            detalles[i].IdProductoNavigation = new Producto
+                            {
+                                Nombre = dgvTicket.Rows[i].Cells["Producto"].Value?.ToString() ?? "Producto"
+                            };
+                        }
+                        nuevaVenta.DetalleVenta = detalles;
+
+                        // 2. Generamos el archivo
                         string nombreCajero = $"{SesionActual.Usuario!.Nombre} {SesionActual.Usuario!.Apellido}";
-                        TicketService.GenerarYAbrirTicket(idVenta, nombreCajero, _totalFinal, itemsParaTicket);
+                        byte[] pdfBytes = _ticketService.GenerarTicketPdf(nuevaVenta, nombreCajero);
+
+                        // 3. Lo guardamos en una carpeta temporal y lo abrimos automáticamente
+                        string rutaTemp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"Ticket_{idVenta}.pdf");
+                        System.IO.File.WriteAllBytes(rutaTemp, pdfBytes);
+
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(rutaTemp)
+                        {
+                            UseShellExecute = true
+                        });
+                        // -----------------------------------
 
                         MessageBox.Show($"¡Venta procesada con {metodoPago}!\nTicket N°: {idVenta}",
                                          "Cobro Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -231,7 +251,8 @@ namespace StockOS.UI.WinForms.Forms
                     }
                     catch (Exception excepcion)
                     {
-                        MessageBox.Show($"Error al procesar la venta: {excepcion.Message}", "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Error al procesar la venta: {excepcion.Message}",
+                                            "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
