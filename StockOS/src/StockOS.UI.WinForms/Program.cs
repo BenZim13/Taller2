@@ -32,7 +32,7 @@ namespace StockOS.UI.WinForms.Forms
                 Log.Information("Iniciando la aplicación StockOS...");
 
                 var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
@@ -41,6 +41,9 @@ namespace StockOS.UI.WinForms.Forms
                     .UseSerilog() // <-- Le decimos al Host que también use Serilog internamente
                     .ConfigureServices((context, services) =>
                     {
+                        // Registrar configuración global
+                        services.AddSingleton<IConfiguration>(configuration);
+
                         // Configurar BD con la cadena de conexión
                         services.AddDbContext<StockOsContext>(options =>
                             options.UseSqlServer(configuration.GetConnectionString("StockOS")));
@@ -57,6 +60,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddScoped<IVentaRepository, VentaRepository>();
                         services.AddScoped<ICompraRepository, CompraRepository>();
                         services.AddScoped<IProveedorRepository, ProveedorRepository>();
+                        services.AddScoped<IReporteRepository, ReporteRepository>();
 
                         // Servicios de Negocio
                         services.AddScoped<IAuthService, AuthService>();
@@ -70,6 +74,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddScoped<IVentaService, VentaService>();
                         services.AddScoped<ICompraService, CompraService>();
                         services.AddScoped<IProveedorService, ProveedorService>();
+                        services.AddScoped<IReporteService, ReporteService>();
                         services.AddScoped<IAuthorizationService, AuthorizationService>();
 
                         // Formularios y Vistas

@@ -13,6 +13,6 @@ namespace StockOS.Application.Services
         void Agregar(Producto producto);
         void Actualizar(Producto producto);
         void CambiarEstado(int idProducto, bool activo);
-        Producto BuscarPorCodigoBarra(string codigoBarra);
+        Producto? BuscarPorCodigoBarra(string codigoBarra);
     }
 }

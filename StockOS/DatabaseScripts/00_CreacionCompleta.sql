@@ -712,3 +712,73 @@ BEGIN
     SET @IdPago = SCOPE_IDENTITY();
 END
 GO
+
+-- ==========================================
+-- 12. PROCEDIMIENTOS ALMACENADOS: REPORTES
+-- ==========================================
+
+CREATE OR ALTER PROCEDURE sp_Reportes_Ventas_Total
+    @FechaInicio DATETIME2,
+    @FechaFin DATETIME2,
+    @Total DECIMAL(12,2) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT @Total = ISNULL(SUM(total_venta), 0)
+    FROM venta
+    WHERE fecha_hora >= @FechaInicio AND fecha_hora <= @FechaFin AND estado = 1;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_Reportes_Ventas_Detalle
+    @FechaInicio DATETIME2,
+    @FechaFin DATETIME2
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        p.codigo_barra AS CodigoBarra,
+        p.nombre AS NombreProducto,
+        SUM(dv.cantidad) AS CantidadTotal,
+        SUM(dv.cantidad * dv.precio_unitario_historico - dv.descuento) AS Subtotal
+    FROM venta v
+    INNER JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+    INNER JOIN producto p ON dv.id_producto = p.id_producto
+    WHERE v.fecha_hora >= @FechaInicio AND v.fecha_hora <= @FechaFin AND v.estado = 1
+    GROUP BY p.codigo_barra, p.nombre
+    ORDER BY CantidadTotal DESC;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_Reportes_Compras_Total
+    @FechaInicio DATETIME2,
+    @FechaFin DATETIME2,
+    @Total DECIMAL(12,2) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT @Total = ISNULL(SUM(total), 0)
+    FROM compra
+    WHERE fecha_hora >= @FechaInicio AND fecha_hora <= @FechaFin;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_Reportes_Compras_Detalle
+    @FechaInicio DATETIME2,
+    @FechaFin DATETIME2
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        p.codigo_barra AS CodigoBarra,
+        p.nombre AS NombreProducto,
+        SUM(dc.cantidad) AS CantidadTotal,
+        SUM(dc.cantidad * dc.precio_unitario_compra) AS Subtotal
+    FROM compra c
+    INNER JOIN detalle_compra dc ON c.id_compra = dc.id_compra
+    INNER JOIN producto p ON dc.id_producto = p.id_producto
+    WHERE c.fecha_hora >= @FechaInicio AND c.fecha_hora <= @FechaFin
+    GROUP BY p.codigo_barra, p.nombre
+    ORDER BY CantidadTotal DESC;
+END
+GO

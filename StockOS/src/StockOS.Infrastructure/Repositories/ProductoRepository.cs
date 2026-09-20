@@ -17,7 +17,7 @@ namespace StockOS.DataAccess.Repositories
         {
             _context = context;
         }
-        public Producto BuscarPorCodigoBarra(string codigoBarra)
+        public Producto? BuscarPorCodigoBarra(string codigoBarra)
         {
             return _context.Productos
                 .AsNoTracking()

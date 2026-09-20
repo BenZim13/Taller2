@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Moq;
 using Xunit;
 using StockOS.Application.Services;
@@ -9,53 +9,179 @@ namespace StockOS.Application.Tests
 {
     public class CajaServiceTests
     {
-        // Prueba 1: Regla de negocio (No se puede cerrar caja con saldo negativo)
+        // ==========================================
+        // PRUEBAS DE ÉXITO
+        // ==========================================
+
         [Fact]
-        public void CerrarCaja_ConMontoNegativo_LanzaExcepcion()
+        public void AbrirCaja_ConPermiso_EjecutaRepositorio()
         {
-            // 1. ARRANGE (Preparar)
-            // Simulamos la base de datos y el guardián de seguridad con Moq
+            // ARRANGE
             var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
             var mockCajaRepo = new Mock<ICajaRepository>();
             var mockAuthService = new Mock<IAuthorizationService>();
 
-            // Le decimos al guardián falso que deje pasar cualquier permiso (para no trabar el test)
-            mockAuthService.Setup(a => a.ValidarPermiso(It.IsAny<string>()));
+            mockCajaSesionRepo.Setup(r => r.AbrirCaja(1, 10, 5000m)).Returns(101);
 
-            // Instanciamos el servicio real, inyectándole los simulacros
             var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
 
-            // 2. ACT (Actuar) & 3. ASSERT (Afirmar)
-            // Afirmamos que si intentamos cerrar la caja 1 con saldo -500, el sistema DEBE lanzar un error
-            var excepcion = Assert.Throws<Exception>(() => cajaService.CerrarCaja(1, -500m));
+            // ACT
+            int idSesion = cajaService.AbrirCaja(1, 10, 5000m);
 
-            // Comprobamos que el mensaje de error sea exactamente el que programaste
-            Assert.Equal("El monto no puede ser negativo.", excepcion.Message);
+            // ASSERT
+            Assert.Equal(101, idSesion);
+            mockAuthService.Verify(a => a.ValidarPermiso(Permisos.CAJA_ABRIR), Times.Once);
+            mockCajaSesionRepo.Verify(r => r.AbrirCaja(1, 10, 5000m), Times.Once);
         }
 
-        // Prueba 2: Camino feliz (Si todo está bien, debe llamar a la base de datos)
         [Fact]
         public void CerrarCaja_ConMontoValido_EjecutaRepositorioCorrectamente()
         {
-            // 1. ARRANGE
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+            decimal montoValido = 15000.50m;
+            int idCajaSesion = 1;
+
+            // ACT
+            cajaService.CerrarCaja(idCajaSesion, montoValido);
+
+            // ASSERT
+            mockAuthService.Verify(a => a.ValidarPermiso(Permisos.CAJA_CERRAR), Times.Once);
+            mockCajaRepo.Verify(r => r.CerrarCaja(idCajaSesion, montoValido), Times.Once);
+        }
+
+        [Fact]
+        public void RegistrarMovimiento_ConDatosValidos_EjecutaRepositorio()
+        {
+            // ARRANGE
             var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
             var mockCajaRepo = new Mock<ICajaRepository>();
             var mockAuthService = new Mock<IAuthorizationService>();
 
             var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
 
-            decimal montoValido = 15000.50m;
-            int idCajaSesion = 1;
+            // ACT
+            cajaService.RegistrarMovimiento(1, "EGRESO", 1500m, "Pago de flete");
 
-            // 2. ACT
-            cajaService.CerrarCaja(idCajaSesion, montoValido);
-
-            // 3. ASSERT
-            // Verificamos que el servicio haya llamado al guardián para pedir permiso de CAJA_CERRAR exactamente 1 vez
-            mockAuthService.Verify(a => a.ValidarPermiso(Permisos.CAJA_CERRAR), Times.Once);
-
-            // Verificamos que el servicio le haya enviado la orden al repositorio (base de datos falsa) exactamente 1 vez con los montos correctos
-            mockCajaRepo.Verify(r => r.CerrarCaja(idCajaSesion, montoValido), Times.Once);
+            // ASSERT
+            mockAuthService.Verify(a => a.ValidarPermiso(Permisos.CAJA_MOVIMIENTOS), Times.Once);
+            mockCajaRepo.Verify(r => r.RegistrarMovimiento(1, "EGRESO", 1500m, "Pago de flete"), Times.Once);
         }
-    }
+
+        // ==========================================
+        // PRUEBAS DE FRACASO
+        // ==========================================
+
+        [Fact]
+        public void AbrirCaja_SinPermiso_LanzaUnauthorizedAccessException()
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            mockAuthService.Setup(a => a.ValidarPermiso(Permisos.CAJA_ABRIR))
+                           .Throws(new UnauthorizedAccessException("Denegado"));
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            Assert.Throws<UnauthorizedAccessException>(() => cajaService.AbrirCaja(1, 10, 5000m));
+            mockCajaSesionRepo.Verify(r => r.AbrirCaja(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<decimal>()), Times.Never);
+        }
+
+        [Fact]
+        public void CerrarCaja_ConMontoNegativo_LanzaExcepcion()
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            var excepcion = Assert.Throws<Exception>(() => cajaService.CerrarCaja(1, -500m));
+            Assert.Equal("El monto no puede ser negativo.", excepcion.Message);
+            mockCajaRepo.Verify(r => r.CerrarCaja(It.IsAny<int>(), It.IsAny<decimal>()), Times.Never);
+        }
+
+        [Fact]
+        public void CerrarCaja_SinPermiso_LanzaUnauthorizedAccessException()
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            mockAuthService.Setup(a => a.ValidarPermiso(Permisos.CAJA_CERRAR))
+                           .Throws(new UnauthorizedAccessException("Denegado"));
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            Assert.Throws<UnauthorizedAccessException>(() => cajaService.CerrarCaja(1, 1000m));
+            mockCajaRepo.Verify(r => r.CerrarCaja(It.IsAny<int>(), It.IsAny<decimal>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-50)]
+        public void RegistrarMovimiento_ConMontoInvalido_LanzaExcepcion(decimal montoInvalido)
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            var ex = Assert.Throws<Exception>(() => cajaService.RegistrarMovimiento(1, "EGRESO", montoInvalido, "Gasto"));
+            Assert.Contains("mayor a cero", ex.Message);
+            mockCajaRepo.Verify(r => r.RegistrarMovimiento(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void RegistrarMovimiento_ConDescripcionVacia_LanzaExcepcion(string? descripcionInvalida)
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            var ex = Assert.Throws<Exception>(() => cajaService.RegistrarMovimiento(1, "EGRESO", 100m, descripcionInvalida!));
+            Assert.Contains("descripción", ex.Message);
+            mockCajaRepo.Verify(r => r.RegistrarMovimiento(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void RegistrarMovimiento_SinPermiso_LanzaUnauthorizedAccessException()
+        {
+            // ARRANGE
+            var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
+            var mockCajaRepo = new Mock<ICajaRepository>();
+            var mockAuthService = new Mock<IAuthorizationService>();
+
+            mockAuthService.Setup(a => a.ValidarPermiso(Permisos.CAJA_MOVIMIENTOS))
+                           .Throws(new UnauthorizedAccessException("Denegado"));
+
+            var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
+
+            // ACT & ASSERT
+            Assert.Throws<UnauthorizedAccessException>(() => cajaService.RegistrarMovimiento(1, "EGRESO", 100m, "Gasto"));
+            mockCajaRepo.Verify(r => r.RegistrarMovimiento(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>()), Times.Never);
+        }
+    
+}
 }

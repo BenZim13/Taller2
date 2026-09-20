@@ -23,7 +23,7 @@ namespace StockOS.Application.Services
             return _productoRepository.ObtenerTodos();
         }
 
-        public Producto BuscarPorCodigoBarra(string codigoBarra)
+        public Producto? BuscarPorCodigoBarra(string codigoBarra)
         {
             _authService.ValidarPermiso(Permisos.PRODUCTOS_VER);
             if (string.IsNullOrWhiteSpace(codigoBarra)) return null;
