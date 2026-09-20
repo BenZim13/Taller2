@@ -168,7 +168,7 @@ namespace StockOS.Application.Tests
 
         [Theory]
         [InlineData(0)]
-        [InlineData(-100)]
+        [InlineData(-50)]
         public void Agregar_ConPrecioInvalido_LanzaArgumentException(decimal precioInvalido)
         {
             // ARRANGE
@@ -178,7 +178,7 @@ namespace StockOS.Application.Tests
             var service = new ProductoService(mockRepo.Object, mockAuth.Object);
             var producto = new Producto { CodigoBarra = "12345", Nombre = "Fideos", PrecioVentaActual = precioInvalido };
 
-            // ACT & ASSERT
+            // ACT & ASSERT - Verificamos que frene ambos casos
             var ex = Assert.Throws<ArgumentException>(() => service.Agregar(producto));
             Assert.Contains("precio de venta", ex.Message);
         }
@@ -224,6 +224,5 @@ namespace StockOS.Application.Tests
             Assert.Null(resultado);
             mockRepo.Verify(r => r.BuscarPorCodigoBarra(It.IsAny<string>()), Times.Never);
         }
-    
-}
+    }
 }

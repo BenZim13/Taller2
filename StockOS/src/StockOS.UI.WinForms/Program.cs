@@ -5,6 +5,8 @@ using StockOS.DataAccess.Persistence;
 using StockOS.Domain.Interfaces;
 using StockOS.DataAccess.Repositories;
 using StockOS.Application.Services;
+using StockOS.Application.Reports;
+
 using System;
 using System.Windows.Forms;
 using Microsoft.Extensions.Configuration;
@@ -76,6 +78,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddScoped<IProveedorService, ProveedorService>();
                         services.AddScoped<IReporteService, ReporteService>();
                         services.AddScoped<IAuthorizationService, AuthorizationService>();
+                        services.AddScoped<ITicketService, TicketService>();
 
                         // Formularios y Vistas
                         services.AddTransient<FormLogin>();

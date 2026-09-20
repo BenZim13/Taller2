@@ -118,13 +118,16 @@ namespace StockOS.Application.Tests
             var mockCajaRepo = new Mock<ICajaRepository>();
             var mockAuthService = new Mock<IAuthorizationService>();
 
+            // Simulamos que el guardián lanza el error de acceso denegado
             mockAuthService.Setup(a => a.ValidarPermiso(Permisos.CAJA_CERRAR))
                            .Throws(new UnauthorizedAccessException("Denegado"));
 
             var cajaService = new CajaService(mockCajaSesionRepo.Object, mockCajaRepo.Object, mockAuthService.Object);
 
-            // ACT & ASSERT
+            // ACT & ASSERT - Verificamos que el servicio propague la explosión
             Assert.Throws<UnauthorizedAccessException>(() => cajaService.CerrarCaja(1, 1000m));
+
+            // Aseguramos que la base de datos NUNCA fue llamada porque el guardián cortó el flujo antes
             mockCajaRepo.Verify(r => r.CerrarCaja(It.IsAny<int>(), It.IsAny<decimal>()), Times.Never);
         }
 
@@ -182,6 +185,5 @@ namespace StockOS.Application.Tests
             Assert.Throws<UnauthorizedAccessException>(() => cajaService.RegistrarMovimiento(1, "EGRESO", 100m, "Gasto"));
             mockCajaRepo.Verify(r => r.RegistrarMovimiento(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<string>()), Times.Never);
         }
-    
-}
+    }
 }
