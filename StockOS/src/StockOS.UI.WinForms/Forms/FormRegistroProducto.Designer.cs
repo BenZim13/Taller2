@@ -174,9 +174,9 @@ namespace StockOS.UI.WinForms.Forms
             this.lblPrecio.ForeColor = System.Drawing.Color.FromArgb(203, 213, 225);
             this.lblPrecio.Location = new System.Drawing.Point(40, 275);
             this.lblPrecio.Name = "lblPrecio";
-            this.lblPrecio.Size = new System.Drawing.Size(104, 19);
+            this.lblPrecio.Size = new System.Drawing.Size(190, 19);
             this.lblPrecio.TabIndex = 7;
-            this.lblPrecio.Text = "Precio de Venta";
+            this.lblPrecio.Text = "Precio de Venta (con IVA 21%)";
             // 
             // txtPrecio
             // 

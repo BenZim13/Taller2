@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
@@ -23,13 +23,24 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.CAJA_ABRIR);
 
-            // 1. BLOQUEO: Usamos tu método existente para verificar si ya tiene un turno abierto
+            if (montoApertura < 0)
+            {
+                throw new ArgumentException("El monto inicial de apertura no puede ser negativo.");
+            }
+
+            // 1. BLOQUEO: Verificar si el empleado ya tiene un turno abierto
             if (_cajaSesionRepo.VerificarCajaAbierta(idEmpleado))
             {
                 throw new InvalidOperationException("Ya tienes un turno de caja abierto. Debes cerrarlo antes de iniciar uno nuevo.");
             }
 
-            // 2. Si pasó el control, abrimos la caja pasándole los 3 parámetros como lo tenías
+            // 2. BLOQUEO: Verificar si la caja física seleccionada ya está abierta en otro turno
+            if (_cajaSesionRepo.VerificarCajaFisicaAbierta(idCaja))
+            {
+                throw new InvalidOperationException("La caja seleccionada ya tiene un turno abierto por otro cajero. Debe cerrarse antes de poder utilizarla.");
+            }
+
+            // 3. Si pasó los controles, abrimos la caja en el repositorio
             return _cajaSesionRepo.AbrirCaja(idCaja, idEmpleado, montoApertura);
         }
 
@@ -52,7 +63,7 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.CAJA_CERRAR);
 
-            if (montoCierreReal < 0) throw new Exception("El monto no puede ser negativo.");
+            if (montoCierreReal < 0) throw new ArgumentException("El monto no puede ser negativo.");
             _cajaRepo.CerrarCaja(idCajaSesion, montoCierreReal);
         }
 
@@ -60,14 +71,35 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.CAJA_MOVIMIENTOS);
 
-            if (monto <= 0) throw new Exception("El monto debe ser mayor a cero.");
-            if (string.IsNullOrWhiteSpace(descripcion)) throw new Exception("Debe ingresar una descripción.");
+            string tipoNormalizado = (tipo ?? "").Trim().ToUpper();
+            if (tipoNormalizado != "INGRESO" && tipoNormalizado != "EGRESO")
+            {
+                throw new ArgumentException("El tipo de movimiento debe ser 'INGRESO' o 'EGRESO'.");
+            }
 
-            _cajaRepo.RegistrarMovimiento(idCajaSesion, tipo, monto, descripcion);
+            if (monto <= 0) throw new ArgumentException("El monto debe ser mayor a cero.");
+            if (string.IsNullOrWhiteSpace(descripcion)) throw new ArgumentException("Debe ingresar una descripción.");
+
+            _cajaRepo.RegistrarMovimiento(idCajaSesion, tipoNormalizado, monto, descripcion.Trim());
         }
         public int? ObtenerIdSesionAbierta(int idEmpleado)
         {
             return _cajaSesionRepo.ObtenerIdSesionAbierta(idEmpleado);
+        }
+
+        public void CerrarCajaPorCierreSesion(int idEmpleado)
+        {
+            var idCajaSesion = _cajaSesionRepo.ObtenerIdSesionAbierta(idEmpleado);
+            if (idCajaSesion.HasValue && idCajaSesion.Value > 0)
+            {
+                decimal montoEsperado = _cajaRepo.ObtenerMontoEsperado(idCajaSesion.Value);
+                _cajaRepo.CerrarCaja(idCajaSesion.Value, montoEsperado);
+            }
+
+            if (SesionActual.Usuario == null || SesionActual.Usuario.IdEmpleado == idEmpleado || (idCajaSesion.HasValue && SesionActual.IdCajaSesionAbierta == idCajaSesion))
+            {
+                SesionActual.IdCajaSesionAbierta = null;
+            }
         }
     }
 }

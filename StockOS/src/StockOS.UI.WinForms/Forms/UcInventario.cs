@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StockOS.Application.Services;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Enums;
+using StockOS.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,22 +17,23 @@ namespace StockOS.UI.WinForms.Forms
         private readonly IStockService _stockService;
         private readonly ICategoriaService _categoriaService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IAuthorizationService _authService;
         
         private List<Producto> _listaProductos = new();
 
         public UcInventario(IProductoService productoService, ICategoriaService categoriaService,
-            IServiceProvider serviceProvider, IStockService stockService)
+            IServiceProvider serviceProvider, IStockService stockService, IAuthorizationService authService)
         {
             InitializeComponent();
             _productoService = productoService;
             _stockService = stockService;
             _categoriaService = categoriaService;
             _serviceProvider = serviceProvider;
+            _authService = authService;
 
             ConfigurarGrid();
             ConfigurarEventos();
             ConfigurarPermisosModulo();
-
         }
 
         private void ConfigurarGrid()
@@ -179,22 +181,16 @@ namespace StockOS.UI.WinForms.Forms
 
         private void ConfigurarPermisosModulo()
         {
-            if (SesionActual.Usuario == null) return;
+            btnNuevo.Visible = _authService.TienePermiso(Permisos.PRODUCTOS_CREAR);
+            btnIngresarStock.Visible = _authService.TienePermiso(Permisos.STOCK_INGRESAR);
+            btnCategorias.Visible = _authService.TienePermiso(Permisos.CATEGORIAS_GESTIONAR);
+            btnProveedores.Visible = _authService.TienePermiso(Permisos.PROVEEDORES_GESTIONAR);
 
-            int idRol = SesionActual.Usuario.IdRol;
-
-            // Si el usuario es Cajero, el inventario es de "Solo Lectura"
-            if (idRol == (int)RolUsuario.Cajero)
-            {
-                btnNuevo.Visible = false;
-                btnIngresarStock.Visible = false;
-                btnCategorias.Visible = false;
-                btnProveedores.Visible = false;
-                if (dgvProductos.Columns.Contains("colModificar"))
-                    dgvProductos.Columns["colModificar"].Visible = false;
-                if (dgvProductos.Columns.Contains("colAccionEstado"))
-                    dgvProductos.Columns["colAccionEstado"].Visible = false;
-            }
+            bool puedeEditar = _authService.TienePermiso(Permisos.PRODUCTOS_EDITAR);
+            if (dgvProductos.Columns.Contains("colModificar"))
+                dgvProductos.Columns["colModificar"].Visible = puedeEditar;
+            if (dgvProductos.Columns.Contains("colAccionEstado"))
+                dgvProductos.Columns["colAccionEstado"].Visible = puedeEditar;
         }
         private void CargarDatos()
         {

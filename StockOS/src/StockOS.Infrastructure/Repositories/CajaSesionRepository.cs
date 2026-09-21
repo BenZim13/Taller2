@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using StockOS.DataAccess.Persistence;
 using StockOS.Domain.Entities;
@@ -52,6 +52,11 @@ namespace StockOS.DataAccess.Repositories
                                  .FirstOrDefault(c => c.IdEmpleado == idEmpleado && c.Estado == 1);
 
             return sesion?.IdCajaSesion;
+        }
+
+        public bool VerificarCajaFisicaAbierta(int idCaja)
+        {
+            return _context.Set<CajaSesion>().Any(c => c.IdCaja == idCaja && c.Estado == 1);
         }
     }
 }

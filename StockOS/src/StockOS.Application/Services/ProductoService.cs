@@ -47,6 +47,11 @@ namespace StockOS.Application.Services
                 throw new System.InvalidOperationException($"Ya existe un producto registrado con el código '{producto.CodigoBarra}'.");
             }
 
+            if (producto.PorcentajeIva <= 0)
+            {
+                producto.PorcentajeIva = Producto.IvaFijoDefault;
+            }
+
             _productoRepository.Agregar(producto);
         }
 
@@ -65,6 +70,11 @@ namespace StockOS.Application.Services
             if (existente != null && existente.IdProducto != producto.IdProducto)
             {
                 throw new System.InvalidOperationException($"El código '{producto.CodigoBarra}' ya pertenece a otro producto ('{existente.Nombre}').");
+            }
+
+            if (producto.PorcentajeIva <= 0)
+            {
+                producto.PorcentajeIva = Producto.IvaFijoDefault;
             }
 
             _productoRepository.Actualizar(producto);

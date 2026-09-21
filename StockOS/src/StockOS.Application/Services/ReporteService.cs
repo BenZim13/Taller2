@@ -14,15 +14,19 @@ namespace StockOS.Application.Services
     public class ReporteService : IReporteService
     {
         private readonly IReporteRepository _reporteRepository;
+        private readonly IAuthorizationService _authService;
 
-        public ReporteService(IReporteRepository reporteRepository)
+        public ReporteService(IReporteRepository reporteRepository, IAuthorizationService authService)
         {
             _reporteRepository = reporteRepository;
+            _authService = authService;
             QuestPDF.Settings.License = LicenseType.Community;
         }
 
         public async Task GenerarReporteVentasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
         {
+            _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
+
             var data = await _reporteRepository.ObtenerReporteVentasAsync(fechaInicio, fechaFin);
             var titulo = $"StockOS Reporte \"Ventas\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Ventas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
@@ -32,6 +36,8 @@ namespace StockOS.Application.Services
 
         public async Task GenerarReporteComprasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
         {
+            _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
+
             var data = await _reporteRepository.ObtenerReporteComprasAsync(fechaInicio, fechaFin);
             var titulo = $"StockOS Reporte \"Compras\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Compras_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";

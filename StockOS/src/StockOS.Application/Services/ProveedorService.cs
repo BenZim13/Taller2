@@ -2,16 +2,19 @@ using System;
 using System.Collections.Generic;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
+using StockOS.Domain.Enums;
 
 namespace StockOS.Application.Services
 {
     public class ProveedorService : IProveedorService
     {
         private readonly IProveedorRepository _proveedorRepository;
+        private readonly IAuthorizationService _authService;
 
-        public ProveedorService(IProveedorRepository proveedorRepository)
+        public ProveedorService(IProveedorRepository proveedorRepository, IAuthorizationService authService)
         {
             _proveedorRepository = proveedorRepository;
+            _authService = authService;
         }
 
         public IEnumerable<Proveedor> ObtenerTodos()
@@ -21,6 +24,13 @@ namespace StockOS.Application.Services
 
         public void Agregar(Proveedor proveedor)
         {
+            _authService.ValidarPermiso(Permisos.PROVEEDORES_GESTIONAR);
+
+            if (proveedor == null)
+            {
+                throw new ArgumentNullException(nameof(proveedor));
+            }
+
             if (string.IsNullOrWhiteSpace(proveedor.RazonSocial))
             {
                 throw new ArgumentException("El nombre o razón social del proveedor es obligatorio.");
@@ -38,6 +48,13 @@ namespace StockOS.Application.Services
 
         public void Actualizar(Proveedor proveedor)
         {
+            _authService.ValidarPermiso(Permisos.PROVEEDORES_GESTIONAR);
+
+            if (proveedor == null)
+            {
+                throw new ArgumentNullException(nameof(proveedor));
+            }
+
             if (string.IsNullOrWhiteSpace(proveedor.RazonSocial))
             {
                 throw new ArgumentException("El nombre o razón social del proveedor es obligatorio.");
@@ -54,6 +71,7 @@ namespace StockOS.Application.Services
 
         public void CambiarEstado(int idProveedor, bool activo)
         {
+            _authService.ValidarPermiso(Permisos.PROVEEDORES_GESTIONAR);
             _proveedorRepository.CambiarEstado(idProveedor, activo);
         }
     }

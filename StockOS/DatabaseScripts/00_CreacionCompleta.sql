@@ -536,16 +536,9 @@ CREATE OR ALTER PROCEDURE sp_Compras_ActualizarPrecio
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @IdDetalle INT; DECLARE @IdCompra INT;
-    SELECT TOP 1 @IdDetalle = dc.id_detalle_compra, @IdCompra = dc.id_compra FROM detalle_compra dc
-    INNER JOIN compra c ON dc.id_compra = c.id_compra WHERE dc.id_producto = @IdProducto
-    ORDER BY c.fecha_hora DESC, dc.id_detalle_compra DESC;
-    IF @IdDetalle IS NOT NULL
-    BEGIN
-        UPDATE detalle_compra SET precio_unitario_compra = @NuevoPrecioCompra WHERE id_detalle_compra = @IdDetalle;
-        UPDATE compra SET total = (SELECT ISNULL(SUM(cantidad * precio_unitario_compra), 0) FROM detalle_compra WHERE id_compra = @IdCompra)
-        WHERE id_compra = @IdCompra;
-    END
+    -- Por principio de trazabilidad contable, los registros históricos de compras emitidos
+    -- en el pasado permanecen inmutables. El costo de reposición se registra en cada compra nueva.
+    RETURN;
 END
 GO
 
@@ -580,10 +573,31 @@ END
 GO
 
 CREATE OR ALTER PROCEDURE sp_Stock_Descontar
-    @IdProducto INT, @IdSucursal INT, @CantidadAVender INT
+    @IdProducto INT, 
+    @IdSucursal INT, 
+    @CantidadAVender INT
 AS
 BEGIN
-    UPDATE stock_sucursal SET stock_actual = stock_actual - @CantidadAVender
+    SET NOCOUNT ON;
+
+    DECLARE @StockActual INT;
+
+    SELECT @StockActual = stock_actual 
+    FROM stock_sucursal 
+    WHERE id_producto = @IdProducto AND id_sucursal = @IdSucursal;
+
+    IF @StockActual IS NULL
+    BEGIN
+        THROW 50001, 'El producto no cuenta con registro de inventario en la sucursal seleccionada.', 1;
+    END
+
+    IF @StockActual < @CantidadAVender
+    BEGIN
+        THROW 50002, 'Stock insuficiente para descontar la venta. La cantidad solicitada supera las existencias.', 1;
+    END
+
+    UPDATE stock_sucursal 
+    SET stock_actual = stock_actual - @CantidadAVender
     WHERE id_producto = @IdProducto AND id_sucursal = @IdSucursal;
 END
 GO
@@ -645,8 +659,8 @@ BEGIN
     INNER JOIN venta v ON p.id_venta = v.id_venta
     WHERE v.id_caja_sesion = @IdCajaSesion AND p.id_metodo_pago = 1;
 
-    SELECT @Ingresos = ISNULL(SUM(monto), 0) FROM movimiento_caja WHERE id_caja_sesion = @IdCajaSesion AND tipo_movimiento = 'Ingreso';
-    SELECT @Egresos = ISNULL(SUM(monto), 0) FROM movimiento_caja WHERE id_caja_sesion = @IdCajaSesion AND tipo_movimiento = 'Egreso';
+    SELECT @Ingresos = ISNULL(SUM(monto), 0) FROM movimiento_caja WHERE id_caja_sesion = @IdCajaSesion AND UPPER(tipo_movimiento) = 'INGRESO';
+    SELECT @Egresos = ISNULL(SUM(monto), 0) FROM movimiento_caja WHERE id_caja_sesion = @IdCajaSesion AND UPPER(tipo_movimiento) = 'EGRESO';
 
     SET @MontoEsperado = @Apertura + @Ventas + @Ingresos - @Egresos;
 END

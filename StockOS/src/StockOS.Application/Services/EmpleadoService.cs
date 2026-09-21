@@ -36,6 +36,11 @@ namespace StockOS.Application.Services
             if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
             if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
 
+            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !empleado.PasswordHash.StartsWith("$2"))
+            {
+                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
+            }
+
             _empleadoRepository.Agregar(empleado);
             return true;
         }
@@ -54,6 +59,11 @@ namespace StockOS.Application.Services
             if (empConMismoEmail != null && empConMismoEmail.IdEmpleado != empleado.IdEmpleado)
             {
                 return (false, "El correo electrónico ya se encuentra registrado por otro empleado.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !empleado.PasswordHash.StartsWith("$2"))
+            {
+                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
             }
 
             _empleadoRepository.Actualizar(empleado);

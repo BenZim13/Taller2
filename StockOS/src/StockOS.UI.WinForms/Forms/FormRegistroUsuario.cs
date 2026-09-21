@@ -192,7 +192,7 @@ namespace StockOS.UI.WinForms.Forms
                     IdSucursal = idSucursal
                 };
 
-                bool exito = await _authService.RegistrarAsync(nuevoEmpleado);
+                bool exito = await _empleadoService.CrearAsync(nuevoEmpleado);
 
                 if (exito)
                 {
@@ -222,7 +222,7 @@ namespace StockOS.UI.WinForms.Forms
 
                 if (!string.IsNullOrWhiteSpace(password))
                 {
-                    _empleadoEdicion.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                    _empleadoEdicion.PasswordHash = password;
                 }
 
                 var (exito, mensaje) = await _empleadoService.ActualizarAsync(_empleadoEdicion);

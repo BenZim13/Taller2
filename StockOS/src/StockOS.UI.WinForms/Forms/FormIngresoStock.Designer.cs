@@ -206,7 +206,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblPorcentajeExtra.Location = new System.Drawing.Point(225, 264);
             this.lblPorcentajeExtra.Name = "lblPorcentajeExtra";
             this.lblPorcentajeExtra.TabIndex = 16;
-            this.lblPorcentajeExtra.Text = "Margen Venta %";
+            this.lblPorcentajeExtra.Text = "Margen % (+21% IVA)";
 
             this.txtPorcentajeExtra.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtPorcentajeExtra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -241,7 +241,7 @@ namespace StockOS.UI.WinForms.Forms
             this.lblPrecioVenta.Location = new System.Drawing.Point(225, 326);
             this.lblPrecioVenta.Name = "lblPrecioVenta";
             this.lblPrecioVenta.TabIndex = 18;
-            this.lblPrecioVenta.Text = "Precio Venta Final";
+            this.lblPrecioVenta.Text = "Precio Venta (con IVA)";
 
             this.txtPrecioVenta.BackColor = System.Drawing.Color.FromArgb(71, 85, 105);
             this.txtPrecioVenta.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;

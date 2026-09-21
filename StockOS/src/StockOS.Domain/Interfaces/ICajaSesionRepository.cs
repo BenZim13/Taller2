@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ namespace StockOS.Domain.Interfaces
     {
         int AbrirCaja(int idCaja, int idEmpleado, decimal montoApertura);
         bool VerificarCajaAbierta(int idEmpleado);
+        bool VerificarCajaFisicaAbierta(int idCaja);
         int? ObtenerIdSesionAbierta(int idEmpleado);
     }
 }

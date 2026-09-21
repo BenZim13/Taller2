@@ -14,6 +14,10 @@ namespace StockOS.UI.WinForms.Forms
         private readonly ICompraService _compraService;
         private readonly IProveedorService _proveedorService;
 
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
+
         public FormIngresoStock(IProductoService productoService, IStockService stockService, 
                                ICategoriaService categoriaService, ICompraService compraService,
                                IProveedorService proveedorService)
@@ -99,7 +103,7 @@ namespace StockOS.UI.WinForms.Forms
                 string nombreActual = txtNombreProducto.Text.Trim();
                 if (!string.IsNullOrWhiteSpace(nombreActual) && !producto.Nombre.Equals(nombreActual, StringComparison.OrdinalIgnoreCase))
                 {
-                    MessageBox.Show(
+                    MostrarMensaje(
                         $"El código '{codigoBuscar}' ya está en uso por el producto '{producto.Nombre}'.\n\nIngrese un código diferente.",
                         "Código en uso",
                         MessageBoxButtons.OK,
@@ -159,15 +163,16 @@ namespace StockOS.UI.WinForms.Forms
                 txtMontoTotal.Text = "0.00";
             }
 
-            // 2. Calcular Precio Venta Final
+            // 2. Calcular Precio Venta Final: Costo * (1 + (Margen + 21% IVA) / 100)
             if (hayPrecio && decimal.TryParse(txtPorcentajeExtra.Text, out decimal porcentaje) && porcentaje >= 0)
             {
-                decimal precioVenta = precioCompra * (1 + (porcentaje / 100m));
+                decimal precioVenta = Producto.CalcularPrecioVentaFinal(precioCompra, porcentaje, Producto.IvaFijoDefault);
                 txtPrecioVenta.Text = precioVenta.ToString("0.00");
             }
             else if (hayPrecio)
             {
-                txtPrecioVenta.Text = precioCompra.ToString("0.00");
+                decimal precioVenta = Producto.CalcularPrecioVentaFinal(precioCompra, 0m, Producto.IvaFijoDefault);
+                txtPrecioVenta.Text = precioVenta.ToString("0.00");
             }
             else
             {
@@ -181,7 +186,7 @@ namespace StockOS.UI.WinForms.Forms
             string codigo = txtCodigo.Text.Trim();
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                MessageBox.Show("Ingrese el código del producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Ingrese el código del producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCodigo.Focus();
                 return;
             }
@@ -189,63 +194,63 @@ namespace StockOS.UI.WinForms.Forms
             string nombre = txtNombreProducto.Text.Trim();
             if (string.IsNullOrWhiteSpace(nombre))
             {
-                MessageBox.Show("Ingrese el nombre del producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Ingrese el nombre del producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombreProducto.Focus();
                 return;
             }
 
             if (cmbCategoria.SelectedValue == null || Convert.ToInt32(cmbCategoria.SelectedValue) <= 0)
             {
-                MessageBox.Show("Seleccione una categoría válida para el producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Seleccione una categoría válida para el producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbCategoria.Focus();
                 return;
             }
 
             if (cmbProveedor.SelectedValue == null || Convert.ToInt32(cmbProveedor.SelectedValue) <= 0)
             {
-                MessageBox.Show("Debe seleccionar un proveedor de la lista. Si no hay proveedores disponibles, primero debe dar de alta al menos uno desde la sección 'Proveedores'.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Debe seleccionar un proveedor de la lista. Si no hay proveedores disponibles, primero debe dar de alta al menos uno desde la sección 'Proveedores'.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbProveedor.Focus();
                 return;
             }
 
             if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad <= 0)
             {
-                MessageBox.Show("La cantidad a ingresar debe ser un número entero mayor a cero (mínimo 1 unidad).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("La cantidad a ingresar debe ser un número entero mayor a cero (mínimo 1 unidad).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCantidad.Focus();
                 return;
             }
 
             if (cantidad > 1000000)
             {
-                MessageBox.Show("La cantidad a ingresar supera el límite permitido (máx. 1.000.000 unidades por ingreso).", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("La cantidad a ingresar supera el límite permitido (máx. 1.000.000 unidades por ingreso).", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCantidad.Focus();
                 return;
             }
 
             if (!decimal.TryParse(txtPrecioCompra.Text, out decimal precioCompra) || precioCompra <= 0)
             {
-                MessageBox.Show("El precio unitario de compra debe ser un número mayor a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El precio unitario de compra debe ser un número mayor a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecioCompra.Focus();
                 return;
             }
 
             if (precioCompra > 100000000m)
             {
-                MessageBox.Show("El precio de compra supera el valor monetario máximo permitido.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El precio de compra supera el valor monetario máximo permitido.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecioCompra.Focus();
                 return;
             }
 
             if (!decimal.TryParse(txtPorcentajeExtra.Text, out decimal porcentaje) || porcentaje < 0)
             {
-                MessageBox.Show("El margen de ganancia debe ser un porcentaje válido mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El margen de ganancia debe ser un porcentaje válido mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPorcentajeExtra.Focus();
                 return;
             }
 
             if (porcentaje > 10000m)
             {
-                MessageBox.Show("El margen de ganancia no puede superar el 10.000%.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El margen de ganancia no puede superar el 10.000%.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPorcentajeExtra.Focus();
                 return;
             }
@@ -259,7 +264,7 @@ namespace StockOS.UI.WinForms.Forms
                 // Si el nombre ingresado difiere del producto existente con ese código, rechazar el ingreso
                 if (!prodExistente.Nombre.Equals(nombre, StringComparison.OrdinalIgnoreCase))
                 {
-                    MessageBox.Show(
+                    MostrarMensaje(
                         $"El código '{codigo}' ya está en uso por el producto '{prodExistente.Nombre}'.\n\nNo se permite ingresar otro producto con un código ya utilizado. Ingrese un código diferente.",
                         "Código en uso",
                         MessageBoxButtons.OK,
@@ -271,7 +276,7 @@ namespace StockOS.UI.WinForms.Forms
             }
 
             int idProveedor = Convert.ToInt32(cmbProveedor.SelectedValue);
-            decimal precioVenta = precioCompra * (1 + (porcentaje / 100m));
+            decimal precioVenta = Producto.CalcularPrecioVentaFinal(precioCompra, porcentaje, Producto.IvaFijoDefault);
             int idProducto;
 
             try
@@ -283,6 +288,7 @@ namespace StockOS.UI.WinForms.Forms
                     prodExistente.IdCategoria = (int)cmbCategoria.SelectedValue!;
                     prodExistente.IdProveedor = idProveedor;
                     prodExistente.PrecioVentaActual = precioVenta;
+                    prodExistente.PorcentajeIva = Producto.IvaFijoDefault;
                     _productoService.Actualizar(prodExistente);
                 }
                 else
@@ -296,7 +302,7 @@ namespace StockOS.UI.WinForms.Forms
                         IdCategoria       = (int)cmbCategoria.SelectedValue!,
                         IdProveedor       = idProveedor,
                         PrecioVentaActual = precioVenta,
-                        PorcentajeIva     = 0,
+                        PorcentajeIva     = Producto.IvaFijoDefault,
                         Activo            = true
                     };
 
@@ -307,10 +313,7 @@ namespace StockOS.UI.WinForms.Forms
                 int idSucursalActual = SesionActual.IdSucursal > 0 ? SesionActual.IdSucursal : 1;
                 int idEmpleadoActual = SesionActual.Usuario?.IdEmpleado ?? 1;
 
-                // 1. Registrar el stock en la sucursal
-                _stockService.AgregarStock(idProducto, idSucursalActual, cantidad);
-
-                // 2. Registrar la Compra y Detalle de Compra en la base de datos
+                // Registrar la Compra, Detalle de Compra y el incremento de Stock de forma atómica
                 decimal montoTotal = precioCompra * cantidad;
                 var nuevaCompra = new Compra
                 {
@@ -331,7 +334,7 @@ namespace StockOS.UI.WinForms.Forms
 
                 _compraService.RegistrarCompra(nuevaCompra, nuevoDetalle);
 
-                MessageBox.Show(
+                MostrarMensaje(
                     $"Ingreso de stock y compra registrados exitosamente.\nProducto: '{txtNombreProducto.Text.Trim()}'\nCantidad ingresada: {cantidad}\nTotal Compra: $ {montoTotal:N2}\nPrecio de Venta: $ {precioVenta:N2}",
                     "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -340,7 +343,7 @@ namespace StockOS.UI.WinForms.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al registrar el ingreso de stock: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarMensaje($"Error al registrar el ingreso de stock: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

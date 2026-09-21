@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using StockOS.Domain.Entities;
 
 namespace StockOS.Application.Services
@@ -12,5 +12,6 @@ namespace StockOS.Application.Services
         void CerrarCaja(int idCajaSesion, decimal montoCierreReal);
         void RegistrarMovimiento(int idCajaSesion, string tipo, decimal monto, string descripcion);
         int? ObtenerIdSesionAbierta(int idEmpleado);
+        void CerrarCajaPorCierreSesion(int idEmpleado);
     }
 }

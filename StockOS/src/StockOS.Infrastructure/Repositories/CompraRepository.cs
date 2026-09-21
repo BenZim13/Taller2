@@ -68,6 +68,11 @@ namespace StockOS.DataAccess.Repositories
                     detalle.IdDetalleCompra = (int)idDetalleParam.Value;
                     detalle.IdCompra = idCompraGenerada;
 
+                    // 3. Incrementar Stock de forma atómica dentro de la misma transacción
+                    _context.Database.ExecuteSqlRaw(
+                        "EXEC sp_Stock_IngresarMercaderia @IdProducto={0}, @IdSucursal={1}, @CantidadAIngresar={2}",
+                        detalle.IdProducto, cabecera.IdSucursal, detalle.Cantidad);
+
                     transaction.Commit();
                     return idCompraGenerada;
                 }

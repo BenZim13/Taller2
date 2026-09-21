@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 using QuestPDF.Fluent;
@@ -131,43 +131,28 @@ namespace StockOS.Application.Reports
 
                 col.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
 
-                // Información fiscal - Calcular IVA por alícuota según cada producto
+                // Información fiscal - Declarar alícuota de IVA aplicada (sin mostrar el total en pesos)
                 col.Item().Text("REGIMEN TRANSPARENCIA FISCAL CONSUMIDOR");
 
                 if (venta.DetalleVenta != null && venta.DetalleVenta.Any())
                 {
-                    // Agrupar por alícuota de IVA
-                    var ivasPorAlicuota = venta.DetalleVenta
-                        .GroupBy(d => d.IdProductoNavigation?.PorcentajeIva ?? 21m)
-                        .Select(g => new
-                        {
-                            Alicuota = g.Key,
-                            MontoIva = g.Sum(d =>
-                            {
-                                decimal subtotalItem = (d.Cantidad * d.PrecioUnitarioHistorico) - d.Descuento;
-                                return subtotalItem - (subtotalItem / (1 + g.Key / 100m));
-                            })
-                        })
-                        .OrderByDescending(x => x.Alicuota);
+                    // Obtener alícuotas de IVA distintas aplicadas a los productos
+                    var alicuotas = venta.DetalleVenta
+                        .Select(d => (d.IdProductoNavigation != null && d.IdProductoNavigation.PorcentajeIva > 0)
+                            ? d.IdProductoNavigation.PorcentajeIva
+                            : Producto.IvaFijoDefault)
+                        .Distinct()
+                        .OrderByDescending(x => x);
 
-                    foreach (var iva in ivasPorAlicuota)
+                    foreach (var alicuota in alicuotas)
                     {
-                        col.Item().Row(row =>
-                        {
-                            row.RelativeItem().Text($"Alicuota {iva.Alicuota:N0}%");
-                            row.ConstantItem(60).AlignRight().Text($"{iva.MontoIva:N2}");
-                        });
+                        col.Item().Text($"Alicuota IVA ({alicuota:N0}%)");
                     }
                 }
                 else
                 {
-                    // Fallback si no hay detalles
-                    decimal ivaCalculado = venta.TotalVenta - (venta.TotalVenta / 1.21m);
-                    col.Item().Row(row =>
-                    {
-                        row.RelativeItem().Text("Alicuota 21%");
-                        row.ConstantItem(60).AlignRight().Text($"{ivaCalculado:N2}");
-                    });
+                    // Fallback si no hay detalles (declara IVA fijo 21%)
+                    col.Item().Text($"Alicuota IVA ({Producto.IvaFijoDefault:N0}%)");
                 }
 
                 // Registro fiscal dinámico (si está configurado)

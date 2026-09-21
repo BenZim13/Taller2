@@ -33,6 +33,21 @@ namespace StockOS.UI.WinForms.Forms
                 .WriteTo.File("logs/stockos-.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
+            // Configurar captura global de excepciones para eventos de WinForms
+            System.Windows.Forms.Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            System.Windows.Forms.Application.ThreadException += (sender, args) =>
+            {
+                Log.Error(args.Exception, "Error no controlado en evento de interfaz (ThreadException)");
+                MessageBox.Show($"Ocurrió un error en la aplicación: {args.Exception.Message}", "Error Inesperado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            };
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                if (args.ExceptionObject is Exception ex)
+                {
+                    Log.Fatal(ex, "Error fatal no controlado en AppDomain");
+                }
+            };
+
             try
             {
                 Log.Information("Iniciando la aplicación StockOS...");
@@ -106,39 +121,56 @@ namespace StockOS.UI.WinForms.Forms
 
                     }).Build();
 
-                // 4. Bucle principal para soportar cierre de sesión y cambio de usuario
+                // 4. Bucle principal con alcance por sesión (Scope) para evitar fugas de DbContext
                 while (true)
                 {
-                    var formLogin = host.Services.GetRequiredService<FormLogin>();
-
-                    if (formLogin.ShowDialog() == DialogResult.OK)
+                    using (var scope = host.Services.CreateScope())
                     {
-                        var usuario = formLogin.UsuarioAutenticado;
-                        var formInicio = host.Services.GetRequiredService<FormInicio>();
+                        var formLogin = scope.ServiceProvider.GetRequiredService<FormLogin>();
 
-                        if (usuario != null)
+                        if (formLogin.ShowDialog() == DialogResult.OK)
                         {
-                            formInicio.EstablecerUsuario(usuario);
-                            Log.Information("Usuario autenticado correctamente: {Nombre} {Apellido} (Rol: {IdRol})", usuario.Nombre, usuario.Apellido, usuario.IdRol);
-                        }
+                            var usuario = formLogin.UsuarioAutenticado;
+                            var formInicio = scope.ServiceProvider.GetRequiredService<FormInicio>();
 
-                        System.Windows.Forms.Application.Run(formInicio);
+                            if (usuario != null)
+                            {
+                                formInicio.EstablecerUsuario(usuario);
+                                Log.Information("Usuario autenticado correctamente: {Nombre} {Apellido} (Rol: {IdRol})", usuario.Nombre, usuario.Apellido, usuario.IdRol);
+                            }
 
-                        if (formInicio.LogoutRequested)
-                        {
-                            Log.Information("Cierre de sesión solicitado por el usuario.");
+                            System.Windows.Forms.Application.Run(formInicio);
+
+                            if (usuario != null)
+                            {
+                                try
+                                {
+                                    var cajaService = scope.ServiceProvider.GetRequiredService<StockOS.Application.Services.ICajaService>();
+                                    cajaService.CerrarCajaPorCierreSesion(usuario.IdEmpleado);
+                                }
+                                catch (Exception exCaja)
+                                {
+                                    Log.Warning(exCaja, "No se pudo cerrar automáticamente la caja al finalizar la sesión del usuario {IdEmpleado}.", usuario.IdEmpleado);
+                                }
+                            }
+
                             StockOS.Application.Services.SesionActual.Limpiar();
-                            continue;
+
+                            if (formInicio.LogoutRequested)
+                            {
+                                Log.Information("Cierre de sesión solicitado por el usuario.");
+                                continue;
+                            }
+                            else
+                            {
+                                Log.Information("Cerrando la aplicación desde la ventana principal.");
+                                break;
+                            }
                         }
                         else
                         {
-                            Log.Information("Cerrando la aplicación desde la ventana principal.");
                             break;
                         }
-                    }
-                    else
-                    {
-                        break;
                     }
                 }
             }

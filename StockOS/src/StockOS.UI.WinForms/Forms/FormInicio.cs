@@ -13,14 +13,16 @@ namespace StockOS.UI.WinForms.Forms
     public partial class FormInicio : Form
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICajaService _cajaService;
         private RoundedPanel? dockPanel;
         private Panel pnlContenedor;
         private Empleado? _usuarioActual;
         public bool LogoutRequested { get; private set; } = false;
 
-        public FormInicio(IServiceProvider serviceProvider)
+        public FormInicio(IServiceProvider serviceProvider, ICajaService cajaService)
         {
             _serviceProvider = serviceProvider;
+            _cajaService = cajaService;
             InitializeComponent();
             
             btnSalirApp.Click += BtnCerrarSesion_Click;
@@ -85,7 +87,30 @@ namespace StockOS.UI.WinForms.Forms
             if (result == DialogResult.Yes)
             {
                 LogoutRequested = true;
+                CerrarCajaSesionUsuarioActual();
                 this.Close();
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            CerrarCajaSesionUsuarioActual();
+            SesionActual.Limpiar();
+        }
+
+        private void CerrarCajaSesionUsuarioActual()
+        {
+            if (_usuarioActual != null)
+            {
+                try
+                {
+                    _cajaService.CerrarCajaPorCierreSesion(_usuarioActual.IdEmpleado);
+                }
+                catch
+                {
+                    // Evitar que una falla en BD bloquee el cierre de sesión
+                }
             }
         }
 
@@ -215,7 +240,8 @@ namespace StockOS.UI.WinForms.Forms
                     break;
                 case "Usuarios":
                     lblTitulo.Text = "Usuarios";
-                    if (_usuarioActual != null && _usuarioActual.IdRol == 1)
+                    var auth = _serviceProvider.GetRequiredService<StockOS.Domain.Interfaces.IAuthorizationService>();
+                    if (auth.TienePermiso(Permisos.USUARIOS_VER))
                     {
                         nuevaVista = _serviceProvider.GetRequiredService<UcUsuarios>();
                     }

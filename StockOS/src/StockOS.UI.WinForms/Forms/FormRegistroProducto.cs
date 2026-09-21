@@ -16,6 +16,10 @@ namespace StockOS.UI.WinForms.Forms
         private Producto? _productoEdicion; // Si es null, es modo "Nuevo"
         private int _stockOriginal = 0; // Para calcular la diferencia al guardar
 
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
+
         public FormRegistroProducto(IProductoService productoService, ICategoriaService categoriaService, 
                                    IStockService stockService, ICompraService compraService,
                                    IProveedorService proveedorService)
@@ -151,7 +155,7 @@ namespace StockOS.UI.WinForms.Forms
             string codigo = txtCodigoBarra.Text.Trim();
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                MessageBox.Show("El código de barra del producto es obligatorio.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El código de barra del producto es obligatorio.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCodigoBarra.Focus();
                 return;
             }
@@ -163,7 +167,7 @@ namespace StockOS.UI.WinForms.Forms
                 var dup = todosProductos.FirstOrDefault(p => p.CodigoBarra.Equals(codigo, StringComparison.OrdinalIgnoreCase));
                 if (dup != null)
                 {
-                    MessageBox.Show(
+                    MostrarMensaje(
                         $"El código de barra '{codigo}' ya está registrado para el producto '{dup.Nombre}'.\n\nCada producto debe contar con un código único.",
                         "Código Duplicado",
                         MessageBoxButtons.OK,
@@ -178,7 +182,7 @@ namespace StockOS.UI.WinForms.Forms
                                                              p.CodigoBarra.Equals(codigo, StringComparison.OrdinalIgnoreCase));
                 if (dup != null)
                 {
-                    MessageBox.Show(
+                    MostrarMensaje(
                         $"El código de barra '{codigo}' ya está siendo utilizado por otro producto ('{dup.Nombre}').\n\nIngrese un código diferente.",
                         "Código Duplicado",
                         MessageBoxButtons.OK,
@@ -191,35 +195,35 @@ namespace StockOS.UI.WinForms.Forms
             string nombre = txtNombre.Text.Trim();
             if (string.IsNullOrWhiteSpace(nombre))
             {
-                MessageBox.Show("El nombre del producto es obligatorio.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El nombre del producto es obligatorio.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombre.Focus();
                 return;
             }
 
             if (!decimal.TryParse(txtPrecio.Text, out decimal precio) || precio <= 0)
             {
-                MessageBox.Show("El precio de venta debe ser un número válido mayor a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El precio de venta debe ser un número válido mayor a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
                 return;
             }
 
             if (precio > 100000000m)
             {
-                MessageBox.Show("El precio de venta supera el límite máximo permitido.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El precio de venta supera el límite máximo permitido.", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
                 return;
             }
 
             if (cmbCategoria.SelectedValue == null || Convert.ToInt32(cmbCategoria.SelectedValue) <= 0)
             {
-                MessageBox.Show("Debe seleccionar una categoría válida de la lista.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Debe seleccionar una categoría válida de la lista.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbCategoria.Focus();
                 return;
             }
 
             if (cmbProveedor.SelectedValue == null || Convert.ToInt32(cmbProveedor.SelectedValue) <= 0)
             {
-                MessageBox.Show("Debe seleccionar un proveedor de la lista. Si no hay proveedores disponibles, primero debe dar de alta al menos uno desde la sección 'Proveedores'.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Debe seleccionar un proveedor de la lista. Si no hay proveedores disponibles, primero debe dar de alta al menos uno desde la sección 'Proveedores'.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbProveedor.Focus();
                 return;
             }
@@ -228,14 +232,14 @@ namespace StockOS.UI.WinForms.Forms
 
             if (!int.TryParse(txtStock.Text, out int stockFinal) || stockFinal < 0)
             {
-                MessageBox.Show("El stock debe ser un número entero mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El stock debe ser un número entero mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtStock.Focus();
                 return;
             }
 
             if (stockFinal > 1000000)
             {
-                MessageBox.Show("El stock ingresado supera el límite permitido (máx. 1.000.000 unidades).", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El stock ingresado supera el límite permitido (máx. 1.000.000 unidades).", "Límite Superado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtStock.Focus();
                 return;
             }
@@ -247,7 +251,7 @@ namespace StockOS.UI.WinForms.Forms
             {
                 if (!decimal.TryParse(txtPrecioCompra.Text, out precioCompra) || precioCompra < 0)
                 {
-                    MessageBox.Show("El precio de compra debe ser un número mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MostrarMensaje("El precio de compra debe ser un número mayor o igual a cero.", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtPrecioCompra.Focus();
                     return;
                 }
@@ -267,6 +271,7 @@ namespace StockOS.UI.WinForms.Forms
                         Nombre = txtNombre.Text.Trim(),
                         Descripcion = "", // Se quitó la descripción, se guarda vacía
                         PrecioVentaActual = precio,
+                        PorcentajeIva = Producto.IvaFijoDefault,
                         IdCategoria = Convert.ToInt32(cmbCategoria.SelectedValue),
                         IdProveedor = idProveedor,
                         Activo = esActivo
@@ -303,7 +308,7 @@ namespace StockOS.UI.WinForms.Forms
                         _compraService.RegistrarCompra(nuevaCompra, nuevoDetalle);
                     }
 
-                    MessageBox.Show("Producto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MostrarMensaje("Producto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
@@ -312,6 +317,7 @@ namespace StockOS.UI.WinForms.Forms
                     _productoEdicion.Nombre = txtNombre.Text.Trim();
                     _productoEdicion.Descripcion = ""; // Mantiene vacío
                     _productoEdicion.PrecioVentaActual = precio;
+                    _productoEdicion.PorcentajeIva = Producto.IvaFijoDefault;
                     _productoEdicion.IdCategoria = Convert.ToInt32(cmbCategoria.SelectedValue);
                     _productoEdicion.IdProveedor = idProveedor;
                     _productoEdicion.Activo = esActivo;
@@ -358,7 +364,7 @@ namespace StockOS.UI.WinForms.Forms
                         }
                     }
 
-                    MessageBox.Show("Producto actualizado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MostrarMensaje("Producto actualizado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 this.DialogResult = DialogResult.OK;
@@ -366,7 +372,7 @@ namespace StockOS.UI.WinForms.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al guardar el producto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarMensaje($"Error al guardar el producto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

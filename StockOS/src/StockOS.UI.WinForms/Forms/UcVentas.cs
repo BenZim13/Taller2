@@ -16,6 +16,7 @@ namespace StockOS.UI.WinForms.Forms
         private readonly ICajaService _cajaService;
         private readonly ITicketService _ticketService;
         private readonly IConfiguracionService _configuracionService;
+        private readonly IStockService _stockService;
 
         private decimal _subtotalVenta = 0;
         private decimal _descuentoTotal = 0;
@@ -24,8 +25,12 @@ namespace StockOS.UI.WinForms.Forms
         // Diccionario para rastrear el IVA de cada producto en el ticket
         private readonly Dictionary<int, decimal> _ivaProductos = new Dictionary<int, decimal>();
 
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
+
         // Inyectamos todas las dependencias necesarias en el constructor
-        public UcVentas(IProductoService productoService, IVentaService ventaService, ICajaService cajaService, ITicketService ticketService, IConfiguracionService configuracionService)
+        public UcVentas(IProductoService productoService, IVentaService ventaService, ICajaService cajaService, ITicketService ticketService, IConfiguracionService configuracionService, IStockService stockService)
         {
             InitializeComponent();
             _productoService = productoService;
@@ -33,6 +38,7 @@ namespace StockOS.UI.WinForms.Forms
             _cajaService = cajaService;
             _ticketService = ticketService;
             _configuracionService = configuracionService;
+            _stockService = stockService;
 
             this.Load += (s, e) => txtCodigoBarra.Focus();
         }
@@ -79,7 +85,7 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     if (producto.Activo == false)
                     {
-                        MessageBox.Show($"El producto '{producto.Nombre}' está deshabilitado / inactivo y no puede ser vendido.", "Producto Inactivo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MostrarMensaje($"El producto '{producto.Nombre}' está deshabilitado / inactivo y no puede ser vendido.", "Producto Inactivo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         txtCodigoBarra.SelectAll();
                         return;
                     }
@@ -89,7 +95,7 @@ namespace StockOS.UI.WinForms.Forms
                 }
                 else
                 {
-                    MessageBox.Show("Producto no encontrado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MostrarMensaje("Producto no encontrado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtCodigoBarra.SelectAll();
                 }
             }
@@ -97,11 +103,28 @@ namespace StockOS.UI.WinForms.Forms
 
         private void AgregarProductoAlTicket(Producto prod)
         {
+            int idSucursal = SesionActual.IdSucursal;
+            int stockDisponible = _stockService.ObtenerCantidadActual(prod.IdProducto, idSucursal);
+
+            if (stockDisponible <= 0)
+            {
+                MostrarMensaje($"El producto '{prod.Nombre}' no posee stock disponible en esta sucursal (Stock: {stockDisponible}). No se permite ingresarlo al ticket.",
+                                "Sin Stock", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             foreach (DataGridViewRow row in dgvTicket.Rows)
             {
                 if (Convert.ToInt32(row.Cells["IdProducto"].Value) == prod.IdProducto)
                 {
                     int cantidadActual = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                    if (cantidadActual + 1 > stockDisponible)
+                    {
+                        MostrarMensaje($"No hay suficiente stock para '{prod.Nombre}'. Stock disponible: {stockDisponible}, cargado en ticket: {cantidadActual}.",
+                                        "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     row.Cells["Cantidad"].Value = cantidadActual + 1;
                     decimal nuevoSubtotal = (cantidadActual + 1) * prod.PrecioVentaActual;
                     row.Cells["Subtotal"].Value = nuevoSubtotal;
@@ -112,10 +135,10 @@ namespace StockOS.UI.WinForms.Forms
 
             dgvTicket.Rows.Add(prod.IdProducto, prod.Nombre, 1, prod.PrecioVentaActual, prod.PrecioVentaActual);
 
-            // Guardamos el IVA del producto para usarlo en el ticket
+            // Guardamos el IVA del producto para usarlo en el ticket (fijo 21% default)
             if (!_ivaProductos.ContainsKey(prod.IdProducto))
             {
-                _ivaProductos[prod.IdProducto] = prod.PorcentajeIva;
+                _ivaProductos[prod.IdProducto] = prod.PorcentajeIva > 0 ? prod.PorcentajeIva : StockOS.Domain.Entities.Producto.IvaFijoDefault;
             }
 
             ActualizarTotal();
@@ -155,15 +178,33 @@ namespace StockOS.UI.WinForms.Forms
         {
             if (!SesionActual.IdCajaSesionAbierta.HasValue || SesionActual.IdCajaSesionAbierta.Value == 0)
             {
-                MessageBox.Show("No puedes cobrar porque no has abierto la caja. Haz clic en 'Abrir Caja' en la barra superior.",
+                MostrarMensaje("No puedes cobrar porque no has abierto la caja. Haz clic en 'Abrir Caja' en la barra superior.",
                                 "Caja Cerrada", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (dgvTicket.Rows.Count == 0)
             {
-                MessageBox.Show("El ticket está vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El ticket está vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
+            }
+
+            int idSucursal = SesionActual.Usuario!.IdSucursal;
+
+            // 1. Verificación previa de stock de todos los ítems antes de proceder al cobro
+            foreach (DataGridViewRow row in dgvTicket.Rows)
+            {
+                int idProd = Convert.ToInt32(row.Cells["IdProducto"].Value);
+                int cantidadPedida = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                string nombreProd = row.Cells["Producto"].Value?.ToString() ?? "Producto";
+                int stockActual = _stockService.ObtenerCantidadActual(idProd, idSucursal);
+
+                if (cantidadPedida > stockActual)
+                {
+                    MostrarMensaje($"No es posible completar la venta. La cantidad de '{nombreProd}' ({cantidadPedida}) supera el stock disponible ({stockActual}).",
+                                    "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
 
             using (var formCobro = new FormCobro(_totalFinal))
@@ -201,23 +242,41 @@ namespace StockOS.UI.WinForms.Forms
                             IdCliente = null
                         };
 
+                        // 2. Reparto proporcional y exacto del descuento entre los ítems
                         var detalles = new List<DetalleVenta>();
-                        decimal descuentoPorItem = dgvTicket.Rows.Count > 0 ? (_descuentoTotal / dgvTicket.Rows.Count) : 0;
+                        decimal descuentoAcumulado = 0;
 
-                        foreach (DataGridViewRow row in dgvTicket.Rows)
+                        for (int i = 0; i < dgvTicket.Rows.Count; i++)
                         {
+                            var row = dgvTicket.Rows[i];
+                            int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                            decimal precioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value);
+                            decimal subtotalItem = cantidad * precioUnitario;
+
+                            decimal descuentoItem = 0;
+                            if (_subtotalVenta > 0 && _descuentoTotal > 0)
+                            {
+                                if (i == dgvTicket.Rows.Count - 1)
+                                {
+                                    descuentoItem = Math.Max(0, _descuentoTotal - descuentoAcumulado);
+                                }
+                                else
+                                {
+                                    descuentoItem = Math.Round(_descuentoTotal * (subtotalItem / _subtotalVenta), 2);
+                                    descuentoAcumulado += descuentoItem;
+                                }
+                            }
+
                             detalles.Add(new DetalleVenta
                             {
                                 IdProducto = Convert.ToInt32(row.Cells["IdProducto"].Value),
-                                Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
-                                PrecioUnitarioHistorico = Convert.ToDecimal(row.Cells["Precio"].Value),
-                                Descuento = descuentoPorItem
+                                Cantidad = cantidad,
+                                PrecioUnitarioHistorico = precioUnitario,
+                                Descuento = descuentoItem
                             });
                         }
 
-                        int idSucursal = SesionActual.Usuario!.IdSucursal;
-
-                        // 1. Registramos la venta en la base de datos
+                        // 3. Registramos la venta en la base de datos
                         int idVenta = _ventaService.RegistrarVenta(nuevaVenta, detalles, idSucursal, idMetodoPago);
 
                         // 2. Preparamos los datos visuales que necesita el PDF
@@ -227,9 +286,11 @@ namespace StockOS.UI.WinForms.Forms
                         for (int i = 0; i < dgvTicket.Rows.Count; i++)
                         {
                             int idProd = Convert.ToInt32(dgvTicket.Rows[i].Cells["IdProducto"].Value);
-                            decimal ivaProducto = _ivaProductos.ContainsKey(idProd) ? _ivaProductos[idProd] : 21m;
+                            decimal ivaProducto = (_ivaProductos.ContainsKey(idProd) && _ivaProductos[idProd] > 0) 
+                                ? _ivaProductos[idProd] 
+                                : StockOS.Domain.Entities.Producto.IvaFijoDefault;
 
-                            detalles[i].IdProductoNavigation = new Producto
+                            detalles[i].IdProductoNavigation = new StockOS.Domain.Entities.Producto
                             {
                                 Nombre = dgvTicket.Rows[i].Cells["Producto"].Value?.ToString() ?? "Producto",
                                 PorcentajeIva = ivaProducto
@@ -261,7 +322,7 @@ namespace StockOS.UI.WinForms.Forms
                             UseShellExecute = true
                         });
                         //---------------
-                        MessageBox.Show($"¡Venta procesada con {metodoPago}!\nTicket N°: {idVenta}",
+                        MostrarMensaje($"¡Venta procesada con {metodoPago}!\nTicket N°: {idVenta}",
                                          "Cobro Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         dgvTicket.Rows.Clear();
@@ -272,7 +333,7 @@ namespace StockOS.UI.WinForms.Forms
                     }
                     catch (Exception excepcion)
                     {
-                        MessageBox.Show($"Error al procesar la venta: {excepcion.Message}", "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MostrarMensaje($"Error al procesar la venta: {excepcion.Message}", "Error Crítico", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
