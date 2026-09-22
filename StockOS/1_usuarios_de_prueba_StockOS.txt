@@ -1,0 +1,98 @@
+================================================================================
+                    STOCKOS - USUARIOS DE PRUEBA Y ACCESOS
+================================================================================
+Fecha de actualización: 21 de Septiembre de 2026
+Base de datos: StockOS
+
+INSTRUCCIONES DE ACCESO AL SISTEMA:
+- Pantalla de Login: FormLogin
+- Campo "Usuario": Ingresar el DNI del empleado
+- Campo "Contraseña": Ingresar la contraseña en texto plano indicada abajo
+
+================================================================================
+                           TABLA RESUMEN DE CREDENCIALES
+================================================================================
+| Empleado    | DNI (Usuario) | Contraseña | Rol Asignado          | Sucursal     |
+|-------------|---------------|------------|-----------------------|--------------|
+| Admin 1     | 43000111      | admin123   | Administrador         | Casa Central |
+| Admin 2     | 43000222      | admin123   | Administrador         | Casa Central |
+| Repositor 1 | 11222333      | repo123    | Repositor             | Casa Central |
+| Deposito 1  | 44555666      | depo123    | Encargado de Depósito | Casa Central |
+| Cajero 1    | 66333999      | cajero12   | Cajero                | Casa Central |
+
+================================================================================
+                         DETALLE COMPLETO POR USUARIO
+================================================================================
+
+1. ADMINISTRADOR PRINCIPAL
+   - Nombre completo: Admin 1
+   - DNI (Usuario login): 43000111
+   - Contraseña: admin123
+   - Rol: Administrador (id_rol: 1)
+   - Permisos: Acceso total al sistema y configuraciones
+   - Email: admin@stockos.com
+   - Teléfono: 3794562092
+   - Dirección: Sin especificar
+   - Sucursal: Casa Central (ID: 1)
+   - Estado: Activo (1)
+
+--------------------------------------------------------------------------------
+
+2. ADMINISTRADOR SECUNDARIO
+   - Nombre completo: Admin 2
+   - DNI (Usuario login): 43000222
+   - Contraseña: admin123
+   - Rol: Administrador (id_rol: 1)
+   - Permisos: Acceso total al sistema y configuraciones
+   - Email: administrador@stockos.com
+   - Teléfono: 3794834167
+   - Dirección: Sin especificar
+   - Sucursal: Casa Central (ID: 1)
+   - Estado: Activo (1)
+
+--------------------------------------------------------------------------------
+
+3. REPOSITOR
+   - Nombre completo: Repositor 1
+   - DNI (Usuario login): 11222333
+   - Contraseña: repo123
+   - Rol: Repositor (id_rol: 4)
+   - Permisos: Consulta de catálogo, stock por ubicación en salón
+   - Email: repo1@gmail.com
+   - Teléfono: 3794112233
+   - Dirección: calle 123
+   - Sucursal: Casa Central (ID: 1)
+   - Estado: Activo (1)
+
+--------------------------------------------------------------------------------
+
+4. ENCARGADO DE DEPÓSITO
+   - Nombre completo: Deposito 1
+   - DNI (Usuario login): 44555666
+   - Contraseña: depo123
+   - Rol: Encargado de Depósito (id_rol: 3)
+   - Permisos: Control total de inventario, ingreso de mercadería, ajustes de stock
+   - Email: depo@gmail.com
+   - Teléfono: 3794990088
+   - Dirección: calle 789
+   - Sucursal: Casa Central (ID: 1)
+   - Estado: Activo (1)
+
+--------------------------------------------------------------------------------
+
+5. CAJERO
+   - Nombre completo: Cajero 1
+   - DNI (Usuario login): 66333999
+   - Contraseña: cajero12
+   - Rol: Cajero (id_rol: 2)
+   - Permisos: Punto de venta, cobro de comprobantes, apertura/cierre de caja
+   - Email: cajero@gmail.com
+   - Teléfono: 3794887711
+   - Dirección: calle 777
+   - Sucursal: Casa Central (ID: 1)
+   - Estado: Activo (1)
+
+================================================================================
+Fin del archivo de credenciales de prueba.
+================================================================================
+

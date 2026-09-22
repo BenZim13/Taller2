@@ -262,10 +262,10 @@ GO
 
 -- Roles
 INSERT INTO rol (nombre, descripcion) VALUES 
-('Administrador', 'Acceso total al sistema'),
-('Cajero', 'Atención al punto de venta, cobro a clientes y manejo de caja.'),
-('Encargado de Depósito', 'Control total del inventario, ingreso de mercadería y gestión de stock.'),
-('Repositor', 'Consulta de stock y control de ubicación de productos en el salón.');
+(N'Administrador', N'Acceso total al sistema'),
+(N'Cajero', N'Atención al punto de venta, cobro a clientes y manejo de caja.'),
+(N'Encargado de Depósito', N'Control total del inventario, ingreso de mercadería y gestión de stock.'),
+(N'Repositor', N'Consulta de stock y control de ubicación de productos en el salón.');
 GO
 
 -- Sucursal y Caja
@@ -273,12 +273,26 @@ INSERT INTO sucursal (nombre, direccion, activo) VALUES ('Casa Central', 'Calle 
 INSERT INTO caja (nombre_numero, id_sucursal, activo) VALUES ('Caja 1', 1, 1);
 GO
 
--- Empleados (Con campo dirección completado)
+-- Empleados iniciales del sistema (Todos los roles configurados)
+-- 1. Administrador (Clave: admin123)
 INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal) 
-VALUES ('Benja', 'Zimerman', '43064294', 'admin@stockos.com', 'Sin especificar', '3794562092', 'admin123', 1, 1, 1);
+VALUES ('Admin', '1', '43000111', 'admin@stockos.com', 'Sin especificar', '3794562092', '$2a$11$sOYBDzMcMNbkep7brvXLNec8OyiG84BDlNbPWyAev8qt/oZ5ZXkyi', 1, 1, 1);
 
+-- 2. Administrador secundario (Clave: admin123)
 INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal) 
-VALUES ('Saul', 'Arnica', '43205368', 'administrador@stockos.com', 'Sin especificar', '3794834167', 'admin123', 1, 1, 1);
+VALUES ('Admin', '2', '43000222', 'administrador@stockos.com', 'Sin especificar', '3794834167', '$2a$11$sOYBDzMcMNbkep7brvXLNec8OyiG84BDlNbPWyAev8qt/oZ5ZXkyi', 1, 1, 1);
+
+-- 3. Repositor (Clave: repo123)
+INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal) 
+VALUES ('Repositor', '1', '11222333', 'repo1@gmail.com', 'calle 123', '3794112233', '$2a$11$ZARprCPtuVdrZGc7.tP/FuHyXSMIhZw2P3WVfWe34kH6NKZyvC0H.', 1, 4, 1);
+
+-- 4. Encargado de Depósito (Clave: depo123)
+INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal) 
+VALUES ('Deposito', '1', '44555666', 'depo@gmail.com', 'calle 789', '3794990088', '$2a$11$1/OIXLIEqH2q2rd5Om5U2uRLaND1x7BDCd/U2RrpAuWiaCG/npBpC', 1, 3, 1);
+
+-- 5. Cajero (Clave: cajero12)
+INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal) 
+VALUES ('Cajero', '1', '66333999', 'cajero@gmail.com', 'calle 777', '3794887711', '$2a$11$xMrrzhWA8FO3azb1QPHuKeyX0FqEvq/LHtet198OhcGNCgXlptHBy', 1, 2, 1);
 GO
 
 -- Métodos de Pago
