@@ -57,9 +57,9 @@ namespace StockOS.UI.WinForms.Forms
             
             if (idRol == (int)RolUsuario.Gerente)
             {
-                AgregarSeccion("Reportes", "");
+                AgregarSeccion("Reportes", "Generación y exportación de reportes analíticos.\nSubsecciones: Reporte de Ventas y Reporte de Compras.");
                 AgregarSeccion("Usuarios", "Administración de cuentas de empleados y asignación de roles.\nSubsecciones: Listar Usuarios y Registrar Usuarios.");
-                AgregarSeccion("Config.", "");
+                AgregarSeccion("Config.", "Información del software, especificaciones técnicas, administración y soporte técnico.");
             }
         }
         
