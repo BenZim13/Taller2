@@ -1,3 +1,6 @@
+CREATE DATABASE StockOS;
+GO
+
 USE StockOS;
 GO
 
@@ -602,12 +605,12 @@ BEGIN
 
     IF @StockActual IS NULL
     BEGIN
-        THROW 50001, 'El producto no cuenta con registro de inventario en la sucursal seleccionada.', 1;
+        ;THROW 50001, 'El producto no cuenta con registro de inventario en la sucursal seleccionada.', 1;
     END
-
+    
     IF @StockActual < @CantidadAVender
     BEGIN
-        THROW 50002, 'Stock insuficiente para descontar la venta. La cantidad solicitada supera las existencias.', 1;
+        ;THROW 50002, 'Stock insuficiente para descontar la venta. La cantidad solicitada supera las existencias.', 1;
     END
 
     UPDATE stock_sucursal 

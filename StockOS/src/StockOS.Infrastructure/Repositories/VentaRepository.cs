@@ -9,6 +9,10 @@ using StockOS.Domain.Interfaces;
 
 namespace StockOS.DataAccess.Repositories
 {
+    /// <summary>
+    /// Repositorio para operaciones de venta con manejo transaccional.
+    /// Utiliza stored procedures para garantizar la integridad de datos y el descuento automático de stock.
+    /// </summary>
     public class VentaRepository : IVentaRepository
     {
         private readonly StockOsContext _context;
@@ -20,10 +24,12 @@ namespace StockOS.DataAccess.Repositories
 
         public int RegistrarVenta(Venta cabecera, List<DetalleVenta> detalles, int idSucursal, int idMetodoPago)
         {
+            // Transacción para asegurar atomicidad: si algo falla, todo se revierte
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
+                    // Parámetro de salida para obtener el ID generado
                     var idVentaParam = new SqlParameter
                     {
                         ParameterName = "@IdVenta",
@@ -42,6 +48,7 @@ namespace StockOS.DataAccess.Repositories
 
                     int idVentaGenerado = (int)idVentaParam.Value;
 
+                    // Insertar cada producto vendido y descontar del stock
                     foreach (var item in detalles)
                     {
                         _context.Database.ExecuteSqlRaw(
@@ -54,7 +61,7 @@ namespace StockOS.DataAccess.Repositories
                     }
 
 
-                    // 3. NUEVO BLOQUE: Guardar el método de pago
+                    // Registrar el método de pago utilizado
                     var idPagoParam = new SqlParameter
                     {
                         ParameterName = "@IdPago",
@@ -62,7 +69,6 @@ namespace StockOS.DataAccess.Repositories
                         Direction = ParameterDirection.Output
                     };
 
-                    // Envolvemos el nulo en un SqlParameter para que EF Core no se queje
                     var referenciaParam = new SqlParameter("@ReferenciaTransaccion", SqlDbType.VarChar, 100)
                     {
                         Value = DBNull.Value

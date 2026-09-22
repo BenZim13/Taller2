@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
-using StockOS.Domain.Enums; // Mapeo de permisos
+using StockOS.Domain.Enums;
 
 namespace StockOS.Application.Services
 {
+    /// <summary>
+    /// Servicio de gestión de turnos de caja con control de concurrencia y validaciones de negocio.
+    /// Previene que un empleado abra múltiples turnos o que una caja sea usada por dos empleados simultáneamente.
+    /// </summary>
     public class CajaService : ICajaService
     {
         private readonly ICajaSesionRepository _cajaSesionRepo;
         private readonly ICajaRepository _cajaRepo;
-        private readonly IAuthorizationService _authService; // Guardián
+        private readonly IAuthorizationService _authService;
 
         public CajaService(ICajaSesionRepository cajaSesionRepo, ICajaRepository cajaRepo, IAuthorizationService authService)
         {
@@ -28,19 +32,17 @@ namespace StockOS.Application.Services
                 throw new ArgumentException("El monto inicial de apertura no puede ser negativo.");
             }
 
-            // 1. BLOQUEO: Verificar si el empleado ya tiene un turno abierto
+            // Validar que el empleado no tenga otro turno activo
             if (_cajaSesionRepo.VerificarCajaAbierta(idEmpleado))
             {
                 throw new InvalidOperationException("Ya tienes un turno de caja abierto. Debes cerrarlo antes de iniciar uno nuevo.");
             }
 
-            // 2. BLOQUEO: Verificar si la caja física seleccionada ya está abierta en otro turno
+            // Validar que la caja física esté disponible (no usada por otro empleado)
             if (_cajaSesionRepo.VerificarCajaFisicaAbierta(idCaja))
             {
                 throw new InvalidOperationException("La caja seleccionada ya tiene un turno abierto por otro cajero. Debe cerrarse antes de poder utilizarla.");
             }
-
-            // 3. Si pasó los controles, abrimos la caja en el repositorio
             return _cajaSesionRepo.AbrirCaja(idCaja, idEmpleado, montoApertura);
         }
 

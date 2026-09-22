@@ -5,12 +5,13 @@ using StockOS.Domain.Enums;
 
 namespace StockOS.Application.Services
 {
+    /// <summary>
+    /// Servicio de gestión de productos con validaciones de negocio y control de permisos.
+    /// </summary>
     public class ProductoService : IProductoService
     {
         private readonly IProductoRepository _productoRepository;
-        private readonly IAuthorizationService _authService; // 1. Declaramos el guardián
-
-        // 2. Lo inyectamos en el constructor
+        private readonly IAuthorizationService _authService;
         public ProductoService(IProductoRepository productoRepository, IAuthorizationService authService)
         {
             _productoRepository = productoRepository;
@@ -32,7 +33,6 @@ namespace StockOS.Application.Services
 
         public void Agregar(Producto producto)
         {
-            // 3. Blindaje de creación
             _authService.ValidarPermiso(Permisos.PRODUCTOS_CREAR);
 
             if (producto == null) throw new System.ArgumentNullException(nameof(producto));
@@ -40,13 +40,14 @@ namespace StockOS.Application.Services
             if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
             if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
 
+            // Verificar que el código de barras no esté duplicado
             var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
-
             if (existente != null)
             {
                 throw new System.InvalidOperationException($"Ya existe un producto registrado con el código '{producto.CodigoBarra}'.");
             }
 
+            // Asignar IVA por defecto si no viene especificado
             if (producto.PorcentajeIva <= 0)
             {
                 producto.PorcentajeIva = Producto.IvaFijoDefault;
@@ -57,7 +58,6 @@ namespace StockOS.Application.Services
 
         public void Actualizar(Producto producto)
         {
-            // 3. Blindaje de edición
             _authService.ValidarPermiso(Permisos.PRODUCTOS_EDITAR);
 
             if (producto == null) throw new System.ArgumentNullException(nameof(producto));
@@ -65,8 +65,8 @@ namespace StockOS.Application.Services
             if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
             if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
 
+            // Verificar que el código no pertenezca a otro producto
             var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
-
             if (existente != null && existente.IdProducto != producto.IdProducto)
             {
                 throw new System.InvalidOperationException($"El código '{producto.CodigoBarra}' ya pertenece a otro producto ('{existente.Nombre}').");
@@ -82,7 +82,7 @@ namespace StockOS.Application.Services
 
         public void CambiarEstado(int idProducto, bool activo)
         {
-            // Apagar o prender un producto cuenta como edición
+            // Activar/desactivar requiere permiso de edición
             _authService.ValidarPermiso(Permisos.PRODUCTOS_EDITAR);
             _productoRepository.CambiarEstado(idProducto, activo);
         }

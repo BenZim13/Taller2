@@ -6,6 +6,9 @@ using StockOS.Domain.Enums;
 
 namespace StockOS.Application.Services
 {
+    /// <summary>
+    /// Servicio de registro de ventas con validaciones de integridad y control de permisos.
+    /// </summary>
     public class VentaService : IVentaService
     {
         private readonly IVentaRepository _ventaRepo;
@@ -21,6 +24,7 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.VENTAS_REALIZAR);
 
+            // Validaciones de datos obligatorios
             if (cabecera == null)
             {
                 throw new ArgumentNullException(nameof(cabecera), "La cabecera de la venta no puede ser nula.");
@@ -41,6 +45,7 @@ namespace StockOS.Application.Services
                 throw new ArgumentException("Debe especificarse un método de pago válido.", nameof(idMetodoPago));
             }
 
+            // Validar cada item del detalle
             foreach (var item in detalles)
             {
                 if (item.Cantidad <= 0)

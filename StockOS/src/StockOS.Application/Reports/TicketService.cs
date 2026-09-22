@@ -7,6 +7,10 @@ using QuestPDF.Infrastructure;
 
 namespace StockOS.Application.Reports
 {
+    /// <summary>
+    /// Servicio de generación de tickets de venta en formato PDF usando QuestPDF.
+    /// Genera comprobantes térmicos de 80mm con formato fiscal.
+    /// </summary>
     public class TicketService : ITicketService
     {
         public TicketService()
@@ -21,12 +25,13 @@ namespace StockOS.Application.Reports
             {
                 container.Page(page =>
                 {
-                    page.ContinuousSize(226.8f); // 80mm
+                    // Ancho estándar de papel térmico: 80mm = 226.8 puntos
+                    page.ContinuousSize(226.8f);
                     page.Margin(12);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(8.5f).FontFamily("Consolas"));
 
-                    // Le pasamos la info del comercio, cajero y pago al Header y al Content
+                    // Composición del ticket: encabezado con datos fiscales y contenido con detalle de venta
                     page.Header().Element(x => ComposeHeader(x, comercio));
                     page.Content().Element(x => ComposeContent(x, venta, cajeroNombre, comercio, pago));
                 });

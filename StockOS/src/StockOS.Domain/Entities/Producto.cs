@@ -13,6 +13,7 @@ public partial class Producto
 
     public string? Descripcion { get; set; }
 
+    // IVA estándar del 21% aplicado a productos
     public const decimal IvaFijoDefault = 21.00m;
 
     public decimal PrecioVentaActual { get; set; }
@@ -26,8 +27,8 @@ public partial class Producto
     public bool Activo { get; set; }
 
     /// <summary>
-    /// Calcula el precio de venta final agregando al costo de compra el margen de ganancia y el IVA fijo.
-    /// Ejemplo: Compra 1000 + 9% ganancia + 21% IVA = 1000 * (1 + 0.30) = 1300.
+    /// Calcula el precio final de venta aplicando margen de ganancia e IVA sobre el costo de compra.
+    /// Ejemplo: Si compras a $1000 con 9% de ganancia y 21% de IVA → $1000 * (1 + 0.30) = $1300
     /// </summary>
     public static decimal CalcularPrecioVentaFinal(decimal precioCompra, decimal margenGanancia, decimal porcentajeIva = IvaFijoDefault)
     {

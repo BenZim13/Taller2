@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace StockOS.Domain.Entities;
 
+/// <summary>
+/// Representa un empleado del sistema con credenciales de acceso y asignación de rol.
+/// </summary>
 public partial class Empleado
 {
     public int IdEmpleado { get; set; }
-
     public string Nombre { get; set; } = null!;
-
     public string Apellido { get; set; } = null!;
-
     public string Dni { get; set; } = null!;
 
     public string Email { get; set; } = null!;
@@ -19,8 +19,10 @@ public partial class Empleado
 
     public string Telefono { get; set; } = null!;
 
+    // Contraseña hasheada con BCrypt (nunca almacenar en texto plano)
     public string PasswordHash { get; set; } = null!;
 
+    // true=Activo, false=Inactivo (no puede iniciar sesión)
     public bool Estado { get; set; }
 
     public int IdRol { get; set; }

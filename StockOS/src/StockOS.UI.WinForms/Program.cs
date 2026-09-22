@@ -15,25 +15,29 @@ using Serilog;
 
 namespace StockOS.UI.WinForms.Forms
 {
+    /// <summary>
+    /// Punto de entrada de la aplicación con configuración de inyección de dependencias,
+    /// logging y manejo global de excepciones.
+    /// </summary>
     internal static class Program
     {
         [STAThread]
         static void Main()
         {
-            // 1. Configuración visual de WinForms (SIEMPRE VA PRIMERO)
+            // Inicializar configuración visual de WinForms
             ApplicationConfiguration.Initialize();
         
-            //Configuracion global pal QuestPDF que genera los reports y tickets 
+            // Configurar QuestPDF para generación de reportes y tickets
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
             QuestPDF.Settings.UseSystemFonts = true;
 
-            // 2. Configurar el archivo de Logs de Serilog
+            // Configurar sistema de logging con Serilog
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.File("logs/stockos-.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
-            // Configurar captura global de excepciones para eventos de WinForms
+            // Configurar manejo global de excepciones no capturadas
             System.Windows.Forms.Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             System.Windows.Forms.Application.ThreadException += (sender, args) =>
             {
@@ -52,20 +56,21 @@ namespace StockOS.UI.WinForms.Forms
             {
                 Log.Information("Iniciando la aplicación StockOS...");
 
+                // Cargar configuración desde appsettings.json
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                // 3. Configurar Inyección de Dependencias
+                // Configurar contenedor de inyección de dependencias
                 var host = Host.CreateDefaultBuilder()
-                    .UseSerilog() // <-- Le decimos al Host que también use Serilog internamente
+                    .UseSerilog()
                     .ConfigureServices((context, services) =>
                     {
-                        // Registrar configuración global
+                        // Configuración global
                         services.AddSingleton<IConfiguration>(configuration);
 
-                        // Configurar BD con la cadena de conexión
+                        // Contexto de base de datos
                         services.AddDbContext<StockOsContext>(options =>
                             options.UseSqlServer(configuration.GetConnectionString("StockOS")));
 
@@ -112,7 +117,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddTransient<FormProveedor>();
                         services.AddTransient<FormAperturaCaja>();
 
-                        // Vistas Faltantes del Menú
+                        // Controles de usuario (User Controls)
                         services.AddTransient<UcInicio>();
                         services.AddTransient<UcInventario>();
                         services.AddTransient<UcVentas>();
@@ -121,7 +126,8 @@ namespace StockOS.UI.WinForms.Forms
 
                     }).Build();
 
-                // 4. Bucle principal con alcance por sesión (Scope) para evitar fugas de DbContext
+                // Bucle principal de autenticación y sesión
+                // Cada iteración crea un nuevo scope para evitar fugas de memoria del DbContext
                 while (true)
                 {
                     using (var scope = host.Services.CreateScope())
@@ -141,6 +147,7 @@ namespace StockOS.UI.WinForms.Forms
 
                             System.Windows.Forms.Application.Run(formInicio);
 
+                            // Intentar cerrar automáticamente la caja al salir
                             if (usuario != null)
                             {
                                 try
@@ -176,13 +183,13 @@ namespace StockOS.UI.WinForms.Forms
             }
             catch (Exception ex)
             {
-                // Si algo explota y rompe toda la aplicación, queda registrado acá
+                // Capturar errores críticos que impidan el inicio de la aplicación
                 Log.Fatal(ex, "La aplicación sufrió un error fatal y se cerró inesperadamente.");
                 MessageBox.Show("Ocurrió un error crítico. Revise el archivo de registro (logs) para más detalles.", "Error Fatal", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                // Guarda físicamente el archivo antes de que el proceso muera en la memoria
+                // Asegurar que todos los logs se escriban en disco antes de cerrar
                 Log.CloseAndFlush();
             }
         }

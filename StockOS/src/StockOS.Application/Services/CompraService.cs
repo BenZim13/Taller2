@@ -5,6 +5,9 @@ using StockOS.Domain.Enums;
 
 namespace StockOS.Application.Services
 {
+    /// <summary>
+    /// Servicio de gestión de compras a proveedores con actualización de precios de costo.
+    /// </summary>
     public class CompraService : ICompraService
     {
         private readonly ICompraRepository _compraRepo;
@@ -30,7 +33,7 @@ namespace StockOS.Application.Services
 
         public decimal? ObtenerUltimoPrecioCompra(int idProducto)
         {
-            // La consulta de precios de compra está permitida a quienes gestionan compras o productos
+            // No requiere permisos especiales: usado para cálculos de margen
             return _compraRepo.ObtenerUltimoPrecioCompra(idProducto);
         }
 

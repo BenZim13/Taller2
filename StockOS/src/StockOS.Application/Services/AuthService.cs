@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
-// Importamos la librería de BCrypt que acabamos de instalar
 using BCrypt.Net;
 
 namespace StockOS.Application.Services
@@ -17,44 +16,44 @@ namespace StockOS.Application.Services
 
         public async Task<(bool Exito, Empleado? Usuario, string? MensajeError)> LoginAsync(string dni, string password)
         {
-            // 1. Consultar estado en base de datos mediante Procedimiento Almacenado
+            // Verificar primero si el usuario está activo en la base de datos
             bool? estadoDb = _empleadoRepository.ConsultarEstado(dni);
             if (estadoDb.HasValue && !estadoDb.Value)
             {
                 return (false, null, "Usuario deshabilitado");
             }
 
-            // 2. Obtener datos del empleado mediante sp_Usuarios_Autenticar
+            // Buscar empleado por DNI
             var empleado = _empleadoRepository.ObtenerPorDni(dni);
 
-            // Validamos si el empleado existe
+            // Si no existe, credenciales incorrectas
             if (empleado == null)
             {
                 return (false, null, "Credenciales incorrectas.");
             }
 
-            // 3. Verificación de consistencia del estado en la entidad
+            // Doble verificación de estado activo
             if (!empleado.Estado)
             {
                 return (false, null, "Usuario deshabilitado");
             }
 
-            // 4. Validación de credenciales
+            // Validar contraseña con BCrypt
             bool isValid = false;
             try
             {
-                // Intentar verificar asumiendo que es un hash de BCrypt
+                // Intentar verificar con BCrypt (contraseñas hasheadas)
                 isValid = BCrypt.Net.BCrypt.Verify(password, empleado.PasswordHash);
             }
             catch (SaltParseException)
             {
-                // Si falla porque el formato no es de BCrypt (ej. texto plano),
-                // verificamos si coincide exactamente con lo guardado en la BD
+                // Retrocompatibilidad: si la contraseña está en texto plano, verificarla directamente
+                // y migrarla automáticamente a BCrypt
                 if (empleado.PasswordHash == password)
                 {
                     isValid = true;
-                    
-                    // Actualizamos la contraseña al nuevo formato hash en la BD para la próxima vez
+
+                    // Migración automática: hashear la contraseña para el próximo login
                     empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
                     _empleadoRepository.Actualizar(empleado);
                 }
@@ -70,11 +69,11 @@ namespace StockOS.Application.Services
 
         public async Task<bool> RegistrarAsync(Empleado empleado)
         {
-            // Evitar duplicados por DNI o Email
+            // Validar que no exista otro empleado con el mismo DNI o email
             if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
             if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
 
-            // Encriptamos la contraseña plana que viene del formulario antes de enviarla al repositorio
+            // Hashear la contraseña antes de guardarla en la base de datos
             empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
 
             _empleadoRepository.Agregar(empleado);

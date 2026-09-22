@@ -5,11 +5,16 @@ using StockOS.Domain.Interfaces;
 
 namespace StockOS.Application.Services
 {
+    /// <summary>
+    /// Servicio de autorización basado en roles (RBAC - Role-Based Access Control).
+    /// Define qué permisos tiene cada rol en el sistema.
+    /// </summary>
     public class AuthorizationService : IAuthorizationService
     {
+        // Matriz de permisos: cada rol tiene un conjunto de permisos asignados
         private readonly Dictionary<int, HashSet<string>> _permisosPorRol = new()
         {
-            // 1: Administrador -> Tiene acceso absoluto a todo
+            // Rol 1: Administrador - Acceso completo al sistema
             { 1, new HashSet<string> {
                 Permisos.USUARIOS_VER, Permisos.USUARIOS_CREAR, Permisos.USUARIOS_EDITAR,
                 Permisos.PRODUCTOS_VER, Permisos.PRODUCTOS_CREAR, Permisos.PRODUCTOS_EDITAR,
@@ -19,20 +24,20 @@ namespace StockOS.Application.Services
                 Permisos.CLIENTES_GESTIONAR, Permisos.CONFIGURACION_GESTIONAR
             }},
             
-            // 2: Cajero -> Solo atiende al público, lee productos y maneja su dinero
+            // Rol 2: Cajero - Acceso a ventas, consulta de productos y manejo de caja
             { 2, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.STOCK_VER,
                 Permisos.VENTAS_REALIZAR, Permisos.CAJA_ABRIR, Permisos.CAJA_CERRAR, Permisos.CAJA_MOVIMIENTOS
             }},
             
-            // 3: Encargado de Depósito -> Dueño del inventario y compras, no toca la caja
+            // Rol 3: Encargado de Depósito - Gestión de inventario, compras y proveedores
             { 3, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.PRODUCTOS_CREAR, Permisos.PRODUCTOS_EDITAR,
                 Permisos.CATEGORIAS_GESTIONAR, Permisos.STOCK_VER, Permisos.STOCK_INGRESAR,
                 Permisos.COMPRAS_GESTIONAR, Permisos.PROVEEDORES_GESTIONAR
             }},
             
-            // 4: Repositor -> Consulta precios y pasillos, no modifica nada
+            // Rol 4: Repositor - Solo consulta de productos y stock (sin modificaciones)
             { 4, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.STOCK_VER
             }}

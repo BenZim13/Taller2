@@ -7,11 +7,15 @@ using System.Windows.Forms;
 
 namespace StockOS.UI.WinForms.Forms
 {
+    /// <summary>
+    /// Formulario de autenticación de usuarios con validación de credenciales.
+    /// </summary>
     public partial class FormLogin : Form
     {
         private readonly IAuthService _authService;
-        private bool _ignorandoCambios = false;
         private readonly ICajaService _cajaService;
+        private bool _ignorandoCambios = false;
+
         public Empleado? UsuarioAutenticado { get; private set; }
 
         public FormLogin(IAuthService authService, ICajaService cajaService)

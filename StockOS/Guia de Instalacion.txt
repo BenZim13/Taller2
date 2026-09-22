@@ -1,0 +1,9 @@
+Hola profes! 
+Para "instalar" la app sigan estos pasos:
+1- Abrir la carpeta \DatabaseScripts y dentro encontrarán todos los scripts para correr la Base de Datos y los usuarios de pruebas encontrados en el otro .txt :) .
+2- Si descargaron el archivo del aula ignoren lo siguiente. 
+Aca está el link para clonar desde GitHub: https://github.com/BenZim13/Taller2.git
+Abran lo en el VS que tengan y luego compilen y denle pa delante!(les recuerdo que está hecho en su totalidad en .NET 8) :P
+3-Cualquier consulta estamos a su disposición.
+
+Atte. el equipo N° 100 Zimerman y Arnica.
