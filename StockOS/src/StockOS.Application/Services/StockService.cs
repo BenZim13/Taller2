@@ -17,6 +17,12 @@ namespace StockOS.Application.Services
         public void AgregarStock(int idProducto, int idSucursal, int cantidadAAgregar)
         {
             _authService.ValidarPermiso(Permisos.STOCK_INGRESAR);
+        
+            if (cantidadAAgregar <= 0)
+            {
+                throw new ArgumentException("La cantidad a ingresar debe ser mayor a cero.");
+            }
+
             _stockRepo.IngresarMercaderia(idProducto, idSucursal, cantidadAAgregar);
         }
 

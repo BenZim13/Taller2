@@ -86,7 +86,7 @@ namespace StockOS.UI.WinForms.Forms
             btnCancelar.TabIndex = 4;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = false;
-            btnCancelar.Click += (s, e) => this.Close();
+            //btnCancelar.Click += (s, e) => this.Close();
             // 
             // FormCierreCaja
             // 

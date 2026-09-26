@@ -33,6 +33,8 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.USUARIOS_CREAR);
 
+            ValidarReglasDeNegocio(empleado);
+
             if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
             if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
 
@@ -48,6 +50,8 @@ namespace StockOS.Application.Services
         public async Task<(bool Exito, string Mensaje)> ActualizarAsync(Empleado empleado)
         {
             _authService.ValidarPermiso(Permisos.USUARIOS_EDITAR);
+
+            ValidarReglasDeNegocio(empleado);
 
             var empConMismoDni = _empleadoRepository.ObtenerPorDni(empleado.Dni);
             if (empConMismoDni != null && empConMismoDni.IdEmpleado != empleado.IdEmpleado)
@@ -87,6 +91,35 @@ namespace StockOS.Application.Services
             emp.Estado = nuevoEstado;
             _empleadoRepository.Actualizar(emp);
             return true;
+        }
+        private void ValidarReglasDeNegocio(Empleado empleado)
+        {
+            if (empleado == null) throw new System.ArgumentNullException(nameof(empleado));
+
+            empleado.Nombre = empleado.Nombre?.Trim() ?? "";
+            empleado.Apellido = empleado.Apellido?.Trim() ?? "";
+            empleado.Dni = empleado.Dni?.Trim() ?? "";
+            empleado.Email = empleado.Email?.Trim() ?? "";
+            empleado.Telefono = empleado.Telefono?.Trim() ?? "";
+            empleado.Direccion = empleado.Direccion?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(empleado.Nombre) || empleado.Nombre.Length > 50)
+                throw new System.ArgumentException("El nombre es obligatorio y no puede superar los 50 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(empleado.Apellido) || empleado.Apellido.Length > 50)
+                throw new System.ArgumentException("El apellido es obligatorio y no puede superar los 50 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(empleado.Dni) || !empleado.Dni.All(char.IsDigit) || empleado.Dni.Length > 20)
+                throw new System.ArgumentException("El DNI es obligatorio, debe contener solo números y no superar los 20 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(empleado.Email) || !empleado.Email.Contains("@") || empleado.Email.Length > 100)
+                throw new System.ArgumentException("Debe ingresar un correo electrónico válido (máximo 100 caracteres).");
+
+            if (string.IsNullOrWhiteSpace(empleado.Telefono) || empleado.Telefono.Length > 30)
+                throw new System.ArgumentException("El teléfono es obligatorio y no puede superar los 30 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(empleado.Direccion) || empleado.Direccion.Length > 200)
+                throw new System.ArgumentException("La dirección es obligatoria y no puede superar los 200 caracteres.");
         }
     }
 }

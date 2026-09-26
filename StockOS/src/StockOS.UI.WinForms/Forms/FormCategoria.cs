@@ -18,8 +18,8 @@ namespace StockOS.UI.WinForms.Forms
             InitializeComponent();
             _categoriaService = categoriaService;
 
-            txtNombre.MaxLength = 50;
-            txtDescripcion.MaxLength = 100;
+            txtNombre.MaxLength = 100; 
+            txtDescripcion.MaxLength = 255; 
 
             btnAgregar.Click += BtnGuardar_Click;
             btnEditar.Click += BtnEditar_Click;

@@ -36,6 +36,18 @@ namespace StockOS.Application.Services
                 throw new ArgumentException("El nombre o razón social del proveedor es obligatorio.");
             }
 
+            if (proveedor.RazonSocial.Length > 100)
+            {
+                throw new ArgumentException("La razón social no puede superar los 100 caracteres.");
+            }
+                
+
+            if (!string.IsNullOrWhiteSpace(proveedor.Cuit) && proveedor.Cuit.Length > 30)
+            {
+                throw new ArgumentException("El CUIT no puede superar los 30 caracteres.");
+            }
+                
+
             // Sanitizar valores por defecto para columnas no nulas
             proveedor.RazonSocial = proveedor.RazonSocial.Trim();
             proveedor.Cuit = string.IsNullOrWhiteSpace(proveedor.Cuit) ? null : proveedor.Cuit.Trim();

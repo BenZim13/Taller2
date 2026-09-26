@@ -28,6 +28,29 @@ namespace StockOS.UI.WinForms.Forms
             _rolService = rolService;
             _authService = authService;
 
+            // Restricciones de longitud según la base de datos
+            txtNombre.MaxLength = 50;
+            textApellido.MaxLength = 50;
+            txtDNI.MaxLength = 20;
+            textEmail.MaxLength = 100;
+            txtCelular.MaxLength = 30;
+            txtDireccion.MaxLength = 200;
+            // Bloquear letras en el DNI (solo números y control)
+            txtDNI.KeyPress += (s, e) =>
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                {
+                    e.Handled = true;
+                }
+            };
+            // Bloquear letras en Celular (permitir números, espacios, '+' y '-')
+            txtCelular.KeyPress += (s, e) =>
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '+' && e.KeyChar != '-')
+                {
+                    e.Handled = true;
+                }
+            };
 
             btnGuardar.Click += btnGuardar_Click;
             btnVolver.Click += (s, e) => AlVolver?.Invoke();

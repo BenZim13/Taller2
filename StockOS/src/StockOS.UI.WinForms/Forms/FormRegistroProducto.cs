@@ -46,6 +46,14 @@ namespace StockOS.UI.WinForms.Forms
                     e.Handled = true;
                 }
             };
+            // Restricción para Código de Barras: Solo letras, números y teclas de control
+            txtCodigoBarra.KeyPress += (s, e) =>
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsLetterOrDigit(e.KeyChar))
+                {
+                    e.Handled = true; // Bloquea espacios y símbolos (!, @, -, etc.)
+                }
+            };
 
             txtPrecio.KeyPress += PermitirSoloDecimales;
             txtPrecioCompra.KeyPress += PermitirSoloDecimales;

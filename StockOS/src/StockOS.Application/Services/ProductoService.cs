@@ -35,22 +35,13 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.PRODUCTOS_CREAR);
 
-            if (producto == null) throw new System.ArgumentNullException(nameof(producto));
-            if (string.IsNullOrWhiteSpace(producto.CodigoBarra)) throw new System.ArgumentException("El código de barra del producto es obligatorio.");
-            if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
-            if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
+            ValidarReglasDeNegocio(producto);
 
             // Verificar que el código de barras no esté duplicado
-            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
+            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra);
             if (existente != null)
             {
                 throw new System.InvalidOperationException($"Ya existe un producto registrado con el código '{producto.CodigoBarra}'.");
-            }
-
-            // Asignar IVA por defecto si no viene especificado
-            if (producto.PorcentajeIva <= 0)
-            {
-                producto.PorcentajeIva = Producto.IvaFijoDefault;
             }
 
             _productoRepository.Agregar(producto);
@@ -60,24 +51,50 @@ namespace StockOS.Application.Services
         {
             _authService.ValidarPermiso(Permisos.PRODUCTOS_EDITAR);
 
-            if (producto == null) throw new System.ArgumentNullException(nameof(producto));
-            if (string.IsNullOrWhiteSpace(producto.CodigoBarra)) throw new System.ArgumentException("El código de barra del producto es obligatorio.");
-            if (string.IsNullOrWhiteSpace(producto.Nombre)) throw new System.ArgumentException("El nombre del producto es obligatorio.");
-            if (producto.PrecioVentaActual <= 0) throw new System.ArgumentException("El precio de venta debe ser un número mayor a cero.");
+            ValidarReglasDeNegocio(producto);
 
             // Verificar que el código no pertenezca a otro producto
-            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra.Trim());
+            var existente = _productoRepository.BuscarPorCodigoBarra(producto.CodigoBarra);
             if (existente != null && existente.IdProducto != producto.IdProducto)
             {
                 throw new System.InvalidOperationException($"El código '{producto.CodigoBarra}' ya pertenece a otro producto ('{existente.Nombre}').");
             }
 
+            _productoRepository.Actualizar(producto);
+        }
+        private void ValidarReglasDeNegocio(Producto producto)
+        {
+            if (producto == null) throw new System.ArgumentNullException(nameof(producto));
+
+            producto.CodigoBarra = producto.CodigoBarra?.Trim() ?? "";
+            producto.Nombre = producto.Nombre?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(producto.CodigoBarra))
+                throw new System.ArgumentException("El código de barra es obligatorio.");
+
+            // Validar que sea alfanumérico (sin espacios ni caracteres especiales)
+            if (!producto.CodigoBarra.All(char.IsLetterOrDigit))
+                throw new System.ArgumentException("El código de barra solo puede contener letras y números, sin espacios.");
+
+            if (producto.CodigoBarra.Length > 50)
+                throw new System.ArgumentException("El código de barra no puede superar los 50 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(producto.Nombre))
+                throw new System.ArgumentException("El nombre del producto es obligatorio.");
+
+            if (producto.Nombre.Length > 100)
+                throw new System.ArgumentException("El nombre no puede superar los 100 caracteres.");
+
+            if (producto.PrecioVentaActual <= 0)
+                throw new System.ArgumentException("El precio de venta debe ser mayor a cero.");
+
+            if (producto.IdCategoria <= 0)
+                throw new System.ArgumentException("Debe asignar una categoría válida al producto.");
+
             if (producto.PorcentajeIva <= 0)
             {
                 producto.PorcentajeIva = Producto.IvaFijoDefault;
             }
-
-            _productoRepository.Actualizar(producto);
         }
 
         public void CambiarEstado(int idProducto, bool activo)
