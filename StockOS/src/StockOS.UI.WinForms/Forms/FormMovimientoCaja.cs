@@ -14,6 +14,8 @@ namespace StockOS.UI.WinForms.Forms
             InitializeComponent();
             _cajaService = cajaService;
             cmbTipo.SelectedIndex = 0; // Selecciona 'EGRESO' por defecto
+            txtMonto.MaxLength = 12;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtMonto, "Monto");
         }
 
         private void btnGuardar_Click(object sender, EventArgs e)
@@ -24,9 +26,11 @@ namespace StockOS.UI.WinForms.Forms
                 return;
             }
 
-            if (!decimal.TryParse(txtMonto.Text, out decimal monto))
+            if (!decimal.TryParse(txtMonto.Text, out decimal monto) || monto <= 0)
             {
-                MessageBox.Show("Ingrese un monto válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Por favor, ingrese un monto válido mayor a cero (solo números y decimales).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMonto.Focus();
+                txtMonto.SelectAll();
                 return;
             }
 
@@ -53,10 +57,7 @@ namespace StockOS.UI.WinForms.Forms
 
         private void txtMonto_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.') && (e.KeyChar != ','))
-            {
-                e.Handled = true;
-            }
+            // La validación se gestiona de forma centralizada con ValidadorUI
         }
     }
 }

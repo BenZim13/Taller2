@@ -24,7 +24,7 @@ namespace StockOS.Application.Tests
             mockRepo.Setup(r => r.BuscarPorCodigoBarra("999")).Returns((Producto?)null);
 
             var service = new ProductoService(mockRepo.Object, mockAuth.Object);
-            var productoNuevo = new Producto { CodigoBarra = "999", Nombre = "Galletitas", PrecioVentaActual = 800 };
+            var productoNuevo = new Producto { CodigoBarra = "999", Nombre = "Galletitas", PrecioVentaActual = 800, IdCategoria = 1 };
 
             // ACT
             service.Agregar(productoNuevo);
@@ -41,7 +41,7 @@ namespace StockOS.Application.Tests
             var mockRepo = new Mock<IProductoRepository>();
             var mockAuth = new Mock<IAuthorizationService>();
 
-            var producto = new Producto { IdProducto = 10, CodigoBarra = "123", Nombre = "Arroz", PrecioVentaActual = 1200 };
+            var producto = new Producto { IdProducto = 10, CodigoBarra = "123", Nombre = "Arroz", PrecioVentaActual = 1200, IdCategoria = 1 };
             mockRepo.Setup(r => r.BuscarPorCodigoBarra("123"))
                     .Returns(new Producto { IdProducto = 10, CodigoBarra = "123", Nombre = "Arroz" });
 
@@ -91,7 +91,7 @@ namespace StockOS.Application.Tests
                     .Returns(new Producto { IdProducto = 1, CodigoBarra = "123", Nombre = "Gaseosa" });
 
             var service = new ProductoService(mockRepo.Object, mockAuth.Object);
-            var productoNuevo = new Producto { CodigoBarra = "123", Nombre = "Jugo", PrecioVentaActual = 1500 };
+            var productoNuevo = new Producto { CodigoBarra = "123", Nombre = "Jugo", PrecioVentaActual = 1500, IdCategoria = 1 };
 
             // ACT & ASSERT
             var excepcion = Assert.Throws<InvalidOperationException>(() => service.Agregar(productoNuevo));
@@ -191,7 +191,7 @@ namespace StockOS.Application.Tests
             var mockAuth = new Mock<IAuthorizationService>();
 
             // El producto a editar tiene IdProducto = 1
-            var productoAEditar = new Producto { IdProducto = 1, CodigoBarra = "999", Nombre = "Jabon", PrecioVentaActual = 100 };
+            var productoAEditar = new Producto { IdProducto = 1, CodigoBarra = "999", Nombre = "Jabon", PrecioVentaActual = 100, IdCategoria = 1 };
 
             // Pero el código "999" ya le pertenece al IdProducto = 2
             mockRepo.Setup(r => r.BuscarPorCodigoBarra("999"))

@@ -38,53 +38,15 @@ namespace StockOS.UI.WinForms.Forms
             txtStock.MaxLength = 8;
             txtPrecioCompra.MaxLength = 12;
 
-            // Restricciones de entrada por teclado (KeyPress)
-            txtStock.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                {
-                    e.Handled = true;
-                }
-            };
-            // Restricción para Código de Barras: Solo letras, números y teclas de control
-            txtCodigoBarra.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsLetterOrDigit(e.KeyChar))
-                {
-                    e.Handled = true; // Bloquea espacios y símbolos (!, @, -, etc.)
-                }
-            };
-
-            txtPrecio.KeyPress += PermitirSoloDecimales;
-            txtPrecioCompra.KeyPress += PermitirSoloDecimales;
+            // Restricciones de entrada por teclado con aviso visual emergente (Globos ToolTip)
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtCodigoBarra, "Código de Barra");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtStock, "Stock");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecio, "Precio de Venta");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecioCompra, "Precio de Compra");
 
             this.Load += FormRegistroProducto_Load;
             btnGuardar.Click += BtnGuardar_Click;
             btnCancelar.Click += (s, e) => { this.DialogResult = DialogResult.Cancel; this.Close(); };
-        }
-
-        private void PermitirSoloDecimales(object? sender, KeyPressEventArgs e)
-        {
-            if (char.IsControl(e.KeyChar)) return;
-
-            TextBox tb = (TextBox)sender!;
-            char decSep = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                if (tb.Text.Contains('.') || tb.Text.Contains(',') || tb.SelectionStart == 0)
-                {
-                    e.Handled = true;
-                    return;
-                }
-                e.KeyChar = decSep;
-                return;
-            }
-
-            if (!char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
         }
 
         private void FormRegistroProducto_Load(object? sender, EventArgs e)
@@ -165,6 +127,14 @@ namespace StockOS.UI.WinForms.Forms
             {
                 MostrarMensaje("El código de barra del producto es obligatorio.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCodigoBarra.Focus();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsAlfanumerico(codigo))
+            {
+                MostrarMensaje("El código de barra solo puede contener letras y números (sin espacios ni caracteres especiales).", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigoBarra.Focus();
+                txtCodigoBarra.SelectAll();
                 return;
             }
 

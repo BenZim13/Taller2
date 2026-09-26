@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 
 namespace StockOS.UI.WinForms.Forms
@@ -20,17 +20,26 @@ namespace StockOS.UI.WinForms.Forms
             // Por defecto, el monto recibido es el total (para pagos electrónicos)
             MontoRecibido = totalCobrar;
             Vuelto = 0;
-            // Bloquear letras en el monto recibido
-            txtMontoRecibido.KeyPress += PermitirSoloDecimales;
+            txtMontoRecibido.MaxLength = 12;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtMontoRecibido, "Monto Recibido");
         }
 
         private void btnEfectivo_Click(object sender, EventArgs e)
         {
+            decimal montoIngresado;
+
             // Validar monto ingresado para efectivo
-            if (!decimal.TryParse(txtMontoRecibido.Text, out decimal montoIngresado))
+            if (string.IsNullOrWhiteSpace(txtMontoRecibido.Text))
             {
                 // Si no ingresó nada, asumimos pago exacto
                 montoIngresado = _totalCobrar;
+            }
+            else if (!decimal.TryParse(txtMontoRecibido.Text, out montoIngresado) || montoIngresado < 0)
+            {
+                MessageBox.Show("Por favor, ingrese un monto válido (solo números y decimales).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMontoRecibido.Focus();
+                txtMontoRecibido.SelectAll();
+                return;
             }
 
             if (montoIngresado < _totalCobrar)
@@ -93,29 +102,6 @@ namespace StockOS.UI.WinForms.Forms
             {
                 lblVueltoValor.Text = "$ 0,00";
                 lblVueltoValor.ForeColor = System.Drawing.Color.White;
-            }
-        }
-        private void PermitirSoloDecimales(object? sender, KeyPressEventArgs e)
-        {
-            if (char.IsControl(e.KeyChar)) return;
-
-            TextBox tb = (TextBox)sender!;
-            char decSep = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                if (tb.Text.Contains('.') || tb.Text.Contains(',') || tb.SelectionStart == 0)
-                {
-                    e.Handled = true;
-                    return;
-                }
-                e.KeyChar = decSep;
-                return;
-            }
-
-            if (!char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
             }
         }
     }

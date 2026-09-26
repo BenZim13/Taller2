@@ -21,6 +21,8 @@ namespace StockOS.UI.WinForms.Forms
             txtNombre.MaxLength = 100; 
             txtDescripcion.MaxLength = 255; 
 
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloLetras(txtNombre, "Nombre de Categoría");
+
             btnAgregar.Click += BtnGuardar_Click;
             btnEditar.Click += BtnEditar_Click;
             btnDarBaja.Click += BtnDarBaja_Click;
@@ -69,10 +71,19 @@ namespace StockOS.UI.WinForms.Forms
 
         private void BtnGuardar_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            string nombre = txtNombre.Text.Trim();
+            if (string.IsNullOrWhiteSpace(nombre))
             {
                 MessageBox.Show("Ingrese el nombre de la categoría.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNombre.Focus();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsSoloLetras(nombre))
+            {
+                MessageBox.Show("El nombre de la categoría solo puede contener letras y espacios (sin números ni símbolos especiales). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                txtNombre.SelectAll();
                 return;
             }
 

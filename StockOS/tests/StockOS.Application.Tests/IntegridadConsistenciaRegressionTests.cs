@@ -536,7 +536,8 @@ namespace StockOS.Application.Tests
                 CodigoBarra = "TESTIVA01",
                 Nombre = "Producto Test IVA",
                 PrecioVentaActual = 1300m,
-                PorcentajeIva = 0m // Se envía 0 o sin inicializar
+                PorcentajeIva = 0m,
+                IdCategoria = 1
             };
 
             // ACT (Agregar)

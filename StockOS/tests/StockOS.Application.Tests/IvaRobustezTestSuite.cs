@@ -134,10 +134,11 @@ namespace StockOS.Application.Tests
 
             var productoInvalido = new Producto
             {
-                CodigoBarra = "TEST-IVA-NORM",
+                CodigoBarra = "TESTIVANORM",
                 Nombre = "Producto Normalizado",
                 PrecioVentaActual = 1300m,
-                PorcentajeIva = 0m
+                PorcentajeIva = 0m,
+                IdCategoria = 1
             };
 
             service.Agregar(productoInvalido);
@@ -159,13 +160,14 @@ namespace StockOS.Application.Tests
             var productoExistente = new Producto
             {
                 IdProducto = 88,
-                CodigoBarra = "TEST-IVA-ACT",
+                CodigoBarra = "TESTIVAACT",
                 Nombre = "Producto Actualizable",
                 PrecioVentaActual = 1300m,
-                PorcentajeIva = -10m // Inválido
+                PorcentajeIva = -10m, // Inválido
+                IdCategoria = 1
             };
 
-            mockRepo.Setup(r => r.BuscarPorCodigoBarra("TEST-IVA-ACT")).Returns(productoExistente);
+            mockRepo.Setup(r => r.BuscarPorCodigoBarra("TESTIVAACT")).Returns(productoExistente);
 
             service.Actualizar(productoExistente);
 
@@ -438,7 +440,7 @@ namespace StockOS.Application.Tests
                 var txtPrecioCompra = (TextBox)typeof(FormIngresoStock).GetField("txtPrecioCompra", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
                 var txtPorcentaje = (TextBox)typeof(FormIngresoStock).GetField("txtPorcentajeExtra", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
 
-                txtCodigo.Text = "PAN-1000";
+                txtCodigo.Text = "PAN1000";
                 txtNombre.Text = "1 kg de Pan";
                 cmbCategoria.SelectedValue = 1;
                 cmbProveedor.SelectedValue = 1;
@@ -475,7 +477,7 @@ namespace StockOS.Application.Tests
                 var prodExistente = new Producto
                 {
                     IdProducto = 55,
-                    CodigoBarra = "PAN-EXISTENTE",
+                    CodigoBarra = "PANEXISTENTE",
                     Nombre = "Pan Francés",
                     IdCategoria = 1,
                     IdProveedor = 1,
@@ -506,7 +508,7 @@ namespace StockOS.Application.Tests
                 var txtPrecioCompra = (TextBox)typeof(FormIngresoStock).GetField("txtPrecioCompra", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
                 var txtPorcentaje = (TextBox)typeof(FormIngresoStock).GetField("txtPorcentajeExtra", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
 
-                txtCodigo.Text = "PAN-EXISTENTE";
+                txtCodigo.Text = "PANEXISTENTE";
                 txtNombre.Text = "Pan Francés";
                 cmbCategoria.SelectedValue = 1;
                 cmbProveedor.SelectedValue = 1;
@@ -565,7 +567,7 @@ namespace StockOS.Application.Tests
                 var cmbProveedor = (ComboBox)typeof(FormRegistroProducto).GetField("cmbProveedor", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
                 var txtStock = (TextBox)typeof(FormRegistroProducto).GetField("txtStock", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
 
-                txtCodigo.Text = "PROD-ALTA-01";
+                txtCodigo.Text = "PRODALTA01";
                 txtNombre.Text = "Producto Nuevo";
                 txtPrecio.Text = "1300";
                 cmbCategoria.SelectedValue = 1;
@@ -598,7 +600,7 @@ namespace StockOS.Application.Tests
                 var prodOriginal = new Producto
                 {
                     IdProducto = 99,
-                    CodigoBarra = "PROD-MOD-01",
+                    CodigoBarra = "PRODMOD01",
                     Nombre = "Producto Original",
                     PrecioVentaActual = 1000m,
                     PorcentajeIva = 0m, // Sin IVA o 0 previo

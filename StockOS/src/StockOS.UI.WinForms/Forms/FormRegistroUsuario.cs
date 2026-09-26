@@ -35,22 +35,12 @@ namespace StockOS.UI.WinForms.Forms
             textEmail.MaxLength = 100;
             txtCelular.MaxLength = 30;
             txtDireccion.MaxLength = 200;
-            // Bloquear letras en el DNI (solo números y control)
-            txtDNI.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                {
-                    e.Handled = true;
-                }
-            };
-            // Bloquear letras en Celular (permitir números, espacios, '+' y '-')
-            txtCelular.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '+' && e.KeyChar != '-')
-                {
-                    e.Handled = true;
-                }
-            };
+
+            // Restricciones de entrada con advertencia visual inmediata (Globos ToolTip)
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloLetras(txtNombre, "Nombre");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloLetras(textApellido, "Apellido");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtDNI, "DNI");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloTelefono(txtCelular, "Celular");
 
             btnGuardar.Click += btnGuardar_Click;
             btnVolver.Click += (s, e) => AlVolver?.Invoke();
@@ -184,6 +174,47 @@ namespace StockOS.UI.WinForms.Forms
                 cmbSucursal.SelectedValue == null)
             {
                 MessageBox.Show("Todos los campos (Nombre, Apellido, DNI, Email, Dirección, Celular, Rol y Sucursal) son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Validaciones de tipo de dato en el Front-End (evita enviar datos inconsistentes)
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsSoloLetras(nombre))
+            {
+                MessageBox.Show("El campo 'Nombre' solo debe contener letras (sin números ni símbolos especiales). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                txtNombre.SelectAll();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsSoloLetras(apellido))
+            {
+                MessageBox.Show("El campo 'Apellido' solo debe contener letras (sin números ni símbolos especiales). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                textApellido.Focus();
+                textApellido.SelectAll();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsSoloNumeros(dni))
+            {
+                MessageBox.Show("El campo 'DNI' solo debe contener números. Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDNI.Focus();
+                txtDNI.SelectAll();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsTelefonoValido(celular))
+            {
+                MessageBox.Show("El campo 'Celular' solo debe contener números (se permiten espacios, '+' y '-'). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCelular.Focus();
+                txtCelular.SelectAll();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsEmailValido(email))
+            {
+                MessageBox.Show("El campo 'Email' no posee un formato de correo electrónico válido (ejemplo: usuario@correo.com). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                textEmail.Focus();
+                textEmail.SelectAll();
                 return;
             }
 

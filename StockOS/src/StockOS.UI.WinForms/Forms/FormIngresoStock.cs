@@ -41,18 +41,11 @@ namespace StockOS.UI.WinForms.Forms
             CargarCategorias();
             CargarProveedores();
 
-            // Restricciones de entrada por teclado (KeyPress)
-            txtCantidad.KeyPress += (s, e) =>
-            {
-                // Solo dígitos enteros y teclas de control (Backspace)
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                {
-                    e.Handled = true;
-                }
-            };
-
-            txtPrecioCompra.KeyPress += PermitirSoloDecimales;
-            txtPorcentajeExtra.KeyPress += PermitirSoloDecimales;
+            // Restricciones de entrada por teclado con advertencias emergentes (Globos ToolTip)
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtCodigo, "Código");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtCantidad, "Cantidad");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecioCompra, "Precio de Compra");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPorcentajeExtra, "Margen de Ganancia");
 
             // Cálculo reactivo del monto total y precio de venta final
             txtCantidad.TextChanged += CalcularValores;
@@ -65,31 +58,6 @@ namespace StockOS.UI.WinForms.Forms
 
             btnGuardar.Click += BtnGuardar_Click;
             btnCancelar.Click += (s, e) => { this.DialogResult = DialogResult.Cancel; this.Close(); };
-        }
-
-        private void PermitirSoloDecimales(object? sender, KeyPressEventArgs e)
-        {
-            if (char.IsControl(e.KeyChar)) return;
-
-            TextBox tb = (TextBox)sender!;
-            char decSep = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            // Si presiona punto o coma, normalizar al separador del sistema
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                if (tb.Text.Contains('.') || tb.Text.Contains(',') || tb.SelectionStart == 0)
-                {
-                    e.Handled = true;
-                    return;
-                }
-                e.KeyChar = decSep;
-                return;
-            }
-
-            if (!char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
         }
 
         private void BuscarProductoPorCodigo()
@@ -188,6 +156,14 @@ namespace StockOS.UI.WinForms.Forms
             {
                 MostrarMensaje("Ingrese el código del producto.", "Campo Requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCodigo.Focus();
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsAlfanumerico(codigo))
+            {
+                MostrarMensaje("El código del producto solo puede contener letras y números (sin espacios ni caracteres especiales).", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                txtCodigo.SelectAll();
                 return;
             }
 

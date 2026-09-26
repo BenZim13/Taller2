@@ -26,7 +26,15 @@ namespace StockOS.Application.Tests
             mockRepo.Setup(r => r.ObtenerPorEmail(It.IsAny<string>())).Returns((Empleado?)null);
 
             var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
-            var nuevoEmpleado = new Empleado { Dni = "40111222", Email = "valido@mail.com" };
+            var nuevoEmpleado = new Empleado 
+            { 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "40111222", 
+                Email = "valido@mail.com", 
+                Telefono = "1122334455", 
+                Direccion = "Av Siempre Viva 123" 
+            };
 
             // ACT
             bool resultado = await service.CrearAsync(nuevoEmpleado);
@@ -44,7 +52,16 @@ namespace StockOS.Application.Tests
             var mockRepo = new Mock<IEmpleadoRepository>();
             var mockAuth = new Mock<IAuthorizationService>();
 
-            var empEditado = new Empleado { IdEmpleado = 5, Dni = "33444555", Email = "editado@mail.com" };
+            var empEditado = new Empleado 
+            { 
+                IdEmpleado = 5, 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "33444555", 
+                Email = "editado@mail.com", 
+                Telefono = "1122334455", 
+                Direccion = "Av Siempre Viva 123" 
+            };
 
             // El DNI encontrado es el del MISMO empleado
             mockRepo.Setup(r => r.ObtenerPorDni("33444555"))
@@ -99,7 +116,15 @@ namespace StockOS.Application.Tests
                     .Returns(new Empleado { IdEmpleado = 1, Dni = "35000111" });
 
             var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
-            var nuevoEmpleado = new Empleado { Dni = "35000111", Email = "nuevo@mail.com" };
+            var nuevoEmpleado = new Empleado 
+            { 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "35000111", 
+                Email = "nuevo@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Av Siempre Viva 123"
+            };
 
             // ACT
             bool resultado = await service.CrearAsync(nuevoEmpleado);
@@ -121,7 +146,15 @@ namespace StockOS.Application.Tests
                     .Returns(new Empleado { IdEmpleado = 2, Email = "duplicado@mail.com" });
 
             var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
-            var nuevoEmpleado = new Empleado { Dni = "40111222", Email = "duplicado@mail.com" };
+            var nuevoEmpleado = new Empleado 
+            { 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "40111222", 
+                Email = "duplicado@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Av Siempre Viva 123"
+            };
 
             // ACT
             bool resultado = await service.CrearAsync(nuevoEmpleado);
@@ -142,7 +175,15 @@ namespace StockOS.Application.Tests
                     .Throws(new UnauthorizedAccessException("Denegado"));
 
             var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
-            var nuevoEmpleado = new Empleado { Dni = "40111222", Email = "test@mail.com" };
+            var nuevoEmpleado = new Empleado 
+            { 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "40111222", 
+                Email = "test@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Av Siempre Viva 123"
+            };
 
             // ACT & ASSERT
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() => service.CrearAsync(nuevoEmpleado));
@@ -156,7 +197,16 @@ namespace StockOS.Application.Tests
             var mockRepo = new Mock<IEmpleadoRepository>();
             var mockAuth = new Mock<IAuthorizationService>();
 
-            var empEditado = new Empleado { IdEmpleado = 5, Dni = "20111222", Email = "editado@mail.com" };
+            var empEditado = new Empleado 
+            { 
+                IdEmpleado = 5, 
+                Nombre = "Juan", 
+                Apellido = "Pérez", 
+                Dni = "20111222", 
+                Email = "editado@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Av Siempre Viva 123"
+            };
 
             // DNI le pertenece al IdEmpleado = 9
             mockRepo.Setup(r => r.ObtenerPorDni("20111222"))

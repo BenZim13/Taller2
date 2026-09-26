@@ -41,6 +41,9 @@ namespace StockOS.UI.WinForms.Forms
             _stockService = stockService;
 
             this.Load += (s, e) => txtCodigoBarra.Focus();
+
+            txtDescuento.MaxLength = 10;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtDescuento, "Descuento");
         }
 
         // ==========================================

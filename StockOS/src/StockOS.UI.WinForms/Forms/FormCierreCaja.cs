@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using StockOS.Application;
 using StockOS.Application.Services;
@@ -13,8 +13,8 @@ namespace StockOS.UI.WinForms.Forms
         {
             InitializeComponent();
             _cajaService = cajaService;
-            // Bloquear letras en el monto
-            txtMontoReal.KeyPress += PermitirSoloDecimales;
+            txtMontoReal.MaxLength = 12;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtMontoReal, "Monto Real");
         }
 
         private void btnConfirmarCierre_Click(object sender, EventArgs e)
@@ -26,9 +26,11 @@ namespace StockOS.UI.WinForms.Forms
                 return;
             }
 
-            if (!decimal.TryParse(txtMontoReal.Text, out decimal montoReal))
+            if (!decimal.TryParse(txtMontoReal.Text, out decimal montoReal) || montoReal < 0)
             {
-                MessageBox.Show("Por favor, ingrese un monto válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Por favor, ingrese un monto válido (solo números y decimales mayores o iguales a cero).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMontoReal.Focus();
+                txtMontoReal.SelectAll();
                 return;
             }
 
@@ -70,29 +72,6 @@ namespace StockOS.UI.WinForms.Forms
 
                 // 2. Le mostramos un mensaje genérico y amigable al usuario
                 MessageBox.Show("Ocurrió un error interno al cerrar la caja. Por favor, contacte al administrador.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        private void PermitirSoloDecimales(object? sender, KeyPressEventArgs e)
-        {
-            if (char.IsControl(e.KeyChar)) return;
-
-            TextBox tb = (TextBox)sender!;
-            char decSep = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                if (tb.Text.Contains('.') || tb.Text.Contains(',') || tb.SelectionStart == 0)
-                {
-                    e.Handled = true;
-                    return;
-                }
-                e.KeyChar = decSep;
-                return;
-            }
-
-            if (!char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
             }
         }
     }

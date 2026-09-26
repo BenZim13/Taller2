@@ -19,14 +19,8 @@ namespace StockOS.UI.WinForms.Forms
             txtNombre.MaxLength = 100;
             txtCuit.MaxLength = 30;
 
-            // Restricción de caracteres en CUIT (solo números y guiones)
-            txtCuit.KeyPress += (s, e) =>
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '-')
-                {
-                    e.Handled = true;
-                }
-            };
+            // Restricción de caracteres en CUIT con aviso visual emergente (Globos ToolTip)
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloCuit(txtCuit, "CUIT");
 
             btnAgregar.Click += BtnAgregar_Click;
             btnDarBaja.Click += BtnDarBaja_Click;
@@ -109,6 +103,14 @@ namespace StockOS.UI.WinForms.Forms
             // Evitar duplicados por CUIT si se especificó
             if (!string.IsNullOrWhiteSpace(cuit))
             {
+                if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsCuitValido(cuit))
+                {
+                    MessageBox.Show("El CUIT solo debe contener números y guiones (ejemplo: 30-12345678-9). Por favor, cargue el tipo de dato correcto.", "Tipo de dato incorrecto", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCuit.Focus();
+                    txtCuit.SelectAll();
+                    return;
+                }
+
                 bool cuitExiste = proveedoresExistentes
                     .Any(p => !string.IsNullOrWhiteSpace(p.Cuit) && p.Cuit.Trim().Equals(cuit, StringComparison.OrdinalIgnoreCase));
 

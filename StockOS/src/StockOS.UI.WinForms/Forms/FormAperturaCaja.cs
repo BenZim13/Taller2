@@ -15,6 +15,9 @@ namespace StockOS.UI.WinForms.Forms
             InitializeComponent();
             _cajaService = cajaService;
 
+            txtMonto.MaxLength = 12;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtMonto, "Monto Inicial");
+
             // Enganchamos el evento Load
             this.Load += FormAperturaCaja_Load;
         }
@@ -40,7 +43,9 @@ namespace StockOS.UI.WinForms.Forms
 
             if (!decimal.TryParse(txtMonto.Text, out decimal montoApertura) || montoApertura < 0)
             {
-                MessageBox.Show("Por favor, ingrese un monto inicial válido.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Por favor, ingrese un monto inicial válido (solo números y decimales mayores o iguales a cero).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMonto.Focus();
+                txtMonto.SelectAll();
                 return;
             }
 
@@ -74,10 +79,7 @@ namespace StockOS.UI.WinForms.Forms
 
         private void txtMonto_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.') && (e.KeyChar != ','))
-            {
-                e.Handled = true;
-            }
+            // La validación y avisos se gestionan mediante ValidadorUI
         }
 
         private void btnSalirApp_Click(object sender, EventArgs e)

@@ -24,6 +24,9 @@ namespace StockOS.UI.WinForms.Forms
             _authService = authService;
             _cajaService = cajaService;
 
+            txtUsuario.MaxLength = 20;
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtUsuario, "DNI");
+
             txtUsuario.TextChanged += (s, e) => { if (!_ignorandoCambios) OcultarError(); };
             txtPassword.TextChanged += (s, e) => { if (!_ignorandoCambios) OcultarError(); };
         }
@@ -56,6 +59,14 @@ namespace StockOS.UI.WinForms.Forms
             if (string.IsNullOrWhiteSpace(dni) || string.IsNullOrWhiteSpace(password))
             {
                 MostrarError("DNI y contraseña son obligatorios.");
+                return;
+            }
+
+            if (!StockOS.UI.WinForms.Helpers.ValidadorUI.EsSoloNumeros(dni))
+            {
+                MostrarError("El DNI debe contener únicamente números.");
+                txtUsuario.Focus();
+                txtUsuario.SelectAll();
                 return;
             }
 
