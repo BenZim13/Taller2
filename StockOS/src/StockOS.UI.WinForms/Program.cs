@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using StockOS.DataAccess.Persistence;
+using StockOS.DataAccess.Services;
 using StockOS.Domain.Interfaces;
 using StockOS.DataAccess.Repositories;
 using StockOS.Application.Services;
@@ -104,10 +105,12 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddScoped<IAuthorizationService, AuthorizationService>();
                         services.AddScoped<ITicketService, TicketService>();
                         services.AddScoped<IConfiguracionService, ConfiguracionService>();
+                        services.AddScoped<IBackupService, BackupService>();
 
                         // Formularios y Vistas
                         services.AddTransient<FormLogin>();
                         services.AddTransient<FormInicio>();
+                        services.AddTransient<FormBackupDatabase>();
                         services.AddTransient<FormRegistroUsuario>();
                         services.AddTransient<UcListarUsuarios>();
                         services.AddTransient<UcUsuarios>();
@@ -143,6 +146,10 @@ namespace StockOS.UI.WinForms.Forms
                             {
                                 formInicio.EstablecerUsuario(usuario);
                                 Log.Information("Usuario autenticado correctamente: {Nombre} {Apellido} (Rol: {IdRol})", usuario.Nombre, usuario.Apellido, usuario.IdRol);
+
+                                // Verificar en segundo plano si corresponde ejecutar un backup periódico programado (Día, Semana, Mes, Año)
+                                var backupService = scope.ServiceProvider.GetRequiredService<IBackupService>();
+                                _ = System.Threading.Tasks.Task.Run(() => backupService.VerificarYEjecutarBackupPendienteAsync());
                             }
 
                             System.Windows.Forms.Application.Run(formInicio);

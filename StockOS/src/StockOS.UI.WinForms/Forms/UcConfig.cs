@@ -1,11 +1,13 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using StockOS.Domain.Interfaces;
 
 namespace StockOS.UI.WinForms.Forms
 {
     public partial class UcConfig : UserControl
     {
+        private readonly IBackupService? _backupService;
         private ContenedorConfigScroll _pnlContenedor = null!;
         private bool _isAdjustingLayout = false;
 
@@ -36,8 +38,13 @@ namespace StockOS.UI.WinForms.Forms
         private RoundedPanel _pnlEmail = null!;
         private Label _lblEmail = null!;
 
-        public UcConfig()
+        public UcConfig() : this(null)
         {
+        }
+
+        public UcConfig(IBackupService? backupService)
+        {
+            _backupService = backupService;
             InitializeComponent();
             InicializarComponentesVisuales();
         }
@@ -107,13 +114,13 @@ namespace StockOS.UI.WinForms.Forms
             _pnlAdmin = CrearTarjeta();
             _lblAdminTitulo = CrearLabelTitulo("🛠️ Administrador de Sistemas");
             _lblAdminDesc = CrearLabelTexto(
-                "Módulo para administración de infraestructura, logs del sistema y utilidades de mantenimiento.\nEsta funcionalidad se encuentra en desarrollo y estará disponible para el administrador en futuras versiones."
+                "Módulo para administración de infraestructura y copias de seguridad de la base de datos SQL Server.\nPermite generar respaldos manuales (.bak) y restaurar el sistema ante contingencias."
             );
 
             _btnAdmin = new Button
             {
-                Text = "Administrador de Sistemas",
-                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
+                Text = "📦 Copias de Seguridad y Respaldo",
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(59, 130, 246),
                 FlatStyle = FlatStyle.Flat,
@@ -124,7 +131,7 @@ namespace StockOS.UI.WinForms.Forms
             _btnAdmin.FlatAppearance.BorderSize = 0;
             _btnAdmin.FlatAppearance.MouseOverBackColor = Color.FromArgb(37, 99, 235);
             _btnAdmin.FlatAppearance.MouseDownBackColor = Color.FromArgb(29, 78, 216);
-            _btnAdmin.Click += (s, e) => { };
+            _btnAdmin.Click += BtnAdmin_Click;
 
             _pnlAdmin.Controls.AddRange(new Control[] { _lblAdminTitulo, _lblAdminDesc, _btnAdmin });
 
@@ -248,7 +255,7 @@ namespace StockOS.UI.WinForms.Forms
                 int yAdmin = 12;
                 PosicionarLabel(_lblAdminTitulo, paddingX, controlWidth, ref yAdmin, 5);
                 PosicionarLabel(_lblAdminDesc, paddingX, controlWidth, ref yAdmin, 8);
-                int btnW = Math.Min(260, controlWidth);
+                int btnW = Math.Min(280, controlWidth);
                 _btnAdmin.Size = new Size(btnW, 36);
                 _btnAdmin.Location = new Point((targetWidth - btnW) / 2, yAdmin);
                 yAdmin += _btnAdmin.Height + 8;
@@ -307,6 +314,19 @@ namespace StockOS.UI.WinForms.Forms
             lbl.Location = new Point(paddingX, currentY);
 
             currentY += altoCalculado + espacioInferior;
+        }
+
+        private void BtnAdmin_Click(object? sender, EventArgs e)
+        {
+            if (_backupService != null)
+            {
+                using var frmBackup = new FormBackupDatabase(_backupService);
+                frmBackup.ShowDialog(this);
+            }
+            else
+            {
+                MessageBox.Show("El servicio de respaldo no se encuentra disponible.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private class ContenedorConfigScroll : Panel

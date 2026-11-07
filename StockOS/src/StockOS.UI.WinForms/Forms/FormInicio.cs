@@ -253,7 +253,7 @@ namespace StockOS.UI.WinForms.Forms
                     break;
                 case "Config.":
                     lblTitulo.Text = "Configuración";
-                    nuevaVista = new UcConfig();
+                    nuevaVista = _serviceProvider.GetRequiredService<UcConfig>();
                     break;
             }
 
