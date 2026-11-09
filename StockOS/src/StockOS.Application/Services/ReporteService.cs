@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,15 +24,21 @@ namespace StockOS.Application.Services
             QuestPDF.Settings.License = LicenseType.Community;
         }
 
+        public async Task<ResumenFinancieroDTO> ObtenerResumenFinancieroAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+        }
         public async Task GenerarReporteVentasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
         {
             _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
 
             var data = await _reporteRepository.ObtenerReporteVentasAsync(fechaInicio, fechaFin);
+            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+
             var titulo = $"StockOS Reporte \"Ventas\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Ventas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
-            
-            GenerarPdf(titulo, data.Total, data.Detalles, fileName);
+
+            GenerarPdf(titulo, data.Total, data.Detalles, resumen, fileName, "Ventas");
         }
 
         public async Task GenerarReporteComprasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
@@ -39,13 +46,15 @@ namespace StockOS.Application.Services
             _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
 
             var data = await _reporteRepository.ObtenerReporteComprasAsync(fechaInicio, fechaFin);
+            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+
             var titulo = $"StockOS Reporte \"Compras\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Compras_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
-            
-            GenerarPdf(titulo, data.Total, data.Detalles, fileName);
+
+            GenerarPdf(titulo, data.Total, data.Detalles, resumen, fileName, "Compras");
         }
 
-        private void GenerarPdf(string titulo, decimal totalGeneral, System.Collections.Generic.IEnumerable<ReporteItemDTO> detalles, string fileName)
+        private void GenerarPdf(string titulo, decimal totalGeneral, IEnumerable<ReporteItemDTO> detalles, ResumenFinancieroDTO resumen, string fileName, string tipoReporte)
         {
             var document = Document.Create(container =>
             {
@@ -57,7 +66,7 @@ namespace StockOS.Application.Services
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
                     page.Header().Element(c => ComposeHeader(c, titulo));
-                    page.Content().Element(c => ComposeContent(c, detalles, totalGeneral));
+                    page.Content().Element(c => ComposeContent(c, detalles, totalGeneral, resumen, tipoReporte));
                     page.Footer().Element(ComposeFooter);
                 });
             });
@@ -94,22 +103,54 @@ namespace StockOS.Application.Services
             });
         }
 
-        private void ComposeContent(IContainer container, System.Collections.Generic.IEnumerable<ReporteItemDTO> detalles, decimal totalGeneral)
+        private void ComposeContent(IContainer container, IEnumerable<ReporteItemDTO> detalles, decimal totalGeneral, ResumenFinancieroDTO resumen, string tipoReporte)
         {
             container.PaddingVertical(1, Unit.Centimetre).Column(column =>
             {
+                // Bloque visual Dinámico según el tipo de reporte
+                column.Item().PaddingBottom(15).Background(Colors.Grey.Lighten4).Padding(10).Column(resumenCol =>
+                {
+                    resumenCol.Item().Text($"Resumen de {tipoReporte} del Período").SemiBold().FontSize(12).FontColor(Colors.Blue.Darken2);
+                    resumenCol.Item().PaddingTop(5).Row(row =>
+                    {
+                        if (tipoReporte == "Ventas")
+                        {
+                            row.RelativeItem().Column(c => {
+                                c.Item().Text("Ingresos Brutos").FontSize(9).FontColor(Colors.Grey.Darken1);
+                                c.Item().Text($"{resumen.IngresosBrutos:C2}").SemiBold().FontSize(11).FontColor(Colors.Green.Darken2);
+                            });
+                            row.RelativeItem().Column(c => {
+                                c.Item().Text("Descuentos").FontSize(9).FontColor(Colors.Grey.Darken1);
+                                c.Item().Text($"{resumen.DescuentosOtorgados:C2}").SemiBold().FontSize(11).FontColor(Colors.Red.Medium);
+                            });
+                            row.RelativeItem().Column(c => {
+                                c.Item().Text("Ingresos Netos").FontSize(9).FontColor(Colors.Grey.Darken1);
+                                c.Item().Text($"{resumen.IngresosNetos:C2}").Bold().FontSize(12).FontColor(Colors.Green.Darken3);
+                            });
+                        }
+                        else if (tipoReporte == "Compras")
+                        {
+                            row.RelativeItem().Column(c => {
+                                c.Item().Text("Total Egresos (Compras)").FontSize(9).FontColor(Colors.Grey.Darken1);
+                                c.Item().Text($"{resumen.EgresosBrutos:C2}").Bold().FontSize(12).FontColor(Colors.Red.Darken2);
+                            });
+                        }
+                    });
+                });
+
+                // Tabla de detalles
+                column.Item().PaddingBottom(5).Text("Detalle de Movimientos").SemiBold().FontSize(12);
                 column.Item().Element(c => ComposeTable(c, detalles));
 
-                column.Item().PaddingTop(15).AlignRight().Text($"Total General: {totalGeneral:C2}")
+                // Total al pie de la tabla
+                column.Item().PaddingTop(15).AlignRight().Text($"Total Listado: {totalGeneral:C2}")
                     .FontSize(14).Bold();
             });
         }
-
-        private void ComposeTable(IContainer container, System.Collections.Generic.IEnumerable<ReporteItemDTO> detalles)
+        private void ComposeTable(IContainer container, IEnumerable<ReporteItemDTO> detalles)
         {
             container.Table(table =>
             {
-                // Definir las columnas
                 table.ColumnsDefinition(columns =>
                 {
                     columns.RelativeColumn(2); // Código
@@ -118,7 +159,6 @@ namespace StockOS.Application.Services
                     columns.RelativeColumn(3); // Subtotal
                 });
 
-                // Header
                 table.Header(header =>
                 {
                     header.Cell().Element(CellStyle).Text("Código");
@@ -132,7 +172,6 @@ namespace StockOS.Application.Services
                     }
                 });
 
-                // Datos
                 foreach (var item in detalles)
                 {
                     table.Cell().Element(CellStyle).Text(item.CodigoBarra);
@@ -145,7 +184,7 @@ namespace StockOS.Application.Services
                         return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                     }
                 }
-                
+
                 if (!detalles.Any())
                 {
                     table.Cell().ColumnSpan(4).PaddingVertical(10).AlignCenter()
@@ -153,7 +192,6 @@ namespace StockOS.Application.Services
                 }
             });
         }
-
         private void ComposeFooter(IContainer container)
         {
             container.AlignCenter().Text(x =>
@@ -163,6 +201,15 @@ namespace StockOS.Application.Services
                 x.Span(" de ");
                 x.TotalPages();
             });
+        }
+        public async Task<IEnumerable<ReporteItemDTO>> ObtenerTopProductosVendidosAsync(int topN, DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _reporteRepository.ObtenerTopProductosVendidosAsync(topN, fechaInicio, fechaFin);
+        }
+
+        public async Task<IEnumerable<VentasPorFechaDTO>> ObtenerVentasPorLineaTiempoAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _reporteRepository.ObtenerVentasPorLineaTiempoAsync(fechaInicio, fechaFin);
         }
     }
 }

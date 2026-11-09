@@ -39,7 +39,8 @@ namespace StockOS.UI.WinForms.Forms
             txtPrecioCompra.MaxLength = 12;
 
             // Restricciones de entrada por teclado con aviso visual emergente (Globos ToolTip)
-            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtCodigoBarra, "Código de Barra");
+             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtNombre, "Nombre del producto");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtCodigoBarra, "Código de Barra");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtStock, "Stock");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecio, "Precio de Venta");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecioCompra, "Precio de Compra");

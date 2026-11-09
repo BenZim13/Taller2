@@ -127,6 +127,72 @@ namespace StockOS.DataAccess.Repositories
 
             return (total, detalles);
         }
+        public async Task<IEnumerable<ReporteItemDTO>> ObtenerTopProductosVendidosAsync(int topN, DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _context.DetalleVentas
+                .Where(dv => dv.IdVentaNavigation.Estado == 1 &&
+                             dv.IdVentaNavigation.FechaHora >= fechaInicio &&
+                             dv.IdVentaNavigation.FechaHora <= fechaFin)
+                .GroupBy(dv => new { dv.IdProductoNavigation.CodigoBarra, dv.IdProductoNavigation.Nombre })
+                .Select(g => new ReporteItemDTO
+                {
+                    CodigoBarra = g.Key.CodigoBarra,
+                    NombreProducto = g.Key.Nombre,
+                    CantidadTotal = g.Sum(dv => dv.Cantidad),
+                    Subtotal = g.Sum(dv => (dv.Cantidad * dv.PrecioUnitarioHistorico) - dv.Descuento)
+                })
+                .OrderByDescending(x => x.CantidadTotal)
+                .Take(topN)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<VentasPorFechaDTO>> ObtenerVentasPorLineaTiempoAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return await _context.Ventas
+                .Where(v => v.Estado == 1 && v.FechaHora >= fechaInicio && v.FechaHora <= fechaFin)
+                .GroupBy(v => v.FechaHora.Date) // Agrupa por el día exacto
+                .Select(g => new VentasPorFechaDTO
+                {
+                    Fecha = g.Key,
+                    TotalVendido = g.Sum(v => v.TotalVenta)
+                })
+                .OrderBy(x => x.Fecha)
+                .ToListAsync();
+        }
+        public async Task<ResumenFinancieroDTO> ObtenerResumenFinancieroAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            var resumen = new ResumenFinancieroDTO();
+
+            // Hacemos un SELECT múltiple para traer todos los totales de un solo viaje a la BD
+            var query = @"
+        SELECT 
+            ISNULL((SELECT SUM(subtotal) FROM venta WHERE estado = 1 AND fecha_hora >= @Inicio AND fecha_hora <= @Fin), 0) AS IngresosBrutos,
+            ISNULL((SELECT SUM(descuento_total) FROM venta WHERE estado = 1 AND fecha_hora >= @Inicio AND fecha_hora <= @Fin), 0) AS Descuentos,
+            ISNULL((SELECT SUM(total_venta) FROM venta WHERE estado = 1 AND fecha_hora >= @Inicio AND fecha_hora <= @Fin), 0) AS IngresosNetos,
+            ISNULL((SELECT SUM(total) FROM compra WHERE fecha_hora >= @Inicio AND fecha_hora <= @Fin), 0) AS EgresosBrutos";
+
+            using (var connection = CreateConnection())
+            {
+                await connection.OpenAsync();
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Inicio", fechaInicio);
+                    cmd.Parameters.AddWithValue("@Fin", fechaFin);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            resumen.IngresosBrutos = Convert.ToDecimal(reader["IngresosBrutos"]);
+                            resumen.DescuentosOtorgados = Convert.ToDecimal(reader["Descuentos"]);
+                            resumen.IngresosNetos = Convert.ToDecimal(reader["IngresosNetos"]);
+                            resumen.EgresosBrutos = Convert.ToDecimal(reader["EgresosBrutos"]);
+                        }
+                    }
+                }
+            }
+            return resumen;
+        }
     }
 }
 
