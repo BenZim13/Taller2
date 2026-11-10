@@ -1,0 +1,172 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>Informe Técnico - Ciclo de Vida de Caja y Carrito de Ventas en StockOS</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+        font-size: 11pt;
+        color: #1e293b;
+        line-height: 1.5;
+        margin: 2cm;
+    }
+    h1 {
+        color: #0f172a;
+        font-size: 18pt;
+        border-bottom: 2px solid #10b981;
+        padding-bottom: 6px;
+        margin-bottom: 12px;
+    }
+    h2 {
+        color: #1e3a8a;
+        font-size: 14pt;
+        margin-top: 22px;
+        margin-bottom: 8px;
+    }
+    h3 {
+        color: #0f172a;
+        font-size: 12pt;
+        margin-top: 16px;
+        margin-bottom: 6px;
+    }
+    .meta {
+        background-color: #f1f5f9;
+        border-left: 4px solid #10b981;
+        padding: 10px 14px;
+        margin-bottom: 20px;
+        font-size: 10.5pt;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 12px;
+        margin-bottom: 16px;
+    }
+    th {
+        background-color: #0f172a;
+        color: #ffffff;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px 10px;
+        border: 1px solid #cbd5e1;
+    }
+    td {
+        padding: 8px 10px;
+        border: 1px solid #cbd5e1;
+        vertical-align: top;
+    }
+    code, pre {
+        font-family: Consolas, 'Courier New', monospace;
+        background-color: #f8fafc;
+        color: #0f172a;
+    }
+    pre {
+        border: 1px solid #cbd5e1;
+        padding: 10px;
+        font-size: 9.5pt;
+    }
+</style>
+</head>
+<body>
+
+<h1>INFORME TÉCNICO: CICLO DE VIDA DE CAJA Y VOLATILIDAD DEL CARRITO DE VENTAS AL CAMBIAR DE PANTALLA</h1>
+
+<div class="meta">
+    <strong>Proyecto:</strong> StockOS — Sistema de Punto de Venta (POS) y Administración de Stock<br>
+    <strong>Módulos Analizados:</strong> Punto de Venta (<code>UcVentas.cs</code>), Navegación Principal (<code>FormInicio.cs</code>), Sesión (<code>SesionActual.cs</code>) e Inyección de Dependencias (<code>Program.cs</code>)<br>
+    <strong>Fecha de Emisión:</strong> Noviembre 2026
+</div>
+
+<h2>1. Planteamiento del Caso Observado</h2>
+<p>Durante la operatoria en el módulo de Ventas se observa el siguiente comportamiento:</p>
+<ol>
+    <li>El operador abre la caja desde el módulo <strong>Ventas</strong> (<code>FormAperturaCaja.cs</code>).</li>
+    <li>Escanea o ingresa productos en el listado de la venta (<code>UcVentas.cs</code>), pero <strong>aún no realiza el cobro</strong>.</li>
+    <li>Sin haber cobrado la venta, cambia de pantalla desde la barra inferior hacia otro módulo (por ejemplo, va a <strong>Inventario</strong> para ingresar stock o consulta el módulo de <strong>Usuarios</strong>).</li>
+    <li>Al regresar a la pantalla de <strong>Ventas</strong>, <strong>la caja continúa abierta</strong>, pero <strong>los productos cargados previamente en el carrito ya no se encuentran en la lista</strong>.</li>
+</ol>
+
+<h2>2. Causas Técnicas en la Arquitectura del Sistema</h2>
+<p>Este comportamiento se debe a la interacción de <strong>tres factores técnicos</strong> definidos en la arquitectura de la capa de presentación e Inyección de Dependencias:</p>
+
+<h3>2.1. Limpieza del Contenedor al Cambiar de Vista (<code>FormInicio.cs</code>)</h3>
+<p>En el formulario principal <code>FormInicio.cs</code>, el método <code>CambiarVista(string nombreVista)</code> administra qué pantalla se muestra cuando el usuario hace clic en la barra inferior (<code>dockPanel</code>):</p>
+<pre>
+private void CambiarVista(string nombreVista)
+{
+    pnlContenedor.Controls.Clear();
+    UserControl? nuevaVista = null;
+
+    switch (nombreVista)
+    {
+        case "Ventas":
+            nuevaVista = _serviceProvider.GetRequiredService&lt;UcVentas&gt;();
+            break;
+        // ...
+    }
+
+    if (nuevaVista != null)
+    {
+        nuevaVista.Dock = DockStyle.Fill;
+        pnlContenedor.Controls.Add(nuevaVista);
+    }
+}
+</pre>
+<ul>
+    <li>Al navegar hacia otro módulo (como <em>Inventario</em> o <em>Usuarios</em>), la instrucción <code>pnlContenedor.Controls.Clear()</code> remueve el control <code>UcVentas</code> actual del contenedor principal.</li>
+    <li>Cuando el usuario vuelve a presionar <strong>Ventas</strong>, se ejecuta nuevamente <code>_serviceProvider.GetRequiredService&lt;UcVentas&gt;()</code>.</li>
+</ul>
+
+<h3>2.2. Registro con Ciclo de Vida <code>Transient</code> en Inyección de Dependencias (<code>Program.cs</code>)</h3>
+<p>En <code>Program.cs</code>, los controles de usuario de las pantallas están registrados en el contenedor de dependencias con ciclo de vida <strong>Transitorio (<code>AddTransient</code>)</strong>:</p>
+<pre>
+services.AddTransient&lt;UcInicio&gt;();
+services.AddTransient&lt;UcInventario&gt;();
+services.AddTransient&lt;UcVentas&gt;();
+services.AddTransient&lt;UcReportes&gt;();
+services.AddTransient&lt;UcConfig&gt;();
+</pre>
+<ul>
+    <li>El registro <code>AddTransient&lt;UcVentas&gt;()</code> indica que <strong>cada vez que se solicita la vista de Ventas, el sistema crea una instancia completamente nueva (<code>new UcVentas(...)</code>)</strong>.</li>
+    <li>La instancia anterior se descarta de memoria al salir de la pestaña, y al volver a entrar se construye un control <code>UcVentas</code> recién inicializado con su grilla vacía.</li>
+</ul>
+
+<h3>2.3. Diferencia entre el Estado de la Caja y el Estado del Carrito (<code>UcVentas.cs</code> vs. <code>SesionActual.cs</code>)</h3>
+<p>La razón por la cual la <strong>caja sigue abierta</strong> pero el <strong>carrito se vacía</strong> radica en dónde se guarda cada dato:</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Elemento</th>
+            <th>Ubicación de Almacenamiento</th>
+            <th>¿Se mantiene al cambiar de pantalla?</th>
+            <th>Explicación Técnica</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Apertura de Caja</strong></td>
+            <td>Base de datos SQL Server (tabla <code>caja_sesion</code>) y clase estática <code>SesionActual.IdCajaSesionActual</code></td>
+            <td><strong>SÍ</strong></td>
+            <td>Al abrir la caja mediante <code>CajaService.AbrirCaja()</code>, el turno queda persistido en la base de datos y vinculado a la sesión activa del cajero hasta que se ejecute el cierre de caja o cierre de sesión.</td>
+        </tr>
+        <tr>
+            <td><strong>Carrito / Ticket pendiente de cobro</strong></td>
+            <td>Memoria interna de la instancia visual <code>UcVentas.cs</code> (filas de <code>dgvTicket.Rows</code> y campos <code>_subtotalVenta</code>, <code>_descuentoTotal</code>, <code>_totalFinal</code>, <code>_ivaProductos</code>)</td>
+            <td><strong>NO</strong></td>
+            <td>Mientras la venta no se cobra, los productos no se guardan en la base de datos ni en <code>SesionActual</code>, sino únicamente en la grilla visual de esa ventana <code>UcVentas</code>. Al recrearse la vista al volver de otro módulo, la grilla inicia en cero.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>3. Ventaja de Integridad de Datos de este Comportamiento</h2>
+<p>En el flujo actual, reiniciar el carrito cuando el usuario sale hacia otros módulos como <strong>Inventario</strong> protege la integridad de los datos de la venta por tres motivos:</p>
+<ol>
+    <li><strong>Actualización de Precios:</strong> Si el usuario sale de Ventas hacia Inventario para registrar un ingreso de stock con un nuevo costo o margen de ganancia, el precio de venta del producto cambia en la base de datos. Si el carrito anterior quedara congelado en pantalla, cobraría con el precio antiguo.</li>
+    <li><strong>Baja o Inactivación de Productos:</strong> Si en el módulo de Inventario se desactiva un producto que había quedado cargado en la grilla de Ventas, al reiniciarse la vista se evita vender un artículo dado de baja.</li>
+    <li><strong>Sincronización Real de Stock:</strong> Cada vez que se escanea un producto en la nueva instancia de <code>UcVentas</code>, se consulta en tiempo real <code>_stockService.ObtenerCantidadActual()</code> contra la base de datos actualizada.</li>
+</ol>
+
+</body>
+</html>
+

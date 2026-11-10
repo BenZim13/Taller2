@@ -168,5 +168,41 @@ namespace StockOS.Application.Tests
             Assert.Equal(new DateTime(2026, 12, 9, 23, 0, 0), BackupService.CalcularProximaEjecucion(PeriodoBackup.Mensual, "23:00", baseDate));
             Assert.Equal(new DateTime(2027, 11, 9, 23, 0, 0), BackupService.CalcularProximaEjecucion(PeriodoBackup.Anual, "23:00", baseDate));
         }
+
+        [Fact]
+        public void FormBackupDatabase_CampoHoraProgramada_NoSeSuperponeConCheckboxNiBoton()
+        {
+            var mockBackup = new Mock<IBackupService>();
+            mockBackup.Setup(b => b.ObtenerProgramacionPeriodica())
+                .Returns(new ConfiguracionBackupPeriodico
+                {
+                    Habilitado = true,
+                    Periodo = PeriodoBackup.Diario,
+                    HoraEjecucion = "23:00",
+                    RutaDestino = @"C:\ProgramData\StockOS\Backups"
+                });
+
+            using var form = new FormBackupDatabase(mockBackup.Object);
+
+            var chkField = typeof(FormBackupDatabase).GetField("chkProgramarAuto", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            var dtpField = typeof(FormBackupDatabase).GetField("dtpHoraProgramada", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            var btnField = typeof(FormBackupDatabase).GetField("btnGuardarProgramacion", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            var cardField = typeof(FormBackupDatabase).GetField("pnlBackupCard", BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+            var chk = (CheckBox)chkField.GetValue(form)!;
+            var dtp = (DateTimePicker)dtpField.GetValue(form)!;
+            var btn = (Button)btnField.GetValue(form)!;
+            var card = (Control)cardField.GetValue(form)!;
+
+            Assert.True(chk.Right + 8 <= dtp.Left,
+                $"chkProgramarAuto.Right ({chk.Right}) se superpone o queda muy pegado a dtpHoraProgramada.Left ({dtp.Left})");
+            Assert.True(dtp.Width >= 90,
+                $"dtpHoraProgramada.Width ({dtp.Width}) debe ser al menos 90px para visualizar HH:mm completo con controles UpDown");
+            Assert.True(dtp.Right + 8 <= btn.Left,
+                $"dtpHoraProgramada.Right ({dtp.Right}) se superpone con btnGuardarProgramacion.Left ({btn.Left})");
+            Assert.True(btn.Right <= card.Width - 20,
+                $"btnGuardarProgramacion.Right ({btn.Right}) desborda el margen derecho de pnlBackupCard ({card.Width})");
+            Assert.Equal("23:00", dtp.Value.ToString("HH:mm"));
+        }
     }
 }

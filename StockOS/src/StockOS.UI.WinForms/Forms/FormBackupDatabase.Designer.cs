@@ -283,22 +283,22 @@ namespace StockOS.UI.WinForms.Forms
             chkProgramarAuto.AutoSize = true;
             chkProgramarAuto.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             chkProgramarAuto.ForeColor = System.Drawing.Color.FromArgb(226, 232, 240);
-            chkProgramarAuto.Location = new System.Drawing.Point(24, 214);
+            chkProgramarAuto.Location = new System.Drawing.Point(24, 213);
             chkProgramarAuto.Name = "chkProgramarAuto";
-            chkProgramarAuto.Size = new System.Drawing.Size(375, 19);
+            chkProgramarAuto.Size = new System.Drawing.Size(392, 19);
             chkProgramarAuto.TabIndex = 11;
             chkProgramarAuto.Text = "⏰ Activar backup automático para el período elegido a las:";
             chkProgramarAuto.UseVisualStyleBackColor = true;
             // 
             // dtpHoraProgramada
             // 
-            dtpHoraProgramada.CustomFormat = "HH:mm";
-            dtpHoraProgramada.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            dtpHoraProgramada.CustomFormat = " HH:mm";
+            dtpHoraProgramada.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             dtpHoraProgramada.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            dtpHoraProgramada.Location = new System.Drawing.Point(408, 210);
+            dtpHoraProgramada.Location = new System.Drawing.Point(428, 209);
             dtpHoraProgramada.Name = "dtpHoraProgramada";
             dtpHoraProgramada.ShowUpDown = true;
-            dtpHoraProgramada.Size = new System.Drawing.Size(78, 24);
+            dtpHoraProgramada.Size = new System.Drawing.Size(92, 25);
             dtpHoraProgramada.TabIndex = 12;
             // 
             // btnGuardarProgramacion
@@ -309,9 +309,9 @@ namespace StockOS.UI.WinForms.Forms
             btnGuardarProgramacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnGuardarProgramacion.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             btnGuardarProgramacion.ForeColor = System.Drawing.Color.White;
-            btnGuardarProgramacion.Location = new System.Drawing.Point(500, 209);
+            btnGuardarProgramacion.Location = new System.Drawing.Point(534, 208);
             btnGuardarProgramacion.Name = "btnGuardarProgramacion";
-            btnGuardarProgramacion.Size = new System.Drawing.Size(214, 28);
+            btnGuardarProgramacion.Size = new System.Drawing.Size(180, 28);
             btnGuardarProgramacion.TabIndex = 13;
             btnGuardarProgramacion.Text = "Guardar Programación";
             btnGuardarProgramacion.UseVisualStyleBackColor = false;

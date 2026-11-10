@@ -156,6 +156,22 @@ flowchart TD
 | **6** | `DatabaseScripts/` | [`00_CreacionCompleta.sql`](file:///c:/Proyecto/StockOS/DatabaseScripts/00_CreacionCompleta.sql) y [`07_Correcciones_Sps_Auditoria.sql`](file:///c:/Proyecto/StockOS/DatabaseScripts/07_Correcciones_Sps_Auditoria.sql) | **Motor SQL Server:** Ejecuta dentro de la misma transacción:<br>1. `sp_Ventas_Insertar` (tabla `venta`).<br>2. `sp_DetalleVenta_Insertar` (tabla `detalle_venta`).<br>3. `sp_Stock_Descontar` (descuenta en `stock_sucursal` validando `stock_actual >= CantidadAVender`).<br>4. `sp_Pago_Insertar` (registra el cobro en `pago` para el arqueo de caja). |
 | **7** | `src/StockOS.Application/Reports/` | [`TicketService.cs`](file:///c:/Proyecto/StockOS/src/StockOS.Application/Reports/TicketService.cs) (`GenerarTicketPdf`) | Confirmado el `Commit()` en base de datos, toma los datos del comercio desde [`ConfiguracionService.cs`](file:///c:/Proyecto/StockOS/src/StockOS.Application/Services/ConfiguracionService.cs) (`appsettings.json`) y construye el comprobante PDF con desglose de IVA e importe total. |
 
+### 3.3. Ciclo de Vida de la Vista de Ventas (`UcVentas`), Persistencia de Caja vs. Volatilidad del Carrito al Cambiar de Módulo
+
+Cuando un operador abre la caja, carga productos en la grilla de venta sin finalizar el cobro, navega hacia otro módulo del sistema (por ejemplo **Inventario** para ingresar stock o **Usuarios**) y luego regresa a **Ventas**, se observa que **la sesión de caja continúa abierta, pero el carrito pendiente de cobro se reinicia vacío**. Este comportamiento responde directamente al diseño arquitectónico de inyección de dependencias y navegación de vistas:
+
+1. **Limpieza del contenedor principal en [`FormInicio.cs`](file:///c:/Proyecto/StockOS/src/StockOS.UI.WinForms/Forms/FormInicio.cs) (`CambiarVista`):**
+   - Al seleccionar cualquier pestaña en la barra inferior (`dockPanel`), el método `CambiarVista(string nombreVista)` ejecuta `pnlContenedor.Controls.Clear()`, desmontando el control de usuario activo de la interfaz gráfica.
+   - Al volver a seleccionar `"Ventas"`, invoca `_serviceProvider.GetRequiredService<UcVentas>()`.
+2. **Tiempo de vida `Transient` en [`Program.cs`](file:///c:/Proyecto/StockOS/src/StockOS.UI.WinForms/Program.cs):**
+   - El control [`UcVentas`](file:///c:/Proyecto/StockOS/src/StockOS.UI.WinForms/Forms/UcVentas.cs) está registrado en el contenedor de Inyección de Dependencias mediante `services.AddTransient<UcVentas>()`.
+   - El ciclo de vida `Transient` instruye al proveedor de servicios a **instanciar un objeto nuevo (`new UcVentas(...)`) en cada solicitud**, en lugar de conservar la instancia previa en memoria durante la sesión (`Scoped` o caché de vista).
+3. **Almacenamiento en memoria local del control (`UcVentas.cs`):**
+   - Mientras la venta no ha sido cobrada, los renglones cargados residen exclusivamente en estructuras en memoria propias de esa instancia visual de [`UcVentas.cs`](file:///c:/Proyecto/StockOS/src/StockOS.UI.WinForms/Forms/UcVentas.cs): las filas de `dgvTicket.Rows` y los campos privados `_subtotalVenta`, `_descuentoTotal`, `_totalFinal` e `_ivaProductos`.
+   - En cambio, **la apertura de caja** sí persiste al cambiar de pantalla porque su estado se almacena en la tabla `caja_sesion` de SQL Server y en la propiedad estática de sesión [`SesionActual.IdCajaSesionActual`](file:///c:/Proyecto/StockOS/src/StockOS.Application/Services/SesionActual.cs).
+4. **Propósito de Integridad de Stock y Precios:**
+   - Al recrear `UcVentas` tras pasar por módulos como **Inventario** (donde pudo haberse modificado el precio de venta, desactivado un producto o alterado el stock disponible), se evita que un carrito en memoria retenga precios desactualizados o cantidades validadas contra un stock que ya cambió antes de concretar la transacción.
+
 ---
 
 ## 4. Flujo de Copias de Seguridad por Períodos (Backup & Restore)

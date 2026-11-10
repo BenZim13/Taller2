@@ -24,7 +24,43 @@ namespace StockOS.UI.WinForms.Forms
             _backupService = backupService;
             _authService = authService;
             InitializeComponent();
+            AjustarLayoutProgramacion();
             InicializarValores();
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            AjustarLayoutProgramacion();
+        }
+
+        private void AjustarLayoutProgramacion()
+        {
+            const int margenDerechoCard = 714;
+            const int separacionChkHora = 10;
+            const int separacionHoraBoton = 14;
+
+            int minLeftDtp = chkProgramarAuto.Right + separacionChkHora;
+            if (dtpHoraProgramada.Left < minLeftDtp)
+            {
+                dtpHoraProgramada.Left = minLeftDtp;
+            }
+
+            if (dtpHoraProgramada.Width < 90)
+            {
+                dtpHoraProgramada.Width = 90;
+            }
+
+            int leftBoton = dtpHoraProgramada.Right + separacionHoraBoton;
+            btnGuardarProgramacion.Left = leftBoton;
+
+            int anchoDisponibleBoton = margenDerechoCard - leftBoton;
+            if (anchoDisponibleBoton >= 150)
+            {
+                btnGuardarProgramacion.Width = anchoDisponibleBoton;
+            }
+
+            dtpHoraProgramada.BringToFront();
         }
 
         private bool ValidarAccesoAdministrador()
