@@ -175,24 +175,38 @@ namespace StockOS.UI.WinForms.Forms
                 MarkerStyle = MarkerStyle.Circle,
                 MarkerSize = 8,
                 IsValueShownAsLabel = false,
-                // 1. CLAVE: Le decimos al gráfico que va a recibir Fechas reales, no textos
                 XValueType = ChartValueType.Date
             };
 
             foreach (var item in datos)
             {
-                // 2. CLAVE: Le pasamos 'item.Fecha' directo (objeto DateTime), sin el ToString()
                 serie.Points.AddXY(item.Fecha, item.TotalVendido);
             }
 
             chartLineaTiempo.Series.Add(serie);
 
-            // 3. CLAVE: Le damos el formato visual al eje X para que diga "19/sept"
+            // 1. Formato visual de la fecha
             chartLineaTiempo.ChartAreas[0].AxisX.LabelStyle.Format = "dd/MMM";
 
-            // Opcional: aseguramos que muestre etiquetas para cada día si el rango es corto
-            chartLineaTiempo.ChartAreas[0].AxisX.IntervalType = DateTimeIntervalType.Days;
-            chartLineaTiempo.ChartAreas[0].AxisX.Interval = 1;
+            // 2. Dejamos que el gráfico calcule automáticamente el salto de fechas para no superponer textos
+            chartLineaTiempo.ChartAreas[0].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
+            chartLineaTiempo.ChartAreas[0].AxisX.IsLabelAutoFit = true;
+            chartLineaTiempo.ChartAreas[0].AxisX.LabelAutoFitStyle = LabelAutoFitStyles.StaggeredLabels | LabelAutoFitStyles.LabelsAngleStep30;
+
+            // 3. HABILITAR ZOOM Y SCROLL
+            // Permite al usuario hacer clic y arrastrar para seleccionar un rango
+            chartLineaTiempo.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chartLineaTiempo.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+
+            // Activa la barra de desplazamiento (Scrollbar)
+            chartLineaTiempo.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chartLineaTiempo.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            chartLineaTiempo.ChartAreas[0].AxisX.ScrollBar.Size = 14;
+
+            // Estilizamos la barra de desplazamiento para que combine con el Modo Oscuro
+            chartLineaTiempo.ChartAreas[0].AxisX.ScrollBar.BackColor = Color.FromArgb(40, 53, 72);
+            chartLineaTiempo.ChartAreas[0].AxisX.ScrollBar.ButtonColor = Color.FromArgb(100, 116, 139);
+            chartLineaTiempo.ChartAreas[0].AxisX.ScrollBar.LineColor = Color.White;
         }
 
         private async void BtnGenerarPdf_Click(object? sender, EventArgs e)
