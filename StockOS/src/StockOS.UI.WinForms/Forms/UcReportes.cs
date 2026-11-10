@@ -167,22 +167,31 @@ namespace StockOS.UI.WinForms.Forms
 
             Series serie = new Series("Ingresos")
             {
-                ChartType = SeriesChartType.SplineArea, // SplineArea queda muy bien con tema oscuro
+                ChartType = SeriesChartType.SplineArea,
                 BorderWidth = 3,
-                Color = Color.FromArgb(14, 165, 233), // Celeste/Azul StockOS
+                Color = Color.FromArgb(14, 165, 233),
                 BackGradientStyle = GradientStyle.TopBottom,
                 BackSecondaryColor = Color.Transparent,
                 MarkerStyle = MarkerStyle.Circle,
                 MarkerSize = 8,
-                IsValueShownAsLabel = false
+                IsValueShownAsLabel = false,
+                // 1. CLAVE: Le decimos al gráfico que va a recibir Fechas reales, no textos
+                XValueType = ChartValueType.Date
             };
 
             foreach (var item in datos)
             {
-                serie.Points.AddXY(item.Fecha.ToString("dd/MMM"), item.TotalVendido);
+                // 2. CLAVE: Le pasamos 'item.Fecha' directo (objeto DateTime), sin el ToString()
+                serie.Points.AddXY(item.Fecha, item.TotalVendido);
             }
 
             chartLineaTiempo.Series.Add(serie);
+
+            // 3. CLAVE: Le damos el formato visual al eje X para que diga "19/sept"
+            chartLineaTiempo.ChartAreas[0].AxisX.LabelStyle.Format = "dd/MMM";
+
+            // Opcional: aseguramos que muestre etiquetas para cada día si el rango es corto
+            chartLineaTiempo.ChartAreas[0].AxisX.IntervalType = DateTimeIntervalType.Days;
             chartLineaTiempo.ChartAreas[0].AxisX.Interval = 1;
         }
 

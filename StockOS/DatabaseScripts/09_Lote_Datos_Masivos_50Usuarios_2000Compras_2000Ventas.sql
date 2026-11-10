@@ -137,7 +137,7 @@ BEGIN TRY
     PRINT 'Paso 1/4 -> Generando lote de 50 usuarios (15 dados de baja y 35 activos)...';
 
     -- Asegurar que el usuario Admin de prueba (43000111 / admin123) siempre exista
-    IF NOT EXISTS (SELECT 1 FROM empleado WHERE dni = '43000111')
+    IF NOT EXISTS (SELECT 1 FROM empleado WHERE email = 'admin@stockos.com' OR dni = '43000111')
     BEGIN
         INSERT INTO empleado (nombre, apellido, dni, email, direccion, telefono, password_hash, estado, id_rol, id_sucursal)
         VALUES ('Admin', '1', '43000111', 'admin@stockos.com', 'Sin especificar', '3794562092', '$2a$11$sOYBDzMcMNbkep7brvXLNec8OyiG84BDlNbPWyAev8qt/oZ5ZXkyi', 1, 1, @IdSucursal);
