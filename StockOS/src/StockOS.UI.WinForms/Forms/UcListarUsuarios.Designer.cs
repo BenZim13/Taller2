@@ -21,6 +21,7 @@ namespace StockOS.UI.WinForms.Forms
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlHeaderLista = new Panel();
+            btnNuevo = new Button();
             btnVolver = new Button();
             btnRecargar = new Button();
             btnDarBaja = new Button();
@@ -40,6 +41,7 @@ namespace StockOS.UI.WinForms.Forms
             // pnlHeaderLista
             // 
             pnlHeaderLista.BackColor = Color.FromArgb(30, 41, 59);
+            pnlHeaderLista.Controls.Add(btnNuevo);
             pnlHeaderLista.Controls.Add(btnVolver);
             pnlHeaderLista.Controls.Add(btnRecargar);
             pnlHeaderLista.Controls.Add(btnDarBaja);
@@ -51,6 +53,22 @@ namespace StockOS.UI.WinForms.Forms
             pnlHeaderLista.Padding = new Padding(25, 10, 25, 5);
             pnlHeaderLista.Size = new Size(1000, 50);
             pnlHeaderLista.TabIndex = 0;
+            // 
+            // btnNuevo
+            // 
+            btnNuevo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnNuevo.BackColor = Color.FromArgb(16, 185, 129);
+            btnNuevo.Cursor = Cursors.Hand;
+            btnNuevo.FlatAppearance.BorderSize = 0;
+            btnNuevo.FlatStyle = FlatStyle.Flat;
+            btnNuevo.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnNuevo.ForeColor = Color.White;
+            btnNuevo.Location = new Point(505, 10);
+            btnNuevo.Name = "btnNuevo";
+            btnNuevo.Size = new Size(120, 32);
+            btnNuevo.TabIndex = 0;
+            btnNuevo.Text = "+ Nuevo";
+            btnNuevo.UseVisualStyleBackColor = false;
             // 
             // btnVolver
             // 
@@ -66,6 +84,7 @@ namespace StockOS.UI.WinForms.Forms
             btnVolver.TabIndex = 4;
             btnVolver.Text = "← Volver";
             btnVolver.UseVisualStyleBackColor = false;
+            btnVolver.Visible = false;
             // 
             // btnRecargar
             // 
@@ -120,7 +139,7 @@ namespace StockOS.UI.WinForms.Forms
             lblTituloLista.AutoSize = true;
             lblTituloLista.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             lblTituloLista.ForeColor = Color.White;
-            lblTituloLista.Location = new Point(120, 7);
+            lblTituloLista.Location = new Point(25, 7);
             lblTituloLista.Name = "lblTituloLista";
             lblTituloLista.Size = new Size(183, 30);
             lblTituloLista.TabIndex = 0;
@@ -257,6 +276,7 @@ namespace StockOS.UI.WinForms.Forms
 
         private Panel pnlHeaderLista;
         private Label lblTituloLista;
+        private Button btnNuevo;
         private Button btnEditar;
         private Button btnDarBaja;
         private Button btnRecargar;

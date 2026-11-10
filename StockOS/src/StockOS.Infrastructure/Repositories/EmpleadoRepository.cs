@@ -22,6 +22,7 @@ namespace StockOS.DataAccess.Repositories
         public Empleado? ObtenerPorEmail(string email)
         {
             return _context.Empleados
+                .AsNoTracking()
                 .Include(e => e.IdRolNavigation)
                 .Include(e => e.IdSucursalNavigation)
                 .FirstOrDefault(e => e.Email == email);
@@ -69,6 +70,7 @@ namespace StockOS.DataAccess.Repositories
         public Empleado? ObtenerPorId(int id)
         {
             return _context.Empleados
+                .AsNoTracking()
                 .Include(e => e.IdRolNavigation)
                 .Include(e => e.IdSucursalNavigation)
                 .FirstOrDefault(e => e.IdEmpleado == id);
@@ -77,6 +79,7 @@ namespace StockOS.DataAccess.Repositories
         public IEnumerable<Empleado> ObtenerTodos()
         {
             return _context.Empleados
+                .AsNoTracking()
                 .Include(e => e.IdRolNavigation)
                 .Include(e => e.IdSucursalNavigation)
                 .ToList();

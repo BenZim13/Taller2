@@ -243,7 +243,7 @@ namespace StockOS.UI.WinForms.Forms
                     var auth = _serviceProvider.GetRequiredService<StockOS.Domain.Interfaces.IAuthorizationService>();
                     if (auth.TienePermiso(Permisos.USUARIOS_VER))
                     {
-                        nuevaVista = _serviceProvider.GetRequiredService<UcUsuarios>();
+                        nuevaVista = _serviceProvider.GetRequiredService<UcListarUsuarios>();
                     }
                     else
                     {

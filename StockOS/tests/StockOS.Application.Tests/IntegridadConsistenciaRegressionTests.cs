@@ -741,6 +741,186 @@ namespace StockOS.Application.Tests
             string pdfHeader = System.Text.Encoding.ASCII.GetString(pdfBytes, 0, Math.Min(5, pdfBytes.Length));
             Assert.StartsWith("%PDF", pdfHeader);
         }
+
+        // =========================================================================
+        // 8. PRUEBAS DE INTEGRIDAD DEL MÓDULO USUARIOS (VISTA DIRECTA + MODAL)
+        // =========================================================================
+        [Fact]
+        public void FormInicio_CambiarVistaUsuarios_CargaDirectamenteUcListarUsuarios()
+        {
+            RunInSta(() =>
+            {
+                var gerente = new Empleado { IdEmpleado = 1, IdRol = (int)RolUsuario.Gerente, IdSucursal = 1, Nombre = "Admin", Apellido = "Principal" };
+                SesionActual.Usuario = gerente;
+
+                var services = new ServiceCollection();
+                var mockEmpService = new Mock<IEmpleadoService>();
+                mockEmpService.Setup(s => s.ObtenerTodos()).Returns(new List<Empleado>());
+                services.AddScoped(_ => mockEmpService.Object);
+                services.AddScoped<IAuthorizationService, AuthorizationService>();
+                services.AddScoped(_ => new Mock<ICajaService>().Object);
+                services.AddTransient<UcListarUsuarios>();
+                services.AddTransient<FormInicio>();
+
+                using var sp = services.BuildServiceProvider();
+                using var formInicio = sp.GetRequiredService<FormInicio>();
+                formInicio.EstablecerUsuario(gerente);
+
+                var cambiarVista = typeof(FormInicio).GetMethod("CambiarVista", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                cambiarVista.Invoke(formInicio, new object[] { "Usuarios" });
+
+                var pnlContenedor = (Panel)typeof(FormInicio).GetField("pnlContenedor", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(formInicio)!;
+                Assert.Single(pnlContenedor.Controls);
+                Assert.IsType<UcListarUsuarios>(pnlContenedor.Controls[0]);
+            });
+        }
+
+        [Fact]
+        public void UcListarUsuarios_EstructuraVisualYResponsividad_CumpleEstandarGeneral()
+        {
+            RunInSta(() =>
+            {
+                var gerente = new Empleado { IdEmpleado = 1, IdRol = (int)RolUsuario.Gerente, IdSucursal = 1 };
+                SesionActual.Usuario = gerente;
+
+                var mockEmpService = new Mock<IEmpleadoService>();
+                mockEmpService.Setup(s => s.ObtenerTodos()).Returns(new List<Empleado>());
+                var mockSp = new Mock<IServiceProvider>();
+                var authService = new AuthorizationService();
+
+                using var uc = new UcListarUsuarios(mockEmpService.Object, mockSp.Object, authService);
+                uc.Size = new Size(1000, 700);
+
+                var btnNuevo = (Button)typeof(UcListarUsuarios).GetField("btnNuevo", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnEditar = (Button)typeof(UcListarUsuarios).GetField("btnEditar", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnDarBaja = (Button)typeof(UcListarUsuarios).GetField("btnDarBaja", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnRecargar = (Button)typeof(UcListarUsuarios).GetField("btnRecargar", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnVolver = (Button)typeof(UcListarUsuarios).GetField("btnVolver", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var lblTitulo = (Label)typeof(UcListarUsuarios).GetField("lblTituloLista", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+
+                // Verificar diseño del botón Nuevo y cabecera
+                Assert.Equal("+ Nuevo", btnNuevo.Text);
+                Assert.Equal(Color.FromArgb(16, 185, 129), btnNuevo.BackColor);
+                Assert.Equal(AnchorStyles.Top | AnchorStyles.Right, btnNuevo.Anchor);
+                Assert.False(btnVolver.Visible);
+                Assert.Equal(25, lblTitulo.Left);
+
+                // Verificar orden horizontal sin solapamientos
+                Assert.True(btnNuevo.Right <= btnEditar.Left);
+                Assert.True(btnEditar.Right <= btnDarBaja.Left);
+                Assert.True(btnDarBaja.Right <= btnRecargar.Left);
+
+                // Verificar responsividad al expandir el ancho a 1600px
+                int distanciaDerechaOriginal = uc.Width - btnNuevo.Right;
+                uc.Size = new Size(1600, 900);
+                int distanciaDerechaExpandida = uc.Width - btnNuevo.Right;
+
+                Assert.Equal(distanciaDerechaOriginal, distanciaDerechaExpandida);
+                Assert.True(lblTitulo.Right < btnNuevo.Left);
+            });
+        }
+
+        [Theory]
+        [InlineData((int)RolUsuario.Gerente, true, true)]
+        [InlineData((int)RolUsuario.Cajero, false, false)]
+        [InlineData((int)RolUsuario.EncargadoDeposito, false, false)]
+        [InlineData((int)RolUsuario.Repositor, false, false)]
+        public void UcListarUsuarios_PermisosSegunRol_ControlaVisibilidadYAcciones(int idRol, bool puedeCrear, bool puedeEditar)
+        {
+            RunInSta(() =>
+            {
+                SesionActual.Usuario = new Empleado { IdEmpleado = 10, IdRol = idRol, IdSucursal = 1 };
+
+                var mockEmpService = new Mock<IEmpleadoService>();
+                mockEmpService.Setup(s => s.ObtenerTodos()).Returns(new List<Empleado>());
+                var mockSp = new Mock<IServiceProvider>();
+                var authService = new AuthorizationService();
+
+                using var uc = new UcListarUsuarios(mockEmpService.Object, mockSp.Object, authService);
+
+                var btnNuevo = (Button)typeof(UcListarUsuarios).GetField("btnNuevo", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnEditar = (Button)typeof(UcListarUsuarios).GetField("btnEditar", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+                var btnDarBaja = (Button)typeof(UcListarUsuarios).GetField("btnDarBaja", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(uc)!;
+
+                Assert.Equal(puedeCrear, btnNuevo.Visible);
+                Assert.Equal(puedeEditar, btnEditar.Visible);
+                Assert.Equal(puedeEditar, btnDarBaja.Visible);
+            });
+        }
+
+        [Fact]
+        public void FormRegistroUsuario_ModalEstandarYReglasDeNegocio_FuncionaSinErrores()
+        {
+            RunInSta(() =>
+            {
+                SesionActual.Usuario = new Empleado { IdEmpleado = 1, IdRol = (int)RolUsuario.Gerente, IdSucursal = 1 };
+
+                var mockEmpService = new Mock<IEmpleadoService>();
+                var mockSucService = new Mock<ISucursalService>();
+                var mockRolService = new Mock<IRolService>();
+                var mockAuthService = new Mock<IAuthService>();
+                var authzService = new AuthorizationService();
+
+                mockSucService.Setup(s => s.ObtenerSucursales()).Returns(new List<Sucursal> { new Sucursal { IdSucursal = 1, Nombre = "Casa Central" } });
+                mockRolService.Setup(r => r.ObtenerRoles()).Returns(new List<Rol> { new Rol { IdRol = 1, Nombre = "Administrador" }, new Rol { IdRol = 2, Nombre = "Cajero" } });
+
+                using var form = new FormRegistroUsuario(mockEmpService.Object, mockSucService.Object, mockRolService.Object, mockAuthService.Object, authzService);
+
+                // 1. Validar propiedades visuales de Modal
+                Assert.Equal(FormBorderStyle.FixedDialog, form.FormBorderStyle);
+                Assert.Equal(FormStartPosition.CenterScreen, form.StartPosition);
+                Assert.False(form.MaximizeBox);
+                Assert.False(form.MinimizeBox);
+                Assert.Equal(new Size(560, 435), form.ClientSize);
+
+                var pnlHeader = (Panel)typeof(FormRegistroUsuario).GetField("pnlHeader", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
+                var btnSalirApp = (Button)typeof(FormRegistroUsuario).GetField("btnSalirApp", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
+                var btnGuardar = (Button)typeof(FormRegistroUsuario).GetField("btnGuardar", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
+                var btnCancelar = (Button)typeof(FormRegistroUsuario).GetField("btnCancelar", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
+
+                Assert.Equal(Color.FromArgb(15, 23, 42), pnlHeader.BackColor);
+                Assert.Equal("Cerrar", btnSalirApp.Text);
+                Assert.Equal(Color.FromArgb(16, 185, 129), btnGuardar.BackColor);
+                Assert.Equal(Color.FromArgb(71, 85, 105), btnCancelar.BackColor);
+
+                // 2. Validar carga de combos y edición no destructiva ante fallo
+                var loadMethod = typeof(FormRegistroUsuario).GetMethod("FormRegistroUsuario_Load", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                var empExistente = new Empleado
+                {
+                    IdEmpleado = 7,
+                    Dni = "30111222",
+                    Nombre = "Carlos",
+                    Apellido = "Gomez",
+                    Email = "carlos@stockos.com",
+                    Direccion = "Calle 123",
+                    Telefono = "3794000111",
+                    IdRol = 2,
+                    IdSucursal = 1,
+                    Estado = true,
+                    PasswordHash = "$2a$11$hashoriginal"
+                };
+
+                form.PrepararParaEdicion(empExistente);
+                loadMethod.Invoke(form, new object?[] { null, EventArgs.Empty });
+
+                // Simular intento de actualización que falla por DNI duplicado
+                mockEmpService.Setup(s => s.ActualizarAsync(It.IsAny<Empleado>()))
+                              .ReturnsAsync((false, "El DNI ya se encuentra registrado por otro empleado."));
+
+                string? ultimoMensaje = null;
+                FormRegistroUsuario.MostrarMensaje = (msg, title, btns, icon) => { ultimoMensaje = msg; };
+
+                var txtNombre = (TextBox)typeof(FormRegistroUsuario).GetField("txtNombre", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(form)!;
+                txtNombre.Text = "NombreFallido";
+
+                var guardarMethod = typeof(FormRegistroUsuario).GetMethod("btnGuardar_Click", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                guardarMethod.Invoke(form, new object?[] { null, EventArgs.Empty });
+
+                // La entidad original en memoria NO debe haberse corrompido tras el fallo
+                Assert.Equal("Carlos", empExistente.Nombre);
+                Assert.Contains("DNI ya se encuentra registrado", ultimoMensaje);
+            });
+        }
     }
 }
 
