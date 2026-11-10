@@ -167,6 +167,30 @@ namespace StockOS.UI.WinForms.Helpers
         }
 
         /// <summary>
+        /// Restringe el campo para nombres comerciales de productos (letras, números, espacios y signos de medida habituales como '.', '-', '/', '%').
+        /// Bloquea símbolos especiales inválidos mostrando aviso explicativo.
+        /// </summary>
+        public static void ConfigurarNombreProducto(TextBox textBox, string nombreCampo = "Nombre del Producto")
+        {
+            if (textBox == null) return;
+
+            textBox.KeyPress += (s, e) =>
+            {
+                if (char.IsControl(e.KeyChar)) return;
+
+                if (EsCaracterValidoNombreProducto(e.KeyChar)) return;
+
+                e.Handled = true;
+                MostrarAviso(textBox, $"El campo '{nombreCampo}' admite letras, números, espacios y signos de unidad (., -, /, %), pero no símbolos especiales.", "Carácter no permitido");
+            };
+        }
+
+        private static bool EsCaracterValidoNombreProducto(char c)
+        {
+            return char.IsLetterOrDigit(c) || c == ' ' || c == '.' || c == ',' || c == '-' || c == '/' || c == '%' || c == '(' || c == ')' || c == '\'' || c == '°' || c == 'º';
+        }
+
+        /// <summary>
         /// Restringe el campo para CUIT (números y guiones).
         /// Bloquea letras mostrando aviso explicativo.
         /// </summary>
@@ -251,6 +275,21 @@ namespace StockOS.UI.WinForms.Helpers
         {
             if (string.IsNullOrWhiteSpace(texto)) return false;
             return texto.All(char.IsLetterOrDigit);
+        }
+
+        /// <summary>
+        /// Verifica si la cadena corresponde a un nombre de producto válido (contiene al menos una letra o número y solo caracteres comerciales permitidos).
+        /// </summary>
+        public static bool EsNombreProductoValido(string? texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return false;
+            bool tieneAlfanumerico = false;
+            foreach (char c in texto)
+            {
+                if (char.IsLetterOrDigit(c)) tieneAlfanumerico = true;
+                if (!EsCaracterValidoNombreProducto(c)) return false;
+            }
+            return tieneAlfanumerico;
         }
 
         /// <summary>

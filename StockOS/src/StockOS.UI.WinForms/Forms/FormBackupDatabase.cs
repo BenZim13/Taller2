@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using StockOS.Application.Services;
 using StockOS.Domain.Enums;
 using StockOS.Domain.Interfaces;
 
@@ -10,14 +11,38 @@ namespace StockOS.UI.WinForms.Forms
     public partial class FormBackupDatabase : Form
     {
         private readonly IBackupService _backupService;
+        private readonly IAuthorizationService? _authService;
         private PeriodoBackup _periodoSeleccionado = PeriodoBackup.Diario;
         private bool _isBusy = false;
 
-        public FormBackupDatabase(IBackupService backupService)
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
+
+        public FormBackupDatabase(IBackupService backupService, IAuthorizationService? authService = null)
         {
             _backupService = backupService;
+            _authService = authService;
             InitializeComponent();
             InicializarValores();
+        }
+
+        private bool ValidarAccesoAdministrador()
+        {
+            bool autorizado = _authService != null
+                ? _authService.TienePermiso(Permisos.CONFIGURACION_GESTIONAR)
+                : (SesionActual.Usuario != null && SesionActual.Usuario.IdRol == 1);
+
+            if (!autorizado)
+            {
+                MostrarMensaje(
+                    "Operación denegada. Solo el Administrador puede ejecutar copias de seguridad o restaurar la base de datos.",
+                    "Acceso Restringido",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+
+            return autorizado;
         }
 
         private void InicializarValores()
@@ -126,11 +151,12 @@ namespace StockOS.UI.WinForms.Forms
         private async void btnGuardarProgramacion_Click(object? sender, EventArgs e)
         {
             if (_isBusy) return;
+            if (!ValidarAccesoAdministrador()) return;
 
             string destino = txtRutaDestino.Text.Trim();
             if (string.IsNullOrWhiteSpace(destino))
             {
-                MessageBox.Show("Por favor indique una carpeta raíz de destino válida.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Por favor indique una carpeta raíz de destino válida.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -164,12 +190,16 @@ namespace StockOS.UI.WinForms.Forms
                         lblBackupEstado.Text = "Programación automática desactivada.";
                     }
 
-                    MessageBox.Show(resultado.Mensaje, "Programación de Respaldo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MostrarMensaje(resultado.Mensaje, "Programación de Respaldo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(resultado.Mensaje, "Error al Programar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MostrarMensaje(resultado.Mensaje, "Error al Programar", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+            catch (UnauthorizedAccessException exAuth)
+            {
+                MostrarMensaje(exAuth.Message, "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
             {
@@ -181,7 +211,7 @@ namespace StockOS.UI.WinForms.Forms
         {
             if (_isBusy)
             {
-                MessageBox.Show("Hay una operación de base de datos en curso. Por favor espere a que finalice.", "Operación en progreso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Hay una operación de base de datos en curso. Por favor espere a que finalice.", "Operación en progreso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             this.Close();
@@ -209,11 +239,12 @@ namespace StockOS.UI.WinForms.Forms
         private async void btnGenerarBackup_Click(object? sender, EventArgs e)
         {
             if (_isBusy) return;
+            if (!ValidarAccesoAdministrador()) return;
 
             string destino = txtRutaDestino.Text.Trim();
             if (string.IsNullOrWhiteSpace(destino))
             {
-                MessageBox.Show("Por favor indique una carpeta de destino válida.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Por favor indique una carpeta de destino válida.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -227,20 +258,26 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     lblBackupEstado.ForeColor = Color.FromArgb(74, 222, 128);
                     lblBackupEstado.Text = $"Último backup ({_periodoSeleccionado}): {DateTime.Now:HH:mm:ss} - Completado";
-                    MessageBox.Show(resultado.Mensaje, "Backup por Período Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MostrarMensaje(resultado.Mensaje, "Backup por Período Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
                     lblBackupEstado.ForeColor = Color.FromArgb(248, 113, 113);
                     lblBackupEstado.Text = "Error al generar la copia de seguridad.";
-                    MessageBox.Show(resultado.Mensaje, "Error al generar Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MostrarMensaje(resultado.Mensaje, "Error al generar Backup", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+            catch (UnauthorizedAccessException exAuth)
+            {
+                lblBackupEstado.ForeColor = Color.FromArgb(248, 113, 113);
+                lblBackupEstado.Text = "Acceso denegado.";
+                MostrarMensaje(exAuth.Message, "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
                 lblBackupEstado.ForeColor = Color.FromArgb(248, 113, 113);
                 lblBackupEstado.Text = "Excepción inesperada.";
-                MessageBox.Show($"Ocurrió un error inesperado:\n{ex.Message}", "Error Inesperado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarMensaje($"Ocurrió un error inesperado:\n{ex.Message}", "Error Inesperado", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -273,11 +310,12 @@ namespace StockOS.UI.WinForms.Forms
         private async void btnRestaurarBackup_Click(object? sender, EventArgs e)
         {
             if (_isBusy) return;
+            if (!ValidarAccesoAdministrador()) return;
 
             string rutaBak = txtRutaOrigen.Text.Trim();
             if (string.IsNullOrWhiteSpace(rutaBak) || !File.Exists(rutaBak))
             {
-                MessageBox.Show("Por favor seleccione un archivo .bak existente para restaurar.", "Archivo no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("Por favor seleccione un archivo .bak existente para restaurar.", "Archivo no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -303,20 +341,26 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     lblRestoreEstado.ForeColor = Color.FromArgb(74, 222, 128);
                     lblRestoreEstado.Text = $"Restauración finalizada con éxito a las {DateTime.Now:HH:mm:ss}";
-                    MessageBox.Show(resultado.Mensaje, "Restauración Completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MostrarMensaje(resultado.Mensaje, "Restauración Completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
                     lblRestoreEstado.ForeColor = Color.FromArgb(248, 113, 113);
                     lblRestoreEstado.Text = "Error durante la restauración.";
-                    MessageBox.Show(resultado.Mensaje, "Error de Restauración", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MostrarMensaje(resultado.Mensaje, "Error de Restauración", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+            catch (UnauthorizedAccessException exAuth)
+            {
+                lblRestoreEstado.ForeColor = Color.FromArgb(248, 113, 113);
+                lblRestoreEstado.Text = "Acceso denegado.";
+                MostrarMensaje(exAuth.Message, "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
                 lblRestoreEstado.ForeColor = Color.FromArgb(248, 113, 113);
                 lblRestoreEstado.Text = "Excepción inesperada.";
-                MessageBox.Show($"Ocurrió un error inesperado al restaurar:\n{ex.Message}", "Error Inesperado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MostrarMensaje($"Ocurrió un error inesperado al restaurar:\n{ex.Message}", "Error Inesperado", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {

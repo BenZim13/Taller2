@@ -10,6 +10,7 @@ param(
     [string]$Servidor = "localhost",
     [string]$BaseDatos = "StockOS",
     [string]$DirectorioBackups = "C:\StockOS\Backups",
+    [string]$Periodo = "Diario",
     [int]$DiasRetencion = 30
 )
 
@@ -22,10 +23,10 @@ try {
     }
 
     $FechaHora = Get-Date -Format "yyyyMMdd_HHmmss"
-    $NombreArchivo = "${BaseDatos}_Backup_${FechaHora}.bak"
+    $NombreArchivo = "${BaseDatos}_${Periodo}_${FechaHora}.bak"
     $RutaCompleta = Join-Path $DirectorioBackups $NombreArchivo
 
-    Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Iniciando backup de la base de datos '$BaseDatos' en '$RutaCompleta'..." -ForegroundColor Cyan
+    Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Iniciando backup [$Periodo] de la base de datos '$BaseDatos' en '$RutaCompleta'..." -ForegroundColor Cyan
 
     # 2. Comando T-SQL con compresión y formato
     $Query = @"
@@ -48,7 +49,7 @@ WITH FORMAT, INIT, COMPRESSION, STATS = 10;
     # 4. Limpieza de respaldos antiguos (Política de retención)
     Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Limpiando backups de más de $DiasRetencion días..." -ForegroundColor Yellow
     $FechaLimite = (Get-Date).AddDays(-$DiasRetencion)
-    Get-ChildItem -Path $DirectorioBackups -Filter "${BaseDatos}_Backup_*.bak" | Where-Object { $_.CreationTime -lt $FechaLimite } | ForEach-Object {
+    Get-ChildItem -Path $DirectorioBackups -Filter "${BaseDatos}_${Periodo}_*.bak" | Where-Object { $_.CreationTime -lt $FechaLimite } | ForEach-Object {
         Write-Host "Eliminando backup expirado: $($_.FullName)" -ForegroundColor DarkGray
         Remove-Item $_.FullName -Force
     }

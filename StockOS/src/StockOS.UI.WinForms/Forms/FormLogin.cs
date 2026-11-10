@@ -70,35 +70,69 @@ namespace StockOS.UI.WinForms.Forms
                 return;
             }
 
-            // Llamada al backend real (Base de Datos)
-            var (exito, empleado, mensajeError) = await _authService.LoginAsync(dni, password);
-
-            if (exito && empleado != null)
+            btnIngresar.Enabled = false;
+            try
             {
-                UsuarioAutenticado = empleado;
+                // Llamada al backend real (Base de Datos)
+                var (exito, empleado, mensajeError) = await Task.Run(() => _authService.LoginAsync(dni, password));
 
-                // Guardamos el usuario en la memoria global
-                SesionActual.Usuario = empleado;
+                if (exito && empleado != null)
+                {
+                    UsuarioAutenticado = empleado;
 
-                // Asegurar que si quedó una sesión huérfana de una ejecución previa se cierre en la base de datos
-                _cajaService.CerrarCajaPorCierreSesion(empleado.IdEmpleado);
+                    // Guardamos el usuario en la memoria global
+                    SesionActual.Usuario = empleado;
 
-                // Toda nueva sesión inicia con la caja cerrada; el cajero debe abrir su caja explícitamente para su turno
-                SesionActual.IdCajaSesionAbierta = null;
+                    // Asegurar que si quedó una sesión huérfana de una ejecución previa se cierre en la base de datos
+                    _cajaService.CerrarCajaPorCierreSesion(empleado.IdEmpleado);
 
-                MostrarExito("Ingreso exitoso");
-                btnIngresar.Enabled = false;
-                await Task.Delay(1200);
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                    // Toda nueva sesión inicia con la caja cerrada; el cajero debe abrir su caja explícitamente para su turno
+                    SesionActual.IdCajaSesionAbierta = null;
+
+                    MostrarExito("Ingreso exitoso");
+                    await Task.Delay(1200);
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                    return;
+                }
+                else
+                {
+                    MostrarError(mensajeError ?? "Credenciales incorrectas.");
+                    _ignorandoCambios = true;
+                    txtPassword.SelectAll();
+                    txtPassword.Focus();
+                    _ignorandoCambios = false;
+                }
             }
-            else
+            catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                MostrarError(mensajeError ?? "Credenciales incorrectas.");
-                _ignorandoCambios = true;
-                txtPassword.SelectAll();
-                txtPassword.Focus();
-                _ignorandoCambios = false;
+                Serilog.Log.Error(ex, "Error de conexión a SQL Server durante el inicio de sesión.");
+                MostrarError("Sin conexión a SQL Server (verifique el servicio MSSQLSERVER).");
+                MessageBox.Show(
+                    "No se pudo conectar a la base de datos SQL Server en 'localhost'.\n\n" +
+                    "Causa probable: El servicio de Windows 'SQL Server (MSSQLSERVER)' está detenido.\n\n" +
+                    "Solución: Abra PowerShell como Administrador y ejecute:\n" +
+                    "Start-Service MSSQLSERVER",
+                    "Error de Conexión a Base de Datos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex, "Error inesperado durante el inicio de sesión.");
+                MostrarError("Error al conectar con el servidor de datos.");
+                MessageBox.Show(
+                    $"Ocurrió un error al intentar iniciar sesión:\n{ex.Message}",
+                    "Error de Inicio de Sesión",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!this.IsDisposed && this.DialogResult != DialogResult.OK)
+                {
+                    btnIngresar.Enabled = true;
+                }
             }
         }
 

@@ -89,10 +89,15 @@ namespace StockOS.Application.Tests
                 services.AddScoped<IAuthorizationService, AuthorizationService>();
                 services.AddScoped(_ => new Mock<ITicketService>().Object);
                 services.AddScoped(_ => new Mock<IConfiguracionService>().Object);
+                var mockBackup = new Mock<IBackupService>();
+                mockBackup.Setup(b => b.ObtenerProgramacionPeriodica()).Returns(new ConfiguracionBackupPeriodico());
+                mockBackup.Setup(b => b.ObtenerDirectorioBackupsPorDefecto()).Returns(@"C:\StockOS\Backups");
+                services.AddScoped(_ => mockBackup.Object);
 
                 // Registro exacto de formularios y UserControls según Program.cs
                 services.AddTransient<FormLogin>();
                 services.AddTransient<FormInicio>();
+                services.AddTransient<FormBackupDatabase>();
                 services.AddTransient<FormRegistroUsuario>();
                 services.AddTransient<UcListarUsuarios>();
                 services.AddTransient<UcUsuarios>();
@@ -123,6 +128,7 @@ namespace StockOS.Application.Tests
                     Assert.NotNull(sp.GetRequiredService<IProveedorService>());
                     Assert.NotNull(sp.GetRequiredService<IReporteService>());
                     Assert.NotNull(sp.GetRequiredService<IAuthorizationService>());
+                    Assert.NotNull(sp.GetRequiredService<IBackupService>());
 
                     // 2. Verificamos que todos los formularios y vistas se resuelvan y creen sin lanzar excepción
                     using var fLogin = sp.GetRequiredService<FormLogin>();
@@ -130,6 +136,9 @@ namespace StockOS.Application.Tests
 
                     using var fInicio = sp.GetRequiredService<FormInicio>();
                     Assert.NotNull(fInicio);
+
+                    using var fBackup = sp.GetRequiredService<FormBackupDatabase>();
+                    Assert.NotNull(fBackup);
 
                     using var fRegUsuario = sp.GetRequiredService<FormRegistroUsuario>();
                     Assert.NotNull(fRegUsuario);
@@ -231,6 +240,84 @@ namespace StockOS.Application.Tests
                 {
                     Assert.Equal(puedeEditar, dgvProductos.Columns["colAccionEstado"].Visible);
                 }
+            });
+        }
+
+        [Fact]
+        public void UcInventario_DobleClic_Cajero_NoAbreFormularioEdicion()
+        {
+            RunInSta(() =>
+            {
+                var usuario = new Empleado { IdEmpleado = 2, IdRol = (int)RolUsuario.Cajero, IdSucursal = 1, Nombre = "Cajero", Apellido = "Test" };
+                SesionActual.Usuario = usuario;
+
+                var listaProd = new List<Producto>
+                {
+                    new Producto { IdProducto = 1, CodigoBarra = "123", Nombre = "Prod A", PrecioVentaActual = 100m, Activo = true }
+                };
+
+                var mockProdService = new Mock<IProductoService>();
+                mockProdService.Setup(p => p.ObtenerTodos()).Returns(listaProd);
+                var mockCatService = new Mock<ICategoriaService>();
+                var mockStockService = new Mock<IStockService>();
+                var mockServiceProvider = new Mock<IServiceProvider>();
+                var authService = new AuthorizationService();
+
+                using var ucInventario = new UcInventario(
+                    mockProdService.Object,
+                    mockCatService.Object,
+                    mockServiceProvider.Object,
+                    mockStockService.Object,
+                    authService);
+
+                // Invocar CargarDatos para poblar la grilla
+                var cargarDatos = typeof(UcInventario).GetMethod("CargarDatos", BindingFlags.NonPublic | BindingFlags.Instance);
+                cargarDatos?.Invoke(ucInventario, null);
+
+                // Disparar doble clic en la primera fila
+                var onCellDoubleClick = typeof(UcInventario).GetMethod("DgvProductos_CellDoubleClick", BindingFlags.NonPublic | BindingFlags.Instance);
+                var ev = new DataGridViewCellEventArgs(1, 0); // columna 1, fila 0
+                onCellDoubleClick?.Invoke(ucInventario, new object[] { ucInventario, ev });
+
+                // Como el rol es Cajero, jamás debe crear scope ni resolver FormRegistroProducto
+                mockServiceProvider.Verify(sp => sp.GetService(typeof(FormRegistroProducto)), Times.Never);
+            });
+        }
+
+        [Fact]
+        public void FormRegistroProducto_CajeroModoEdicion_BloqueaAcceso()
+        {
+            RunInSta(() =>
+            {
+                var usuario = new Empleado { IdEmpleado = 2, IdRol = (int)RolUsuario.Cajero, IdSucursal = 1, Nombre = "Cajero", Apellido = "Test" };
+                SesionActual.Usuario = usuario;
+
+                var mockProdService = new Mock<IProductoService>();
+                var mockCatService = new Mock<ICategoriaService>();
+                var mockStockService = new Mock<IStockService>();
+                var mockCompraService = new Mock<ICompraService>();
+                var mockProvService = new Mock<IProveedorService>();
+                var authService = new AuthorizationService();
+
+                string? mensajeMostrado = null;
+                FormRegistroProducto.MostrarMensaje = (msg, title, btns, icon) => { mensajeMostrado = msg; };
+
+                using var form = new FormRegistroProducto(
+                    mockProdService.Object,
+                    mockCatService.Object,
+                    mockStockService.Object,
+                    mockCompraService.Object,
+                    mockProvService.Object,
+                    authService);
+
+                form.PrepararParaEdicion(new Producto { IdProducto = 99, CodigoBarra = "999", Nombre = "Prod Test", PrecioVentaActual = 50m });
+
+                var loadMethod = typeof(FormRegistroProducto).GetMethod("FormRegistroProducto_Load", BindingFlags.NonPublic | BindingFlags.Instance)!;
+                loadMethod.Invoke(form, new object?[] { null, EventArgs.Empty });
+
+                Assert.NotNull(mensajeMostrado);
+                Assert.Contains("No tiene permisos", mensajeMostrado);
+                Assert.Equal(DialogResult.Cancel, form.DialogResult);
             });
         }
 

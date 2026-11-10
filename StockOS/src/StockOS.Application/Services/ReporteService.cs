@@ -22,23 +22,26 @@ namespace StockOS.Application.Services
             _reporteRepository = reporteRepository;
             _authService = authService;
             QuestPDF.Settings.License = LicenseType.Community;
+            QuestPDF.Settings.ThrowOnMissingFontFamilies = false;
+            QuestPDF.Settings.UseSystemFonts = true;
         }
 
         public async Task<ResumenFinancieroDTO> ObtenerResumenFinancieroAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            return await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+            _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
+            return await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin) ?? new ResumenFinancieroDTO();
         }
         public async Task GenerarReporteVentasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
         {
             _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
 
             var data = await _reporteRepository.ObtenerReporteVentasAsync(fechaInicio, fechaFin);
-            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin) ?? new ResumenFinancieroDTO();
 
             var titulo = $"StockOS Reporte \"Ventas\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Ventas_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
 
-            GenerarPdf(titulo, data.Total, data.Detalles, resumen, fileName, "Ventas");
+            GenerarPdf(titulo, data.Total, data.Detalles ?? Enumerable.Empty<ReporteItemDTO>(), resumen, fileName, "Ventas");
         }
 
         public async Task GenerarReporteComprasPdfAsync(DateTime fechaInicio, DateTime fechaFin, string periodoDescripcion)
@@ -46,16 +49,18 @@ namespace StockOS.Application.Services
             _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
 
             var data = await _reporteRepository.ObtenerReporteComprasAsync(fechaInicio, fechaFin);
-            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin);
+            var resumen = await _reporteRepository.ObtenerResumenFinancieroAsync(fechaInicio, fechaFin) ?? new ResumenFinancieroDTO();
 
             var titulo = $"StockOS Reporte \"Compras\" en el periodo {periodoDescripcion}";
             var fileName = $"Reporte_Compras_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
 
-            GenerarPdf(titulo, data.Total, data.Detalles, resumen, fileName, "Compras");
+            GenerarPdf(titulo, data.Total, data.Detalles ?? Enumerable.Empty<ReporteItemDTO>(), resumen, fileName, "Compras");
         }
 
-        private void GenerarPdf(string titulo, decimal totalGeneral, IEnumerable<ReporteItemDTO> detalles, ResumenFinancieroDTO resumen, string fileName, string tipoReporte)
+        private void GenerarPdf(string titulo, decimal totalGeneral, IEnumerable<ReporteItemDTO> detalles, ResumenFinancieroDTO? resumen, string fileName, string tipoReporte)
         {
+            resumen ??= new ResumenFinancieroDTO();
+            var listaDetalles = (detalles ?? Enumerable.Empty<ReporteItemDTO>()).ToList();
             var document = Document.Create(container =>
             {
                 container.Page(page =>
@@ -63,10 +68,10 @@ namespace StockOS.Application.Services
                     page.Size(PageSizes.A4);
                     page.Margin(1, Unit.Centimetre);
                     page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial", "Lato"));
 
                     page.Header().Element(c => ComposeHeader(c, titulo));
-                    page.Content().Element(c => ComposeContent(c, detalles, totalGeneral, resumen, tipoReporte));
+                    page.Content().Element(c => ComposeContent(c, listaDetalles, totalGeneral, resumen, tipoReporte));
                     page.Footer().Element(ComposeFooter);
                 });
             });
@@ -103,7 +108,7 @@ namespace StockOS.Application.Services
             });
         }
 
-        private void ComposeContent(IContainer container, IEnumerable<ReporteItemDTO> detalles, decimal totalGeneral, ResumenFinancieroDTO resumen, string tipoReporte)
+        private void ComposeContent(IContainer container, IReadOnlyList<ReporteItemDTO> detalles, decimal totalGeneral, ResumenFinancieroDTO resumen, string tipoReporte)
         {
             container.PaddingVertical(1, Unit.Centimetre).Column(column =>
             {
@@ -115,22 +120,26 @@ namespace StockOS.Application.Services
                     {
                         if (tipoReporte == "Ventas")
                         {
-                            row.RelativeItem().Column(c => {
+                            row.RelativeItem().Column(c =>
+                            {
                                 c.Item().Text("Ingresos Brutos").FontSize(9).FontColor(Colors.Grey.Darken1);
                                 c.Item().Text($"{resumen.IngresosBrutos:C2}").SemiBold().FontSize(11).FontColor(Colors.Green.Darken2);
                             });
-                            row.RelativeItem().Column(c => {
+                            row.RelativeItem().Column(c =>
+                            {
                                 c.Item().Text("Descuentos").FontSize(9).FontColor(Colors.Grey.Darken1);
                                 c.Item().Text($"{resumen.DescuentosOtorgados:C2}").SemiBold().FontSize(11).FontColor(Colors.Red.Medium);
                             });
-                            row.RelativeItem().Column(c => {
+                            row.RelativeItem().Column(c =>
+                            {
                                 c.Item().Text("Ingresos Netos").FontSize(9).FontColor(Colors.Grey.Darken1);
                                 c.Item().Text($"{resumen.IngresosNetos:C2}").Bold().FontSize(12).FontColor(Colors.Green.Darken3);
                             });
                         }
                         else if (tipoReporte == "Compras")
                         {
-                            row.RelativeItem().Column(c => {
+                            row.RelativeItem().Column(c =>
+                            {
                                 c.Item().Text("Total Egresos (Compras)").FontSize(9).FontColor(Colors.Grey.Darken1);
                                 c.Item().Text($"{resumen.EgresosBrutos:C2}").Bold().FontSize(12).FontColor(Colors.Red.Darken2);
                             });
@@ -147,7 +156,7 @@ namespace StockOS.Application.Services
                     .FontSize(14).Bold();
             });
         }
-        private void ComposeTable(IContainer container, IEnumerable<ReporteItemDTO> detalles)
+        private void ComposeTable(IContainer container, IReadOnlyList<ReporteItemDTO> detalles)
         {
             container.Table(table =>
             {
@@ -185,7 +194,7 @@ namespace StockOS.Application.Services
                     }
                 }
 
-                if (!detalles.Any())
+                if (detalles.Count == 0)
                 {
                     table.Cell().ColumnSpan(4).PaddingVertical(10).AlignCenter()
                          .Text("No hay registros en el período seleccionado.").Italic().FontColor(Colors.Grey.Medium);
@@ -204,12 +213,14 @@ namespace StockOS.Application.Services
         }
         public async Task<IEnumerable<ReporteItemDTO>> ObtenerTopProductosVendidosAsync(int topN, DateTime fechaInicio, DateTime fechaFin)
         {
-            return await _reporteRepository.ObtenerTopProductosVendidosAsync(topN, fechaInicio, fechaFin);
+            _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
+            return await _reporteRepository.ObtenerTopProductosVendidosAsync(topN, fechaInicio, fechaFin) ?? Enumerable.Empty<ReporteItemDTO>();
         }
 
         public async Task<IEnumerable<VentasPorFechaDTO>> ObtenerVentasPorLineaTiempoAsync(DateTime fechaInicio, DateTime fechaFin)
         {
-            return await _reporteRepository.ObtenerVentasPorLineaTiempoAsync(fechaInicio, fechaFin);
+            _authService.ValidarPermiso(StockOS.Domain.Enums.Permisos.REPORTES_VER);
+            return await _reporteRepository.ObtenerVentasPorLineaTiempoAsync(fechaInicio, fechaFin) ?? Enumerable.Empty<VentasPorFechaDTO>();
         }
     }
 }

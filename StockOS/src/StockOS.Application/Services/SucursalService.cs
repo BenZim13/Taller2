@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using StockOS.Domain.Entities;
 using StockOS.Domain.Interfaces;
 

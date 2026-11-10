@@ -97,6 +97,82 @@ namespace StockOS.Application.Tests
             mockAuth.Verify(a => a.ValidarPermiso(Permisos.REPORTES_VER), Times.Once);
             mockRepo.Verify(r => r.ObtenerReporteComprasAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
         }
+
+        [Fact]
+        public async Task ObtenerTopProductosVendidosAsync_SinPermiso_LanzaUnauthorizedAccessException()
+        {
+            var mockRepo = new Mock<IReporteRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            mockAuth.Setup(a => a.ValidarPermiso(Permisos.REPORTES_VER))
+                    .Throws(new UnauthorizedAccessException("Acceso denegado"));
+
+            var service = new ReporteService(mockRepo.Object, mockAuth.Object);
+
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+                service.ObtenerTopProductosVendidosAsync(5, DateTime.Today.AddDays(-30), DateTime.Today));
+
+            mockRepo.Verify(r => r.ObtenerTopProductosVendidosAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ObtenerTopProductosVendidosAsync_ConPermiso_RetornaTopNProductos()
+        {
+            var mockRepo = new Mock<IReporteRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            var esperados = new List<ReporteItemDTO>
+            {
+                new ReporteItemDTO { CodigoBarra = "111", NombreProducto = "Coca Cola 1.5L", CantidadTotal = 40, Subtotal = 80000m },
+                new ReporteItemDTO { CodigoBarra = "222", NombreProducto = "Agua Mineral 2L", CantidadTotal = 25, Subtotal = 30000m }
+            };
+
+            mockRepo.Setup(r => r.ObtenerTopProductosVendidosAsync(5, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .ReturnsAsync(esperados);
+
+            var service = new ReporteService(mockRepo.Object, mockAuth.Object);
+            var resultado = await service.ObtenerTopProductosVendidosAsync(5, DateTime.Today.AddDays(-30), DateTime.Today);
+
+            mockAuth.Verify(a => a.ValidarPermiso(Permisos.REPORTES_VER), Times.Once);
+            Assert.Equal(esperados, resultado);
+        }
+
+        [Fact]
+        public async Task ObtenerVentasPorLineaTiempoAsync_SinPermiso_LanzaUnauthorizedAccessException()
+        {
+            var mockRepo = new Mock<IReporteRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            mockAuth.Setup(a => a.ValidarPermiso(Permisos.REPORTES_VER))
+                    .Throws(new UnauthorizedAccessException("Acceso denegado"));
+
+            var service = new ReporteService(mockRepo.Object, mockAuth.Object);
+
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+                service.ObtenerVentasPorLineaTiempoAsync(DateTime.Today.AddDays(-7), DateTime.Today));
+
+            mockRepo.Verify(r => r.ObtenerVentasPorLineaTiempoAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ObtenerResumenFinancieroAsync_ConPermiso_CalculaBalanceNetoCorrectamente()
+        {
+            var mockRepo = new Mock<IReporteRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            var resumenMock = new ResumenFinancieroDTO
+            {
+                IngresosBrutos = 150000m,
+                DescuentosOtorgados = 10000m,
+                IngresosNetos = 140000m,
+                EgresosBrutos = 90000m
+            };
+
+            mockRepo.Setup(r => r.ObtenerResumenFinancieroAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                    .ReturnsAsync(resumenMock);
+
+            var service = new ReporteService(mockRepo.Object, mockAuth.Object);
+            var resultado = await service.ObtenerResumenFinancieroAsync(DateTime.Today.AddDays(-30), DateTime.Today);
+
+            mockAuth.Verify(a => a.ValidarPermiso(Permisos.REPORTES_VER), Times.Once);
+            Assert.Equal(50000m, resultado.BalanceNeto);
+        }
     }
 }
 

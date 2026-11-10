@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using StockOS.Domain.Enums;
 using StockOS.Domain.Interfaces;
@@ -14,8 +14,8 @@ namespace StockOS.Application.Services
         // Matriz de permisos: cada rol tiene un conjunto de permisos asignados
         private readonly Dictionary<int, HashSet<string>> _permisosPorRol = new()
         {
-            // Rol 1: Administrador - Acceso completo al sistema
-            { 1, new HashSet<string> {
+            // Rol 1: Gerente / Administrador - Acceso completo al sistema
+            { (int)RolUsuario.Gerente, new HashSet<string> {
                 Permisos.USUARIOS_VER, Permisos.USUARIOS_CREAR, Permisos.USUARIOS_EDITAR,
                 Permisos.PRODUCTOS_VER, Permisos.PRODUCTOS_CREAR, Permisos.PRODUCTOS_EDITAR,
                 Permisos.CATEGORIAS_GESTIONAR, Permisos.STOCK_VER, Permisos.STOCK_INGRESAR,
@@ -25,20 +25,20 @@ namespace StockOS.Application.Services
             }},
             
             // Rol 2: Cajero - Acceso a ventas, consulta de productos y manejo de caja
-            { 2, new HashSet<string> {
+            { (int)RolUsuario.Cajero, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.STOCK_VER,
                 Permisos.VENTAS_REALIZAR, Permisos.CAJA_ABRIR, Permisos.CAJA_CERRAR, Permisos.CAJA_MOVIMIENTOS
             }},
             
             // Rol 3: Encargado de Depósito - Gestión de inventario, compras y proveedores
-            { 3, new HashSet<string> {
+            { (int)RolUsuario.EncargadoDeposito, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.PRODUCTOS_CREAR, Permisos.PRODUCTOS_EDITAR,
                 Permisos.CATEGORIAS_GESTIONAR, Permisos.STOCK_VER, Permisos.STOCK_INGRESAR,
                 Permisos.COMPRAS_GESTIONAR, Permisos.PROVEEDORES_GESTIONAR
             }},
             
             // Rol 4: Repositor - Solo consulta de productos y stock (sin modificaciones)
-            { 4, new HashSet<string> {
+            { (int)RolUsuario.Repositor, new HashSet<string> {
                 Permisos.PRODUCTOS_VER, Permisos.STOCK_VER
             }}
         };

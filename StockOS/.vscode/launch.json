@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "StockOS (WinForms - .NET Core Launch)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/StockOS.UI.WinForms/bin/Debug/net8.0-windows/StockOS.UI.WinForms.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/StockOS.UI.WinForms",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "StockOS (C# Dev Kit)",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/src/StockOS.UI.WinForms/StockOS.UI.WinForms.csproj"
+        }
+    ]
+}

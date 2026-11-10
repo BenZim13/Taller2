@@ -42,9 +42,8 @@ namespace StockOS.UI.WinForms.Forms
             CargarProveedores();
 
             // Restricciones de entrada por teclado con advertencias emergentes (Globos ToolTip)
-            
-            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtCodigo, "Código");
-            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtNombreProducto, "Nombre del Producto");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtCodigo, "Código");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarNombreProducto(txtNombreProducto, "Nombre del Producto");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtCantidad, "Cantidad");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecioCompra, "Precio de Compra");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPorcentajeExtra, "Margen de Ganancia");

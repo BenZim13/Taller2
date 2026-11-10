@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using StockOS.Application.Services;
+using StockOS.Domain.Enums;
 using StockOS.Domain.Interfaces;
 
 namespace StockOS.UI.WinForms.Forms
@@ -8,8 +10,13 @@ namespace StockOS.UI.WinForms.Forms
     public partial class UcConfig : UserControl
     {
         private readonly IBackupService? _backupService;
+        private readonly IAuthorizationService? _authService;
         private ContenedorConfigScroll _pnlContenedor = null!;
         private bool _isAdjustingLayout = false;
+
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
 
         // Tarjetas principales
         private RoundedPanel _pnlAcerca = null!;
@@ -38,13 +45,14 @@ namespace StockOS.UI.WinForms.Forms
         private RoundedPanel _pnlEmail = null!;
         private Label _lblEmail = null!;
 
-        public UcConfig() : this(null)
+        public UcConfig() : this(null, null)
         {
         }
 
-        public UcConfig(IBackupService? backupService)
+        public UcConfig(IBackupService? backupService = null, IAuthorizationService? authService = null)
         {
             _backupService = backupService;
+            _authService = authService;
             InitializeComponent();
             InicializarComponentesVisuales();
         }
@@ -316,16 +324,35 @@ namespace StockOS.UI.WinForms.Forms
             currentY += altoCalculado + espacioInferior;
         }
 
+        private bool TienePermisoAdministrador()
+        {
+            if (_authService != null)
+            {
+                return _authService.TienePermiso(Permisos.CONFIGURACION_GESTIONAR);
+            }
+            return SesionActual.Usuario != null && SesionActual.Usuario.IdRol == 1;
+        }
+
         private void BtnAdmin_Click(object? sender, EventArgs e)
         {
+            if (!TienePermisoAdministrador())
+            {
+                MostrarMensaje(
+                    "Acceso denegado. Solo los usuarios con rol de Administrador tienen permiso para gestionar copias de seguridad y restauración de la base de datos.",
+                    "Acceso Restringido",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_backupService != null)
             {
-                using var frmBackup = new FormBackupDatabase(_backupService);
+                using var frmBackup = new FormBackupDatabase(_backupService, _authService);
                 frmBackup.ShowDialog(this);
             }
             else
             {
-                MessageBox.Show("El servicio de respaldo no se encuentra disponible.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje("El servicio de respaldo no se encuentra disponible.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

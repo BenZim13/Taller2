@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Oculta advertencias informativas de async sin await (CS1998) y de inicialización DbSet de EF Core (CS8618) -->
+    <NoWarn>$(NoWarn);CS1998;CS8618</NoWarn>
+  </PropertyGroup>
+</Project>
+

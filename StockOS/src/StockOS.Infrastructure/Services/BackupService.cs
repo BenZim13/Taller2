@@ -19,15 +19,26 @@ namespace StockOS.DataAccess.Services
     public class BackupService : IBackupService
     {
         private readonly string _connectionString;
+        private readonly IAuthorizationService? _authService;
         private readonly ILogger<BackupService>? _logger;
         private readonly string _rutaConfigProgramacion;
 
-        public BackupService(IConfiguration configuration, ILogger<BackupService>? logger = null)
+        public BackupService(IConfiguration configuration, IAuthorizationService? authService = null, ILogger<BackupService>? logger = null)
         {
             _connectionString = configuration.GetConnectionString("StockOS")
                 ?? "Server=localhost;Database=StockOS;Trusted_Connection=True;TrustServerCertificate=True;";
+            _authService = authService;
             _logger = logger;
             _rutaConfigProgramacion = Path.Combine(AppContext.BaseDirectory, "backup_schedule.json");
+        }
+
+        private void ValidarPermisoAdministrador()
+        {
+            if (_authService == null)
+            {
+                throw new UnauthorizedAccessException("Operación denegada. No se pudo verificar el permiso de Administrador.");
+            }
+            _authService.ValidarPermiso(Permisos.CONFIGURACION_GESTIONAR);
         }
 
         public string ObtenerDirectorioBackupsPorDefecto()
@@ -39,22 +50,50 @@ namespace StockOS.DataAccess.Services
                 using var comando = new SqlCommand("SELECT CAST(SERVERPROPERTY('InstanceDefaultBackupPath') AS NVARCHAR(512))", conexion);
                 var resultado = comando.ExecuteScalar()?.ToString();
 
-                if (!string.IsNullOrWhiteSpace(resultado) && Directory.Exists(resultado))
+                if (!string.IsNullOrWhiteSpace(resultado) && Directory.Exists(resultado) && TienePermisosDeEscritura(resultado))
                 {
                     return resultado;
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "No se pudo consultar InstanceDefaultBackupPath en SQL Server. Se usará ruta alternativa.");
+                _logger?.LogWarning(ex, "No se pudo consultar InstanceDefaultBackupPath en SQL Server o no tiene permisos. Se usará ruta alternativa.");
             }
 
             string rutaLocal = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "StockOS", "Backups");
-            if (!Directory.Exists(rutaLocal))
-            {
-                Directory.CreateDirectory(rutaLocal);
-            }
+            AsegurarDirectorio(rutaLocal);
             return rutaLocal;
+        }
+
+        private static bool TienePermisosDeEscritura(string ruta)
+        {
+            try
+            {
+                if (!Directory.Exists(ruta)) return false;
+                string archivoPrueba = Path.Combine(ruta, $".stockos_write_test_{Guid.NewGuid():N}.tmp");
+                File.WriteAllText(archivoPrueba, "test");
+                File.Delete(archivoPrueba);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void AsegurarDirectorio(string ruta)
+        {
+            try
+            {
+                if (!Directory.Exists(ruta))
+                {
+                    Directory.CreateDirectory(ruta);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "No se pudo crear el directorio con .NET: {Ruta}", ruta);
+            }
         }
 
         /// <summary>
@@ -99,6 +138,14 @@ namespace StockOS.DataAccess.Services
             string? rutaDestinoPersonalizada = null,
             PeriodoBackup periodo = PeriodoBackup.Diario)
         {
+            ValidarPermisoAdministrador();
+            return await EjecutarBackupInternoAsync(rutaDestinoPersonalizada, periodo);
+        }
+
+        private async Task<(bool Exito, string Mensaje, string? RutaArchivo)> EjecutarBackupInternoAsync(
+            string? rutaDestinoPersonalizada = null,
+            PeriodoBackup periodo = PeriodoBackup.Diario)
+        {
             return await Task.Run(async () =>
             {
                 string? archivoStaging = null;
@@ -112,11 +159,18 @@ namespace StockOS.DataAccess.Services
                     int diasRetencion = ObtenerDiasRetencionPorPeriodo(periodo);
                     string nombreArchivo = $"{dbName}_{etiquetaPeriodo}_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
 
-                    archivoStaging = Path.Combine(defaultBackupDir, nombreArchivo);
+                    string directorioRaizDestino = string.IsNullOrWhiteSpace(rutaDestinoPersonalizada)
+                        ? defaultBackupDir
+                        : rutaDestinoPersonalizada;
+
+                    string directorioPeriodoDestino = Path.Combine(directorioRaizDestino, etiquetaPeriodo);
+                    AsegurarDirectorio(directorioPeriodoDestino);
+
+                    string rutaFinal = Path.Combine(directorioPeriodoDestino, nombreArchivo);
 
                     _logger?.LogInformation(
                         "Iniciando copia de seguridad [{Periodo}] de la base de datos '{Db}' en '{Ruta}'",
-                        etiquetaPeriodo, dbName, archivoStaging);
+                        etiquetaPeriodo, dbName, rutaFinal);
 
                     // 1. Ejecutar comando T-SQL nativo de Backup con compresión y descripción del período
                     string descripcionBackup = $"StockOS Backup {etiquetaPeriodo} - Retencion {diasRetencion} dias";
@@ -131,40 +185,56 @@ namespace StockOS.DataAccess.Services
                     using (var conexion = new SqlConnection(_connectionString))
                     {
                         await conexion.OpenAsync();
-                        using var comando = new SqlCommand(sqlBackup, conexion);
-                        comando.CommandTimeout = 600;
-                        comando.Parameters.AddWithValue("@RutaBackup", archivoStaging);
-                        comando.Parameters.AddWithValue("@NombreBackup", $"{dbName}-{etiquetaPeriodo}");
-                        comando.Parameters.AddWithValue("@DescripcionBackup", descripcionBackup);
-                        await comando.ExecuteNonQueryAsync();
+
+                        // Asegurar con SQL Server que la subcarpeta existe en caso de que C# no haya tenido permisos
+                        if (!Directory.Exists(directorioPeriodoDestino))
+                        {
+                            try
+                            {
+                                using var cmdSub = new SqlCommand("EXEC master.dbo.xp_create_subdir @dir", conexion);
+                                cmdSub.Parameters.AddWithValue("@dir", directorioPeriodoDestino);
+                                await cmdSub.ExecuteNonQueryAsync();
+                            }
+                            catch { }
+                        }
+
+                        bool backupDirectoExitoso = false;
+                        try
+                        {
+                            using var comando = new SqlCommand(sqlBackup, conexion);
+                            comando.CommandTimeout = 600;
+                            comando.Parameters.AddWithValue("@RutaBackup", rutaFinal);
+                            comando.Parameters.AddWithValue("@NombreBackup", $"{dbName}-{etiquetaPeriodo}");
+                            comando.Parameters.AddWithValue("@DescripcionBackup", descripcionBackup);
+                            await comando.ExecuteNonQueryAsync();
+                            backupDirectoExitoso = true;
+                        }
+                        catch (SqlException exSql)
+                        {
+                            _logger?.LogWarning(exSql, "SQL Server no pudo escribir directamente en '{RutaFinal}'. Se intentará vía staging en '{StagingDir}'.", rutaFinal, defaultBackupDir);
+                        }
+
+                        // Si el backup directo falló (por ejemplo, por permisos en una ruta de red o carpeta personal),
+                        // realizamos el backup en el área de staging nativa de SQL Server y luego lo copiamos
+                        if (!backupDirectoExitoso)
+                        {
+                            archivoStaging = Path.Combine(defaultBackupDir, nombreArchivo);
+                            using var comandoStaging = new SqlCommand(sqlBackup, conexion);
+                            comandoStaging.CommandTimeout = 600;
+                            comandoStaging.Parameters.AddWithValue("@RutaBackup", archivoStaging);
+                            comandoStaging.Parameters.AddWithValue("@NombreBackup", $"{dbName}-{etiquetaPeriodo}");
+                            comandoStaging.Parameters.AddWithValue("@DescripcionBackup", descripcionBackup);
+                            await comandoStaging.ExecuteNonQueryAsync();
+
+                            File.Copy(archivoStaging, rutaFinal, overwrite: true);
+                            try { File.Delete(archivoStaging); } catch { /* Ignorar si está en uso */ }
+                        }
                     }
 
-                    // 2. Organizar en subcarpeta del período correspondiente (Ej: <Destino>\Diario\...)
-                    string directorioRaizDestino = string.IsNullOrWhiteSpace(rutaDestinoPersonalizada)
-                        ? defaultBackupDir
-                        : rutaDestinoPersonalizada;
-
-                    string directorioPeriodoDestino = Path.Combine(directorioRaizDestino, etiquetaPeriodo);
-                    if (!Directory.Exists(directorioPeriodoDestino))
-                    {
-                        Directory.CreateDirectory(directorioPeriodoDestino);
-                    }
-
-                    string rutaFinal = Path.Combine(directorioPeriodoDestino, nombreArchivo);
-
-                    // Copiar desde el área de staging de SQL Server a la subcarpeta del período
-                    File.Copy(archivoStaging, rutaFinal, overwrite: true);
-
-                    // Limpiar el archivo temporal de la raíz de staging si fue movido a subcarpeta
-                    if (!string.Equals(Path.GetFullPath(archivoStaging), Path.GetFullPath(rutaFinal), StringComparison.OrdinalIgnoreCase))
-                    {
-                        try { File.Delete(archivoStaging); } catch { /* Ignorar si está en uso */ }
-                    }
-
-                    // 3. Aplicar regla de negocio de retención (Purga de backups vencidos del mismo período)
+                    // 2. Aplicar regla de negocio de retención (Purga de backups vencidos del mismo período)
                     int archivosEliminados = AplicarPoliticaRetencion(directorioPeriodoDestino, dbName, etiquetaPeriodo, diasRetencion);
 
-                    // 4. Actualizar registro si existe programación activa
+                    // 3. Actualizar registro si existe programación activa
                     ActualizarRegistroUltimaEjecucion(periodo);
 
                     _logger?.LogInformation(
@@ -257,6 +327,8 @@ namespace StockOS.DataAccess.Services
 
         public async Task<(bool Exito, string Mensaje)> GuardarProgramacionPeriodicaAsync(ConfiguracionBackupPeriodico config)
         {
+            ValidarPermisoAdministrador();
+
             return await Task.Run(() =>
             {
                 try
@@ -349,7 +421,7 @@ namespace StockOS.DataAccess.Services
                 if (DateTime.Now >= config.ProximaEjecucion.Value)
                 {
                     _logger?.LogInformation("Ejecutando backup periódico programado pendiente [{Periodo}]...", config.Periodo);
-                    await CrearBackupAsync(config.RutaDestino, config.Periodo);
+                    await EjecutarBackupInternoAsync(config.RutaDestino, config.Periodo);
                 }
             }
             catch (Exception ex)
@@ -381,11 +453,17 @@ namespace StockOS.DataAccess.Services
 
                 int diasRetencion = ObtenerDiasRetencionPorPeriodo(config.Periodo);
                 string dirPeriodo = Path.Combine(config.RutaDestino, config.Periodo.ToString());
-                string scriptPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\..\DatabaseScripts\Backup_Programado_StockOS.ps1"));
+
+                // Buscar script tanto en carpeta de despliegue como en árbol de desarrollo
+                string scriptPath = Path.Combine(AppContext.BaseDirectory, "DatabaseScripts", "Backup_Programado_StockOS.ps1");
+                if (!File.Exists(scriptPath))
+                {
+                    scriptPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\..\DatabaseScripts\Backup_Programado_StockOS.ps1"));
+                }
 
                 if (File.Exists(scriptPath))
                 {
-                    string trCommand = $"powershell.exe -NoProfile -ExecutionPolicy Bypass -File \\\"{scriptPath}\\\" -DirectorioBackups \\\"{dirPeriodo}\\\" -DiasRetencion {diasRetencion}";
+                    string trCommand = $"powershell.exe -NoProfile -ExecutionPolicy Bypass -File \\\"{scriptPath}\\\" -DirectorioBackups \\\"{dirPeriodo}\\\" -Periodo \\\"{config.Periodo}\\\" -DiasRetencion {diasRetencion}";
                     string args = $"/Create /TN \"{taskName}\" {frecuenciaSchTasks} /ST {config.HoraEjecucion} /TR \"{trCommand}\" /F";
                     EjecutarComandoSilencioso("schtasks", args);
                 }
@@ -414,6 +492,8 @@ namespace StockOS.DataAccess.Services
 
         public async Task<(bool Exito, string Mensaje)> RestaurarBackupAsync(string rutaArchivoBak)
         {
+            ValidarPermisoAdministrador();
+
             return await Task.Run(async () =>
             {
                 if (string.IsNullOrWhiteSpace(rutaArchivoBak) || !File.Exists(rutaArchivoBak))

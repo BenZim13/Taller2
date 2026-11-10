@@ -1,4 +1,5 @@
-﻿using StockOS.Domain.Interfaces;
+using System;
+using StockOS.Domain.Interfaces;
 using StockOS.Domain.Enums; // Mapeo de permisos
 
 namespace StockOS.Application.Services

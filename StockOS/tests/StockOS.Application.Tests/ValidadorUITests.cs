@@ -249,6 +249,50 @@ namespace StockOS.Application.Tests
                 .Invoke(tb, new object[] { evLetra });
             Assert.True(evLetra.Handled);
         }
+
+        [Theory]
+        [InlineData("Coca Cola 1.5L")]
+        [InlineData("Harina 0000 1kg")]
+        [InlineData("Café Tostado (Molido)")]
+        [InlineData("Leche Descremada 1%")]
+        [InlineData("Cable USB-C / Lightning")]
+        public void EsNombreProductoValido_ConNombresComercialesConEspaciosYUnidades_RetornaTrue(string nombre)
+        {
+            Assert.True(ValidadorUI.EsNombreProductoValido(nombre));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("Producto @#$")]
+        [InlineData("---")]
+        public void EsNombreProductoValido_ConSimbolosInvalidosOSinAlfanumericos_RetornaFalse(string nombre)
+        {
+            Assert.False(ValidadorUI.EsNombreProductoValido(nombre));
+        }
+
+        [Fact]
+        public void ConfigurarNombreProducto_PermiteEspaciosLetrasYNumeros_BloqueaSimbolosEspeciales()
+        {
+            using var tb = new TextBox();
+            ValidadorUI.ConfigurarNombreProducto(tb, "Nombre del Producto");
+            var onKeyPress = tb.GetType().GetMethod("OnKeyPress", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+
+            // Permitir espacio ' '
+            var evEspacio = new KeyPressEventArgs(' ');
+            onKeyPress.Invoke(tb, new object[] { evEspacio });
+            Assert.False(evEspacio.Handled);
+
+            // Permitir punto '.' (ej: 1.5L)
+            var evPunto = new KeyPressEventArgs('.');
+            onKeyPress.Invoke(tb, new object[] { evPunto });
+            Assert.False(evPunto.Handled);
+
+            // Bloquear '@'
+            var evArroba = new KeyPressEventArgs('@');
+            onKeyPress.Invoke(tb, new object[] { evArroba });
+            Assert.True(evArroba.Handled);
+        }
     }
 }
 

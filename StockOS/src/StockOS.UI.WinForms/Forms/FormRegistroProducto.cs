@@ -3,6 +3,8 @@ using System.Linq;
 using System.Windows.Forms;
 using StockOS.Application.Services;
 using StockOS.Domain.Entities;
+using StockOS.Domain.Enums;
+using StockOS.Domain.Interfaces;
 
 namespace StockOS.UI.WinForms.Forms
 {
@@ -13,6 +15,7 @@ namespace StockOS.UI.WinForms.Forms
         private readonly IStockService _stockService;
         private readonly ICompraService _compraService;
         private readonly IProveedorService _proveedorService;
+        private readonly IAuthorizationService? _authService;
         private Producto? _productoEdicion; // Si es null, es modo "Nuevo"
         private int _stockOriginal = 0; // Para calcular la diferencia al guardar
 
@@ -22,7 +25,8 @@ namespace StockOS.UI.WinForms.Forms
 
         public FormRegistroProducto(IProductoService productoService, ICategoriaService categoriaService, 
                                    IStockService stockService, ICompraService compraService,
-                                   IProveedorService proveedorService)
+                                   IProveedorService proveedorService,
+                                   IAuthorizationService? authService = null)
         {
             InitializeComponent();
             _productoService = productoService;
@@ -30,6 +34,7 @@ namespace StockOS.UI.WinForms.Forms
             _stockService = stockService;
             _compraService = compraService;
             _proveedorService = proveedorService;
+            _authService = authService;
 
             // Restricción de longitud de caracteres
             txtCodigoBarra.MaxLength = 50;
@@ -39,8 +44,8 @@ namespace StockOS.UI.WinForms.Forms
             txtPrecioCompra.MaxLength = 12;
 
             // Restricciones de entrada por teclado con aviso visual emergente (Globos ToolTip)
-             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtNombre, "Nombre del producto");
-            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtCodigoBarra, "Código de Barra");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarNombreProducto(txtNombre, "Nombre del producto");
+            StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloAlfanumerico(txtCodigoBarra, "Código de Barra");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloNumeros(txtStock, "Stock");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecio, "Precio de Venta");
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtPrecioCompra, "Precio de Compra");
@@ -52,6 +57,22 @@ namespace StockOS.UI.WinForms.Forms
 
         private void FormRegistroProducto_Load(object? sender, EventArgs e)
         {
+            if (_authService != null)
+            {
+                if (_productoEdicion != null && !_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR))
+                {
+                    MostrarMensaje("No tiene permisos para modificar productos.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    CerrarPorFaltaDePermiso();
+                    return;
+                }
+                if (_productoEdicion == null && !_authService.TienePermiso(Permisos.PRODUCTOS_CREAR))
+                {
+                    MostrarMensaje("No tiene permisos para registrar nuevos productos.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    CerrarPorFaltaDePermiso();
+                    return;
+                }
+            }
+
             CargarCategorias();
             CargarProveedores();
             if (_productoEdicion == null)
@@ -59,6 +80,15 @@ namespace StockOS.UI.WinForms.Forms
                 cmbEstado.SelectedIndex = 0; // "Activo" por defecto
                 txtStock.Text = "0";
                 txtPrecioCompra.Text = "0.00";
+            }
+        }
+
+        private void CerrarPorFaltaDePermiso()
+        {
+            this.DialogResult = DialogResult.Cancel;
+            if (this.IsHandleCreated)
+            {
+                this.BeginInvoke(new Action(this.Close));
             }
         }
 
@@ -122,6 +152,20 @@ namespace StockOS.UI.WinForms.Forms
 
         private void BtnGuardar_Click(object? sender, EventArgs e)
         {
+            if (_authService != null)
+            {
+                if (_productoEdicion != null && !_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR))
+                {
+                    MostrarMensaje("No tiene permisos para modificar productos.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (_productoEdicion == null && !_authService.TienePermiso(Permisos.PRODUCTOS_CREAR))
+                {
+                    MostrarMensaje("No tiene permisos para registrar nuevos productos.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
             // --- Validaciones de Entrada ---
             string codigo = txtCodigoBarra.Text.Trim();
             if (string.IsNullOrWhiteSpace(codigo))

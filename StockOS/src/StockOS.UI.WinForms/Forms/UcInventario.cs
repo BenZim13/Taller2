@@ -293,6 +293,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void BtnNuevo_Click(object? sender, EventArgs e)
         {
+            if (!_authService.TienePermiso(Permisos.PRODUCTOS_CREAR)) return;
+
             using var scope = _serviceProvider.CreateScope();
             var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
 
@@ -310,6 +312,8 @@ namespace StockOS.UI.WinForms.Forms
 
             if (colName == "colModificar")
             {
+                if (!_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR)) return;
+
                 if (int.TryParse(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value?.ToString(), out int idProducto))
                 {
                     var producto = _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
@@ -321,6 +325,8 @@ namespace StockOS.UI.WinForms.Forms
             }
             else if (colName == "colAccionEstado")
             {
+                if (!_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR)) return;
+
                 if (int.TryParse(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value?.ToString(), out int idProducto))
                 {
                     var producto = _listaProductos.FirstOrDefault(p => p.IdProducto == idProducto);
@@ -335,6 +341,10 @@ namespace StockOS.UI.WinForms.Forms
         private void DgvProductos_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvProductos.Rows.Count) return;
+
+            // Restricción por rol: Si no tiene permiso de edición (ej: Cajero, Repositor), no se permite abrir el formulario de modificación
+            if (!_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR)) return;
+
             string colName = dgvProductos.Columns[e.ColumnIndex].Name;
             if (colName == "colModificar" || colName == "colAccionEstado") return;
 
@@ -350,6 +360,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void AbrirFormularioEdicion(Producto producto)
         {
+            if (!_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR)) return;
+
             using var scope = _serviceProvider.CreateScope();
             var formRegistro = scope.ServiceProvider.GetRequiredService<FormRegistroProducto>();
             formRegistro.PrepararParaEdicion(producto);
@@ -362,6 +374,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void CambiarEstadoProducto(Producto producto)
         {
+            if (!_authService.TienePermiso(Permisos.PRODUCTOS_EDITAR)) return;
+
             bool estaActivo = producto.Activo == true;
             string accion = estaActivo ? "dar de baja (desactivar)" : "reactivar";
 
@@ -413,6 +427,8 @@ namespace StockOS.UI.WinForms.Forms
         }
         private void BtnCategorias_Click(object? sender, EventArgs e)
         {
+            if (!_authService.TienePermiso(Permisos.CATEGORIAS_GESTIONAR)) return;
+
             using var scope = _serviceProvider.CreateScope();
             var formCategoria = scope.ServiceProvider.GetRequiredService<FormCategoria>();
             formCategoria.ShowDialog();
@@ -422,6 +438,8 @@ namespace StockOS.UI.WinForms.Forms
 
         private void BtnProveedores_Click(object? sender, EventArgs e)
         {
+            if (!_authService.TienePermiso(Permisos.PROVEEDORES_GESTIONAR)) return;
+
             using var scope = _serviceProvider.CreateScope();
             var formProveedor = scope.ServiceProvider.GetRequiredService<FormProveedor>();
             formProveedor.ShowDialog();
@@ -429,8 +447,11 @@ namespace StockOS.UI.WinForms.Forms
             CargarDatos();
         }
 
+        // Captura eventos del boton ingresar stock
         private void BtnIngresarStock_Click(object? sender, EventArgs e)
         {
+            if (!_authService.TienePermiso(Permisos.STOCK_INGRESAR)) return;
+
             using var scope = _serviceProvider.CreateScope();
             var formStock = scope.ServiceProvider.GetRequiredService<FormIngresoStock>();
 

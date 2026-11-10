@@ -218,6 +218,14 @@ namespace StockOS.UI.WinForms.Forms
                 {
                     string metodoPago = formCobro.MetodoPagoSeleccionado;
 
+                    // Segunda barrera: revalidamos el pago con la regla centralizada ANTES de registrar la venta
+                    var validacionPago = ValidadorPago.Validar(metodoPago, _totalFinal, formCobro.MontoRecibido);
+                    if (!validacionPago.EsValido)
+                    {
+                        MostrarMensaje(validacionPago.Mensaje, validacionPago.Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     int idMetodoPago = 1; // Efectivo por defecto
                     string metodoLower = metodoPago.ToLower();
 

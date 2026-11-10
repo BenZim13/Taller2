@@ -83,9 +83,9 @@ namespace StockOS.UI.WinForms.Forms
             lblMontoRecibido.ForeColor = System.Drawing.Color.White;
             lblMontoRecibido.Location = new System.Drawing.Point(40, 180);
             lblMontoRecibido.Name = "lblMontoRecibido";
-            lblMontoRecibido.Size = new System.Drawing.Size(175, 19);
+            lblMontoRecibido.Size = new System.Drawing.Size(120, 19);
             lblMontoRecibido.TabIndex = 8;
-            lblMontoRecibido.Text = "Monto Recibido (Efectivo):";
+            lblMontoRecibido.Text = "Monto Recibido:";
             // 
             // txtMontoRecibido
             // 

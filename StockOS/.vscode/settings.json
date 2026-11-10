@@ -1,1 +1,8 @@
-{}
+{
+    "dotnet.defaultSolution": "StockOS.sln",
+    "code-runner.executorMap": {
+        "csharp": "dotnet run --project \"${workspaceFolder}/src/StockOS.UI.WinForms/StockOS.UI.WinForms.csproj\""
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.saveAllFilesBeforeRun": true
+}

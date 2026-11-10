@@ -1,11 +1,18 @@
 using System;
+using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
+using StockOS.Application.Services;
 
 namespace StockOS.UI.WinForms.Forms
 {
     public partial class FormCobro : Form
     {
         private readonly decimal _totalCobrar;
+
+        // Delegado para mostrar mensajes (permite interceptar en pruebas automatizadas sin bloquear la UI)
+        public static Action<string, string, MessageBoxButtons, MessageBoxIcon> MostrarMensaje { get; set; } =
+            (msg, title, btns, icon) => MessageBox.Show(msg, title, btns, icon);
 
         public string MetodoPagoSeleccionado { get; private set; } = "";
         public decimal MontoRecibido { get; private set; }
@@ -22,68 +29,64 @@ namespace StockOS.UI.WinForms.Forms
             Vuelto = 0;
             txtMontoRecibido.MaxLength = 12;
             StockOS.UI.WinForms.Helpers.ValidadorUI.ConfigurarSoloDecimales(txtMontoRecibido, "Monto Recibido");
+
+            // Al presionar ENTER en el campo de monto recibido, ejecutar cobro en Efectivo
+            txtMontoRecibido.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+                    ConfirmarPago("Efectivo");
+                }
+            };
+
+            this.Shown += (s, e) => txtMontoRecibido.Focus();
         }
 
-        private void btnEfectivo_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Valida el pago con la regla centralizada (ValidadorPago) para CUALQUIER método de pago.
+        /// Solo cierra el formulario con OK si el pago es válido.
+        /// </summary>
+        private void ConfirmarPago(string metodoPago)
         {
-            decimal montoIngresado;
+            decimal? montoIngresado = null;
 
-            // Validar monto ingresado para efectivo
-            if (string.IsNullOrWhiteSpace(txtMontoRecibido.Text))
+            if (!string.IsNullOrWhiteSpace(txtMontoRecibido.Text))
             {
-                // Si no ingresó nada, asumimos pago exacto
-                montoIngresado = _totalCobrar;
+                if (!decimal.TryParse(txtMontoRecibido.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out decimal parsed) || parsed < 0)
+                {
+                    MostrarMensaje("Por favor, ingrese un monto válido (solo números y decimales).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtMontoRecibido.Focus();
+                    txtMontoRecibido.SelectAll();
+                    return;
+                }
+                montoIngresado = parsed;
             }
-            else if (!decimal.TryParse(txtMontoRecibido.Text, out montoIngresado) || montoIngresado < 0)
+
+            var resultado = ValidadorPago.Validar(metodoPago, _totalCobrar, montoIngresado);
+
+            if (!resultado.EsValido)
             {
-                MessageBox.Show("Por favor, ingrese un monto válido (solo números y decimales).", "Dato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MostrarMensaje(resultado.Mensaje, resultado.Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMontoRecibido.Focus();
                 txtMontoRecibido.SelectAll();
                 return;
             }
 
-            if (montoIngresado < _totalCobrar)
-            {
-                MessageBox.Show($"El monto ingresado (${montoIngresado:N2}) es menor al total (${_totalCobrar:N2}).",
-                    "Monto Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtMontoRecibido.Focus();
-                txtMontoRecibido.SelectAll();
-                return;
-            }
-
-            MontoRecibido = montoIngresado;
-            Vuelto = montoIngresado - _totalCobrar;
-            MetodoPagoSeleccionado = "Efectivo";
+            MontoRecibido = resultado.MontoRecibido;
+            Vuelto = resultado.Vuelto;
+            MetodoPagoSeleccionado = metodoPago;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void btnTarjetaDebito_Click(object sender, EventArgs e)
-        {
-            MontoRecibido = _totalCobrar;
-            Vuelto = 0;
-            MetodoPagoSeleccionado = "Tarjeta de Débito";
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
+        private void btnEfectivo_Click(object sender, EventArgs e) => ConfirmarPago("Efectivo");
 
-        private void btnTarjetaCredito_Click(object sender, EventArgs e)
-        {
-            MontoRecibido = _totalCobrar;
-            Vuelto = 0;
-            MetodoPagoSeleccionado = "Tarjeta de Crédito";
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
+        private void btnTarjetaDebito_Click(object sender, EventArgs e) => ConfirmarPago("Tarjeta de Débito");
 
-        private void btnMercadoPago_Click(object sender, EventArgs e)
-        {
-            MontoRecibido = _totalCobrar;
-            Vuelto = 0;
-            MetodoPagoSeleccionado = "Mercado Pago";
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
+        private void btnTarjetaCredito_Click(object sender, EventArgs e) => ConfirmarPago("Tarjeta de Crédito");
+
+        private void btnMercadoPago_Click(object sender, EventArgs e) => ConfirmarPago("Mercado Pago");
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
@@ -93,15 +96,30 @@ namespace StockOS.UI.WinForms.Forms
 
         private void txtMontoRecibido_TextChanged(object sender, EventArgs e)
         {
-            if (decimal.TryParse(txtMontoRecibido.Text, out decimal monto) && monto >= _totalCobrar)
+            if (decimal.TryParse(txtMontoRecibido.Text, NumberStyles.Number, CultureInfo.CurrentCulture, out decimal monto))
             {
-                lblVueltoValor.Text = $"$ {(monto - _totalCobrar):N2}";
-                lblVueltoValor.ForeColor = System.Drawing.Color.FromArgb(16, 185, 129);
+                decimal total = Math.Round(_totalCobrar, 2, MidpointRounding.AwayFromZero);
+                decimal montoRedondeado = Math.Round(monto, 2, MidpointRounding.AwayFromZero);
+
+                if (montoRedondeado >= total)
+                {
+                    lblVuelto.Text = "Vuelto:";
+                    lblVueltoValor.Text = $"$ {(montoRedondeado - total):N2}";
+                    lblVueltoValor.ForeColor = Color.FromArgb(16, 185, 129);
+                }
+                else
+                {
+                    // Aviso en vivo: falta dinero para cubrir el total
+                    lblVuelto.Text = "Falta:";
+                    lblVueltoValor.Text = $"$ {(total - montoRedondeado):N2}";
+                    lblVueltoValor.ForeColor = Color.FromArgb(239, 68, 68);
+                }
             }
             else
             {
+                lblVuelto.Text = "Vuelto:";
                 lblVueltoValor.Text = "$ 0,00";
-                lblVueltoValor.ForeColor = System.Drawing.Color.White;
+                lblVueltoValor.ForeColor = Color.White;
             }
         }
     }
