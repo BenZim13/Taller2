@@ -54,7 +54,7 @@ namespace StockOS.UI.WinForms.Forms
             this.btnCerrarHeader.TabIndex = 99;
             this.btnCerrarHeader.Text = "Cerrar";
             this.btnCerrarHeader.UseVisualStyleBackColor = false;
-            this.btnCerrarHeader.Click += (s, e) => this.Close();
+            //this.btnCerrarHeader.Click += (s, e) => this.Close();
 
             // lblTitulo
             this.lblTitulo.AutoSize = true;

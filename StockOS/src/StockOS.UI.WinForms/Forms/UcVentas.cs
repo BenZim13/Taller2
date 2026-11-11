@@ -78,28 +78,33 @@ namespace StockOS.UI.WinForms.Forms
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                string codigoBuscar = txtCodigoBarra.Text.Trim();
+                string textoBuscado = txtCodigoBarra.Text.Trim();
 
-                if (string.IsNullOrEmpty(codigoBuscar)) return;
+                if (string.IsNullOrEmpty(textoBuscado)) return;
 
-                var producto = _productoService.BuscarPorCodigoBarra(codigoBuscar);
+                // 1. Intentamos buscar el código exacto primero (para el lector láser)
+                var productoExacto = _productoService.BuscarPorCodigoBarra(textoBuscado);
 
-                if (producto != null)
+                if (productoExacto != null)
                 {
-                    if (producto.Activo == false)
-                    {
-                        MostrarMensaje($"El producto '{producto.Nombre}' está deshabilitado / inactivo y no puede ser vendido.", "Producto Inactivo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        txtCodigoBarra.SelectAll();
-                        return;
-                    }
-
-                    AgregarProductoAlTicket(producto);
-                    txtCodigoBarra.Clear();
+                    ProcesarProductoParaTicket(productoExacto);
                 }
                 else
                 {
-                    MostrarMensaje("Producto no encontrado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtCodigoBarra.SelectAll();
+                    // 2. Si no es un código exacto, buscamos coincidencias parciales por nombre o código
+                    var productosEncontrados = _productoService.BuscarPorTexto(textoBuscado).ToList();
+
+                    if (productosEncontrados.Any())
+                    {
+                        // Por ahora agregamos el primero que encuentra. 
+                        // A futuro podrías abrir un DataGridView (Form modal) si productosEncontrados.Count > 1
+                        ProcesarProductoParaTicket(productosEncontrados.First());
+                    }
+                    else
+                    {
+                        MostrarMensaje("Producto no encontrado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtCodigoBarra.SelectAll();
+                    }
                 }
             }
         }
@@ -297,8 +302,8 @@ namespace StockOS.UI.WinForms.Forms
                         for (int i = 0; i < dgvTicket.Rows.Count; i++)
                         {
                             int idProd = Convert.ToInt32(dgvTicket.Rows[i].Cells["IdProducto"].Value);
-                            decimal ivaProducto = (_ivaProductos.ContainsKey(idProd) && _ivaProductos[idProd] > 0) 
-                                ? _ivaProductos[idProd] 
+                            decimal ivaProducto = (_ivaProductos.ContainsKey(idProd) && _ivaProductos[idProd] > 0)
+                                ? _ivaProductos[idProd]
                                 : StockOS.Domain.Entities.Producto.IvaFijoDefault;
 
                             detalles[i].IdProductoNavigation = new StockOS.Domain.Entities.Producto
@@ -348,6 +353,18 @@ namespace StockOS.UI.WinForms.Forms
                     }
                 }
             }
+        }
+        private void ProcesarProductoParaTicket(Producto producto)
+        {
+            if (producto.Activo == false)
+            {
+                MostrarMensaje($"El producto '{producto.Nombre}' está deshabilitado / inactivo y no puede ser vendido.", "Producto Inactivo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigoBarra.SelectAll();
+                return;
+            }
+
+            AgregarProductoAlTicket(producto);
+            txtCodigoBarra.Clear();
         }
 
         private void txtDescuento_TextChanged(object sender, EventArgs e)

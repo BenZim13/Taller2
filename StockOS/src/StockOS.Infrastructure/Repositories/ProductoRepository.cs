@@ -23,6 +23,14 @@ namespace StockOS.DataAccess.Repositories
                 .AsNoTracking()
                 .FirstOrDefault(p => p.CodigoBarra == codigoBarra);
         }
+        public IEnumerable<Producto> BuscarPorTexto(string textoBuscado)
+        {
+            // Buscamos productos que contengan el texto en el Código de Barras o en el Nombre
+            return _context.Productos
+                .AsNoTracking()
+                .Where(p => p.CodigoBarra.Contains(textoBuscado) || p.Nombre.Contains(textoBuscado))
+                .ToList();
+        }
 
         public IEnumerable<Producto> ObtenerTodos()
         {

@@ -14,5 +14,6 @@ namespace StockOS.Application.Services
         void Actualizar(Producto producto);
         void CambiarEstado(int idProducto, bool activo);
         Producto? BuscarPorCodigoBarra(string codigoBarra);
+        IEnumerable<Producto> BuscarPorTexto(string textoBuscado);
     }
 }

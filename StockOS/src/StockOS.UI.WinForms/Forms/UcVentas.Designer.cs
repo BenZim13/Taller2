@@ -17,27 +17,27 @@ namespace StockOS.UI.WinForms.Forms
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            pnlTop = new System.Windows.Forms.Panel();
-            lblBuscador = new System.Windows.Forms.Label();
-            txtCodigoBarra = new System.Windows.Forms.TextBox();
-            btnAbrirCaja = new System.Windows.Forms.Button();
-            btnMovimientoCaja = new System.Windows.Forms.Button();
-            btnCerrarCaja = new System.Windows.Forms.Button();
-            pnlBottom = new System.Windows.Forms.Panel();
-            lblTextoTotal = new System.Windows.Forms.Label();
-            lblTotal = new System.Windows.Forms.Label();
-            lblDescuento = new System.Windows.Forms.Label();
-            txtDescuento = new System.Windows.Forms.TextBox();
-            btnCobrar = new System.Windows.Forms.Button();
-            dgvTicket = new System.Windows.Forms.DataGridView();
-            IdProducto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Producto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Cantidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Precio = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Subtotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            Eliminar = new System.Windows.Forms.DataGridViewButtonColumn();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            pnlTop = new Panel();
+            btnCerrarCaja = new Button();
+            btnMovimientoCaja = new Button();
+            btnAbrirCaja = new Button();
+            lblBuscador = new Label();
+            txtCodigoBarra = new TextBox();
+            pnlBottom = new Panel();
+            lblDescuento = new Label();
+            txtDescuento = new TextBox();
+            lblTextoTotal = new Label();
+            lblTotal = new Label();
+            btnCobrar = new Button();
+            dgvTicket = new DataGridView();
+            IdProducto = new DataGridViewTextBoxColumn();
+            Producto = new DataGridViewTextBoxColumn();
+            Cantidad = new DataGridViewTextBoxColumn();
+            Precio = new DataGridViewTextBoxColumn();
+            Subtotal = new DataGridViewTextBoxColumn();
+            Eliminar = new DataGridViewButtonColumn();
             pnlTop.SuspendLayout();
             pnlBottom.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvTicket).BeginInit();
@@ -45,166 +45,168 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // pnlTop
             // 
-            pnlTop.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            pnlTop.BackColor = Color.FromArgb(30, 41, 59);
             pnlTop.Controls.Add(btnCerrarCaja);
             pnlTop.Controls.Add(btnMovimientoCaja);
             pnlTop.Controls.Add(btnAbrirCaja);
             pnlTop.Controls.Add(lblBuscador);
             pnlTop.Controls.Add(txtCodigoBarra);
-            pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
-            pnlTop.Location = new System.Drawing.Point(0, 0);
+            pnlTop.Dock = DockStyle.Top;
+            pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new System.Drawing.Size(900, 80);
+            pnlTop.Size = new Size(900, 80);
             pnlTop.TabIndex = 0;
-            // 
-            // lblBuscador
-            // 
-            lblBuscador.AutoSize = true;
-            lblBuscador.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            lblBuscador.ForeColor = System.Drawing.Color.White;
-            lblBuscador.Location = new System.Drawing.Point(20, 30);
-            lblBuscador.Name = "lblBuscador";
-            lblBuscador.Size = new System.Drawing.Size(70, 21);
-            lblBuscador.TabIndex = 1;
-            lblBuscador.Text = "Código:";
-            // 
-            // txtCodigoBarra
-            // 
-            txtCodigoBarra.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
-            txtCodigoBarra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtCodigoBarra.Font = new System.Drawing.Font("Segoe UI", 16F);
-            txtCodigoBarra.ForeColor = System.Drawing.Color.White;
-            txtCodigoBarra.Location = new System.Drawing.Point(100, 22);
-            txtCodigoBarra.Name = "txtCodigoBarra";
-            txtCodigoBarra.Size = new System.Drawing.Size(320, 36);
-            txtCodigoBarra.TabIndex = 0;
-            txtCodigoBarra.KeyDown += txtCodigoBarra_KeyDown;
-            // 
-            // btnAbrirCaja
-            // 
-            btnAbrirCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            btnAbrirCaja.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
-            btnAbrirCaja.Cursor = System.Windows.Forms.Cursors.Hand;
-            btnAbrirCaja.FlatAppearance.BorderSize = 0;
-            btnAbrirCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnAbrirCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnAbrirCaja.ForeColor = System.Drawing.Color.White;
-            btnAbrirCaja.Location = new System.Drawing.Point(440, 20);
-            btnAbrirCaja.Name = "btnAbrirCaja";
-            btnAbrirCaja.Size = new System.Drawing.Size(120, 40);
-            btnAbrirCaja.TabIndex = 2;
-            btnAbrirCaja.Text = "🔓 Abrir Caja";
-            btnAbrirCaja.UseVisualStyleBackColor = false;
-            btnAbrirCaja.Click += btnAbrirCaja_Click;
-            // 
-            // btnMovimientoCaja
-            // 
-            btnMovimientoCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            btnMovimientoCaja.BackColor = System.Drawing.Color.FromArgb(59, 130, 246);
-            btnMovimientoCaja.Cursor = System.Windows.Forms.Cursors.Hand;
-            btnMovimientoCaja.FlatAppearance.BorderSize = 0;
-            btnMovimientoCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnMovimientoCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnMovimientoCaja.ForeColor = System.Drawing.Color.White;
-            btnMovimientoCaja.Location = new System.Drawing.Point(570, 20);
-            btnMovimientoCaja.Name = "btnMovimientoCaja";
-            btnMovimientoCaja.Size = new System.Drawing.Size(130, 40);
-            btnMovimientoCaja.TabIndex = 4;
-            btnMovimientoCaja.Text = "📝 Movimiento";
-            btnMovimientoCaja.UseVisualStyleBackColor = false;
-            btnMovimientoCaja.Click += btnMovimientoCaja_Click;
             // 
             // btnCerrarCaja
             // 
-            btnCerrarCaja.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            btnCerrarCaja.BackColor = System.Drawing.Color.FromArgb(239, 68, 68);
-            btnCerrarCaja.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnCerrarCaja.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCerrarCaja.BackColor = Color.FromArgb(239, 68, 68);
+            btnCerrarCaja.Cursor = Cursors.Hand;
             btnCerrarCaja.FlatAppearance.BorderSize = 0;
-            btnCerrarCaja.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnCerrarCaja.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
-            btnCerrarCaja.ForeColor = System.Drawing.Color.White;
-            btnCerrarCaja.Location = new System.Drawing.Point(710, 20);
+            btnCerrarCaja.FlatStyle = FlatStyle.Flat;
+            btnCerrarCaja.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnCerrarCaja.ForeColor = Color.White;
+            btnCerrarCaja.Location = new Point(710, 20);
             btnCerrarCaja.Name = "btnCerrarCaja";
-            btnCerrarCaja.Size = new System.Drawing.Size(120, 40);
+            btnCerrarCaja.Size = new Size(120, 40);
             btnCerrarCaja.TabIndex = 3;
             btnCerrarCaja.Text = "🔒 Cerrar Caja";
             btnCerrarCaja.UseVisualStyleBackColor = false;
             btnCerrarCaja.Click += btnCerrarCaja_Click;
             // 
+            // btnMovimientoCaja
+            // 
+            btnMovimientoCaja.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnMovimientoCaja.BackColor = Color.FromArgb(59, 130, 246);
+            btnMovimientoCaja.Cursor = Cursors.Hand;
+            btnMovimientoCaja.FlatAppearance.BorderSize = 0;
+            btnMovimientoCaja.FlatStyle = FlatStyle.Flat;
+            btnMovimientoCaja.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnMovimientoCaja.ForeColor = Color.White;
+            btnMovimientoCaja.Location = new Point(570, 20);
+            btnMovimientoCaja.Name = "btnMovimientoCaja";
+            btnMovimientoCaja.Size = new Size(130, 40);
+            btnMovimientoCaja.TabIndex = 4;
+            btnMovimientoCaja.Text = "📝 Movimiento";
+            btnMovimientoCaja.UseVisualStyleBackColor = false;
+            btnMovimientoCaja.Click += btnMovimientoCaja_Click;
+            // 
+            // btnAbrirCaja
+            // 
+            btnAbrirCaja.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAbrirCaja.BackColor = Color.FromArgb(16, 185, 129);
+            btnAbrirCaja.Cursor = Cursors.Hand;
+            btnAbrirCaja.FlatAppearance.BorderSize = 0;
+            btnAbrirCaja.FlatStyle = FlatStyle.Flat;
+            btnAbrirCaja.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnAbrirCaja.ForeColor = Color.White;
+            btnAbrirCaja.Location = new Point(440, 20);
+            btnAbrirCaja.Name = "btnAbrirCaja";
+            btnAbrirCaja.Size = new Size(120, 40);
+            btnAbrirCaja.TabIndex = 2;
+            btnAbrirCaja.Text = "🔓 Abrir Caja";
+            btnAbrirCaja.UseVisualStyleBackColor = false;
+            btnAbrirCaja.Click += btnAbrirCaja_Click;
+            // 
+            // lblBuscador
+            // 
+            lblBuscador.AutoSize = true;
+            lblBuscador.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblBuscador.ForeColor = Color.White;
+            lblBuscador.Location = new Point(10, 31);
+            lblBuscador.Name = "lblBuscador";
+            lblBuscador.Size = new Size(84, 21);
+            lblBuscador.TabIndex = 1;
+            lblBuscador.Text = "Producto:";
+            lblBuscador.Click += btnCobrar_Click;
+            // 
+            // txtCodigoBarra
+            // 
+            txtCodigoBarra.BackColor = Color.FromArgb(15, 23, 42);
+            txtCodigoBarra.BorderStyle = BorderStyle.FixedSingle;
+            txtCodigoBarra.Font = new Font("Segoe UI", 16F);
+            txtCodigoBarra.ForeColor = Color.White;
+            txtCodigoBarra.Location = new Point(100, 22);
+            txtCodigoBarra.Name = "txtCodigoBarra";
+            txtCodigoBarra.PlaceholderText = "Nombre o Código de prod.";
+            txtCodigoBarra.Size = new Size(320, 36);
+            txtCodigoBarra.TabIndex = 0;
+            txtCodigoBarra.KeyDown += txtCodigoBarra_KeyDown;
+            // 
             // pnlBottom
             // 
-            pnlBottom.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
+            pnlBottom.BackColor = Color.FromArgb(15, 23, 42);
             pnlBottom.Controls.Add(lblDescuento);
             pnlBottom.Controls.Add(txtDescuento);
             pnlBottom.Controls.Add(lblTextoTotal);
             pnlBottom.Controls.Add(lblTotal);
             pnlBottom.Controls.Add(btnCobrar);
-            pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            pnlBottom.Location = new System.Drawing.Point(0, 500);
+            pnlBottom.Dock = DockStyle.Bottom;
+            pnlBottom.Location = new Point(0, 500);
             pnlBottom.Name = "pnlBottom";
-            pnlBottom.Size = new System.Drawing.Size(900, 100);
+            pnlBottom.Size = new Size(900, 100);
             pnlBottom.TabIndex = 2;
+            // 
+            // lblDescuento
+            // 
+            lblDescuento.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblDescuento.AutoSize = true;
+            lblDescuento.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblDescuento.ForeColor = Color.White;
+            lblDescuento.Location = new Point(400, 38);
+            lblDescuento.Name = "lblDescuento";
+            lblDescuento.Size = new Size(108, 21);
+            lblDescuento.TabIndex = 3;
+            lblDescuento.Text = "Descuento $:";
+            // 
+            // txtDescuento
+            // 
+            txtDescuento.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            txtDescuento.BackColor = Color.FromArgb(30, 41, 59);
+            txtDescuento.BorderStyle = BorderStyle.FixedSingle;
+            txtDescuento.Font = new Font("Segoe UI", 16F);
+            txtDescuento.ForeColor = Color.White;
+            txtDescuento.Location = new Point(515, 32);
+            txtDescuento.Name = "txtDescuento";
+            txtDescuento.Size = new Size(110, 36);
+            txtDescuento.TabIndex = 4;
+            txtDescuento.TextAlign = HorizontalAlignment.Right;
+            txtDescuento.TextChanged += txtDescuento_TextChanged;
             // 
             // lblTextoTotal
             // 
             lblTextoTotal.AutoSize = true;
-            lblTextoTotal.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold);
-            lblTextoTotal.ForeColor = System.Drawing.Color.White;
-            lblTextoTotal.Location = new System.Drawing.Point(20, 25);
+            lblTextoTotal.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            lblTextoTotal.ForeColor = Color.White;
+            lblTextoTotal.Location = new Point(20, 25);
             lblTextoTotal.Name = "lblTextoTotal";
-            lblTextoTotal.Size = new System.Drawing.Size(126, 45);
+            lblTextoTotal.Size = new Size(126, 45);
             lblTextoTotal.TabIndex = 1;
             lblTextoTotal.Text = "TOTAL:";
             // 
             // lblTotal
             // 
             lblTotal.AutoSize = true;
-            lblTotal.Font = new System.Drawing.Font("Segoe UI", 32F, System.Drawing.FontStyle.Bold);
-            lblTotal.ForeColor = System.Drawing.Color.FromArgb(16, 185, 129);
-            lblTotal.Location = new System.Drawing.Point(140, 15);
+            lblTotal.Font = new Font("Segoe UI", 32F, FontStyle.Bold);
+            lblTotal.ForeColor = Color.FromArgb(16, 185, 129);
+            lblTotal.Location = new Point(140, 15);
             lblTotal.Name = "lblTotal";
-            lblTotal.Size = new System.Drawing.Size(137, 59);
+            lblTotal.Size = new Size(149, 59);
             lblTotal.TabIndex = 2;
             lblTotal.Text = "$ 0.00";
             // 
-            // lblDescuento
-            // 
-            lblDescuento.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            lblDescuento.AutoSize = true;
-            lblDescuento.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            lblDescuento.ForeColor = System.Drawing.Color.White;
-            lblDescuento.Location = new System.Drawing.Point(400, 38);
-            lblDescuento.Name = "lblDescuento";
-            lblDescuento.Size = new System.Drawing.Size(107, 21);
-            lblDescuento.TabIndex = 3;
-            lblDescuento.Text = "Descuento $:";
-            // 
-            // txtDescuento
-            // 
-            txtDescuento.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            txtDescuento.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            txtDescuento.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtDescuento.Font = new System.Drawing.Font("Segoe UI", 16F);
-            txtDescuento.ForeColor = System.Drawing.Color.White;
-            txtDescuento.Location = new System.Drawing.Point(515, 32);
-            txtDescuento.Name = "txtDescuento";
-            txtDescuento.Size = new System.Drawing.Size(110, 36);
-            txtDescuento.TabIndex = 4;
-            txtDescuento.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            txtDescuento.TextChanged += txtDescuento_TextChanged;
-            // 
             // btnCobrar
             // 
-            btnCobrar.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            btnCobrar.BackColor = System.Drawing.Color.FromArgb(16, 185, 129);
-            btnCobrar.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnCobrar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCobrar.BackColor = Color.FromArgb(16, 185, 129);
+            btnCobrar.Cursor = Cursors.Hand;
             btnCobrar.FlatAppearance.BorderSize = 0;
-            btnCobrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnCobrar.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            btnCobrar.ForeColor = System.Drawing.Color.White;
-            btnCobrar.Location = new System.Drawing.Point(650, 20);
+            btnCobrar.FlatStyle = FlatStyle.Flat;
+            btnCobrar.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            btnCobrar.ForeColor = Color.White;
+            btnCobrar.Location = new Point(650, 20);
             btnCobrar.Name = "btnCobrar";
-            btnCobrar.Size = new System.Drawing.Size(220, 60);
+            btnCobrar.Size = new Size(220, 60);
             btnCobrar.TabIndex = 0;
             btnCobrar.Text = "COBRAR (F12)";
             btnCobrar.UseVisualStyleBackColor = false;
@@ -214,34 +216,35 @@ namespace StockOS.UI.WinForms.Forms
             // 
             dgvTicket.AllowUserToAddRows = false;
             dgvTicket.AllowUserToDeleteRows = false;
-            dgvTicket.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dgvTicket.BackgroundColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            dgvTicket.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(15, 23, 42);
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(15, 23, 42);
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
-            dgvTicket.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dgvTicket.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTicket.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { IdProducto, Producto, Cantidad, Precio, Subtotal, Eliminar });
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(30, 41, 59);
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 12F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(51, 65, 85);
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White;
-            dgvTicket.DefaultCellStyle = dataGridViewCellStyle2;
-            dgvTicket.Dock = System.Windows.Forms.DockStyle.Fill;
+            dgvTicket.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvTicket.BackgroundColor = Color.FromArgb(30, 41, 59);
+            dgvTicket.BorderStyle = BorderStyle.None;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(15, 23, 42);
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            dataGridViewCellStyle3.ForeColor = Color.White;
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(15, 23, 42);
+            dataGridViewCellStyle3.SelectionForeColor = Color.White;
+            dgvTicket.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dgvTicket.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvTicket.Columns.AddRange(new DataGridViewColumn[] { IdProducto, Producto, Cantidad, Precio, Subtotal, Eliminar });
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = Color.FromArgb(30, 41, 59);
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 12F);
+            dataGridViewCellStyle4.ForeColor = Color.White;
+            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(51, 65, 85);
+            dataGridViewCellStyle4.SelectionForeColor = Color.White;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
+            dgvTicket.DefaultCellStyle = dataGridViewCellStyle4;
+            dgvTicket.Dock = DockStyle.Fill;
             dgvTicket.EnableHeadersVisualStyles = false;
-            dgvTicket.Location = new System.Drawing.Point(0, 80);
+            dgvTicket.Location = new Point(0, 80);
             dgvTicket.Name = "dgvTicket";
             dgvTicket.ReadOnly = true;
             dgvTicket.RowHeadersVisible = false;
             dgvTicket.RowTemplate.Height = 40;
-            dgvTicket.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            dgvTicket.Size = new System.Drawing.Size(900, 420);
+            dgvTicket.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvTicket.Size = new Size(900, 420);
             dgvTicket.TabIndex = 1;
             dgvTicket.CellContentClick += dgvTicket_CellContentClick;
             // 
@@ -291,13 +294,13 @@ namespace StockOS.UI.WinForms.Forms
             // 
             // UcVentas
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(dgvTicket);
             Controls.Add(pnlBottom);
             Controls.Add(pnlTop);
             Name = "UcVentas";
-            Size = new System.Drawing.Size(900, 600);
+            Size = new Size(900, 600);
             pnlTop.ResumeLayout(false);
             pnlTop.PerformLayout();
             pnlBottom.ResumeLayout(false);

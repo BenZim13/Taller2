@@ -105,5 +105,12 @@ namespace StockOS.Application.Services
             _authService.ValidarPermiso(Permisos.PRODUCTOS_EDITAR);
             _productoRepository.CambiarEstado(idProducto, activo);
         }
+        public IEnumerable<Producto> BuscarPorTexto(string textoBuscado)
+        {
+            _authService.ValidarPermiso(Permisos.PRODUCTOS_VER);
+            if (string.IsNullOrWhiteSpace(textoBuscado)) return Enumerable.Empty<Producto>();
+
+            return _productoRepository.BuscarPorTexto(textoBuscado.Trim());
+        }
     }
 }
