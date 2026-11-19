@@ -429,3 +429,12 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ===================================================================
+# Antigravity & AI Agent Configurations and Audit Docs
+# ===================================================================
+.agents/
+AGENTS.md
+GEMINI.md
+docs/INFORME_AUDITORIA_CRITICA_STOCKOS.md
+
