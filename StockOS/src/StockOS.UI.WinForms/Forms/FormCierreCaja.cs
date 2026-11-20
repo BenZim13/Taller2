@@ -19,8 +19,16 @@ namespace StockOS.UI.WinForms.Forms
 
         private void btnConfirmarCierre_Click(object sender, EventArgs e)
         {
-            // Corregimos la validación para soportar nulos
-            if (!SesionActual.IdCajaSesionAbierta.HasValue || SesionActual.IdCajaSesionAbierta.Value == 0)
+            int? idSesion = SesionActual.IdCajaSesionAbierta;
+            if (!idSesion.HasValue || idSesion.Value == 0)
+            {
+                if (SesionActual.Usuario != null)
+                {
+                    idSesion = _cajaService.ObtenerIdSesionAbierta(SesionActual.Usuario.IdEmpleado);
+                }
+            }
+
+            if (!idSesion.HasValue || idSesion.Value == 0)
             {
                 MessageBox.Show("No hay ninguna caja abierta actualmente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -36,7 +44,7 @@ namespace StockOS.UI.WinForms.Forms
 
             try
             {
-                int idCaja = SesionActual.IdCajaSesionAbierta.Value;
+                int idCaja = idSesion.Value;
 
                 // 1. Calculamos cuánto DEBERÍA haber según el sistema
                 decimal montoEsperado = _cajaService.ObtenerMontoEsperado(idCaja);
@@ -62,6 +70,7 @@ namespace StockOS.UI.WinForms.Forms
                     SesionActual.IdCajaSesionAbierta = null;
 
                     MessageBox.Show("Turno finalizado y caja cerrada correctamente.", "Cierre Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
             }

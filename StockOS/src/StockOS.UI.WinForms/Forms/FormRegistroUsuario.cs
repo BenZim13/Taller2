@@ -76,7 +76,7 @@ namespace StockOS.UI.WinForms.Forms
         txtPassword.Clear();
         lblTitulo.Text = "Registro de Usuario";
         this.Text = "Registro de Usuario";
-        lblCodigo.Text = "Contraseña (8 dígitos)";
+        lblCodigo.Text = "Contraseña";
         if (cmbRol.Items.Count > 0) cmbRol.SelectedIndex = 0;
         if (cmbSucursal.Items.Count > 0) cmbSucursal.SelectedIndex = 0;
     }

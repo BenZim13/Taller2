@@ -40,9 +40,9 @@ namespace StockOS.Application.Services
             if (_empleadoRepository.ObtenerPorDni(empleado.Dni) != null) return false;
             if (_empleadoRepository.ObtenerPorEmail(empleado.Email) != null) return false;
 
-            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !empleado.PasswordHash.StartsWith("$2"))
+            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !EsHashBCryptValido(empleado.PasswordHash))
             {
-                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
+                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash, workFactor: 11);
             }
 
             _empleadoRepository.Agregar(empleado);
@@ -67,9 +67,9 @@ namespace StockOS.Application.Services
                 return (false, "El correo electrónico ya se encuentra registrado por otro empleado.");
             }
 
-            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !empleado.PasswordHash.StartsWith("$2"))
+            if (!string.IsNullOrWhiteSpace(empleado.PasswordHash) && !EsHashBCryptValido(empleado.PasswordHash))
             {
-                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash);
+                empleado.PasswordHash = BCrypt.Net.BCrypt.HashPassword(empleado.PasswordHash, workFactor: 11);
             }
 
             _empleadoRepository.Actualizar(empleado);
@@ -122,6 +122,16 @@ namespace StockOS.Application.Services
 
             if (string.IsNullOrWhiteSpace(empleado.Direccion) || empleado.Direccion.Length > 200)
                 throw new System.ArgumentException("La dirección es obligatoria y no puede superar los 200 caracteres.");
+        }
+
+        private static bool EsHashBCryptValido(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input) || input.Length != 60)
+            {
+                return false;
+            }
+
+            return System.Text.RegularExpressions.Regex.IsMatch(input, @"^\$2[abxy]\$\d{2}\$[A-Za-z0-9./]{53}$");
         }
     }
 }

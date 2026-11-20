@@ -86,8 +86,12 @@ namespace StockOS.UI.WinForms.Forms
             var result = MessageBox.Show("¿Está seguro de que desea cerrar sesión?", "Confirmar Cierre de Sesión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                if (!ValidarYCerrarCajaAntesDeSalir())
+                {
+                    return;
+                }
+
                 LogoutRequested = true;
-                CerrarCajaSesionUsuarioActual();
                 this.Close();
             }
         }
@@ -95,23 +99,55 @@ namespace StockOS.UI.WinForms.Forms
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            CerrarCajaSesionUsuarioActual();
+
+            if (!ValidarYCerrarCajaAntesDeSalir())
+            {
+                e.Cancel = true;
+                return;
+            }
+
             SesionActual.Limpiar();
         }
 
-        private void CerrarCajaSesionUsuarioActual()
+        private bool ValidarYCerrarCajaAntesDeSalir()
         {
-            if (_usuarioActual != null)
+            if (_usuarioActual == null) return true;
+
+            int? idSesionAbierta = SesionActual.IdCajaSesionAbierta ?? _cajaService.ObtenerIdSesionAbierta(_usuarioActual.IdEmpleado);
+            if (idSesionAbierta.HasValue && idSesionAbierta.Value > 0)
             {
-                try
+                var respuesta = MessageBox.Show(
+                    "Tiene un turno de caja abierto.\n\n" +
+                    "Para garantizar la seguridad del arqueo y permitir el relevo de turnos entre empleados, " +
+                    "debe realizar el arqueo y cierre de caja antes de salir.\n\n" +
+                    "¿Desea realizar el cierre de caja ahora?",
+                    "Caja Abierta — Arqueo Obligatorio",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (respuesta == DialogResult.Yes)
                 {
-                    _cajaService.CerrarCajaPorCierreSesion(_usuarioActual.IdEmpleado);
+                    SesionActual.IdCajaSesionAbierta = idSesionAbierta.Value;
+                    using (var formCierre = new FormCierreCaja(_cajaService))
+                    {
+                        var resultadoCierre = formCierre.ShowDialog();
+                        if (resultadoCierre == DialogResult.OK || !SesionActual.IdCajaSesionAbierta.HasValue)
+                        {
+                            return true;
+                        }
+                    }
                 }
-                catch
-                {
-                    // Evitar que una falla en BD bloquee el cierre de sesión
-                }
+
+                MessageBox.Show(
+                    "No se puede cerrar la sesión con una caja abierta sin arquear.\n" +
+                    "El turno permanecerá activo en la terminal.",
+                    "Salida Cancelada",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return false;
             }
+
+            return true;
         }
 
         private void InicializarDock()

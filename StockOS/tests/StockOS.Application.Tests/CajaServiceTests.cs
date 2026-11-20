@@ -262,7 +262,7 @@ namespace StockOS.Application.Tests
         }
 
         [Fact]
-        public void CerrarCajaPorCierreSesion_ConSesionAbierta_ObtieneMontoEsperadoYCierraRepositorio()
+        public void CerrarCajaPorCierreSesion_ConSesionAbierta_LimpiaContextoSinCierreCiego()
         {
             // ARRANGE
             var mockCajaSesionRepo = new Mock<ICajaSesionRepository>();
@@ -271,10 +271,8 @@ namespace StockOS.Application.Tests
 
             int idEmpleado = 10;
             int idSesionAbierta = 77;
-            decimal montoEsperado = 12500.50m;
 
             mockCajaSesionRepo.Setup(r => r.ObtenerIdSesionAbierta(idEmpleado)).Returns(idSesionAbierta);
-            mockCajaRepo.Setup(r => r.ObtenerMontoEsperado(idSesionAbierta)).Returns(montoEsperado);
 
             SesionActual.Limpiar();
             SesionActual.Usuario = new Domain.Entities.Empleado { IdEmpleado = idEmpleado, Nombre = "Juan", Apellido = "Perez" };
@@ -285,9 +283,8 @@ namespace StockOS.Application.Tests
             // ACT
             cajaService.CerrarCajaPorCierreSesion(idEmpleado);
 
-            // ASSERT
-            mockCajaRepo.Verify(r => r.ObtenerMontoEsperado(idSesionAbierta), Times.Once);
-            mockCajaRepo.Verify(r => r.CerrarCaja(idSesionAbierta, montoEsperado), Times.Once);
+            // ASSERT: Debe limpiar la sesión en memoria pero NUNCA cerrar ciegamente el turno en la BD
+            mockCajaRepo.Verify(r => r.CerrarCaja(It.IsAny<int>(), It.IsAny<decimal>()), Times.Never);
             Assert.Null(SesionActual.IdCajaSesionAbierta);
             SesionActual.Limpiar();
         }

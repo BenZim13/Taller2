@@ -241,6 +241,67 @@ namespace StockOS.Application.Tests
             Assert.False(resultado);
             mockRepo.Verify(r => r.Actualizar(It.IsAny<Empleado>()), Times.Never);
         }
-    
-}
+
+        [Fact]
+        public async Task CrearAsync_PasswordComienzaConSignoPesosDos_HasheaCorrectamenteConBCrypt()
+        {
+            // ARRANGE
+            var mockRepo = new Mock<IEmpleadoRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            mockRepo.Setup(r => r.ObtenerPorDni(It.IsAny<string>())).Returns((Empleado?)null);
+            mockRepo.Setup(r => r.ObtenerPorEmail(It.IsAny<string>())).Returns((Empleado?)null);
+
+            var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
+            string passwordPlana = "$2026SecurePass!";
+            var nuevoEmpleado = new Empleado
+            {
+                Nombre = "Carlos",
+                Apellido = "Gomez",
+                Dni = "33999888",
+                Email = "carlos@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Calle 1 234",
+                PasswordHash = passwordPlana
+            };
+
+            // ACT
+            bool resultado = await service.CrearAsync(nuevoEmpleado);
+
+            // ASSERT
+            Assert.True(resultado);
+            Assert.NotEqual(passwordPlana, nuevoEmpleado.PasswordHash);
+            Assert.True(nuevoEmpleado.PasswordHash.Length == 60);
+            Assert.True(BCrypt.Net.BCrypt.Verify(passwordPlana, nuevoEmpleado.PasswordHash));
+        }
+
+        [Fact]
+        public async Task CrearAsync_PasswordEsHashBCryptValido_NoVuelveAHashear()
+        {
+            // ARRANGE
+            var mockRepo = new Mock<IEmpleadoRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
+            mockRepo.Setup(r => r.ObtenerPorDni(It.IsAny<string>())).Returns((Empleado?)null);
+            mockRepo.Setup(r => r.ObtenerPorEmail(It.IsAny<string>())).Returns((Empleado?)null);
+
+            var service = new EmpleadoService(mockRepo.Object, mockAuth.Object);
+            string hashOriginal = BCrypt.Net.BCrypt.HashPassword("OriginalPass123", workFactor: 11);
+            var nuevoEmpleado = new Empleado
+            {
+                Nombre = "Carlos",
+                Apellido = "Gomez",
+                Dni = "33999888",
+                Email = "carlos@mail.com",
+                Telefono = "1122334455",
+                Direccion = "Calle 1 234",
+                PasswordHash = hashOriginal
+            };
+
+            // ACT
+            bool resultado = await service.CrearAsync(nuevoEmpleado);
+
+            // ASSERT
+            Assert.True(resultado);
+            Assert.Equal(hashOriginal, nuevoEmpleado.PasswordHash);
+        }
+    }
 }

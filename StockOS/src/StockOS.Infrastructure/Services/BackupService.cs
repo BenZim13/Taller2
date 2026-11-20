@@ -550,9 +550,12 @@ namespace StockOS.DataAccess.Services
 
                     try
                     {
-                        var builder = new SqlConnectionStringBuilder(_connectionString) { InitialCatalog = "master" };
-                        string dbName = string.IsNullOrWhiteSpace(builder.InitialCatalog) ? "StockOS" : builder.InitialCatalog;
-                        using var conexionFallback = new SqlConnection(builder.ConnectionString);
+                        // Extraer el nombre real de la base de datos ANTES de conmutar el catálogo a 'master'
+                        var originalBuilder = new SqlConnectionStringBuilder(_connectionString);
+                        string dbName = string.IsNullOrWhiteSpace(originalBuilder.InitialCatalog) ? "StockOS" : originalBuilder.InitialCatalog;
+
+                        var masterBuilder = new SqlConnectionStringBuilder(_connectionString) { InitialCatalog = "master" };
+                        using var conexionFallback = new SqlConnection(masterBuilder.ConnectionString);
                         await conexionFallback.OpenAsync();
                         using var cmdFallback = new SqlCommand($"ALTER DATABASE [{dbName}] SET MULTI_USER;", conexionFallback);
                         await cmdFallback.ExecuteNonQueryAsync();

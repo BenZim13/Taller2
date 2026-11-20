@@ -119,6 +119,7 @@ namespace StockOS.UI.WinForms.Forms
                         services.AddTransient<FormCategoria>();
                         services.AddTransient<FormProveedor>();
                         services.AddTransient<FormAperturaCaja>();
+                        services.AddTransient<FormCierreCaja>();
 
                         // Controles de usuario (User Controls)
                         services.AddTransient<UcInicio>();
@@ -154,7 +155,8 @@ namespace StockOS.UI.WinForms.Forms
 
                             System.Windows.Forms.Application.Run(formInicio);
 
-                            // Intentar cerrar automáticamente la caja al salir
+                            // Si el usuario tenía una caja abierta, limpiar el contexto de sesión activa
+                            // (Se respeta la regla de no realizar cierres ciegos automáticos; el turno permanece para arqueo manual)
                             if (usuario != null)
                             {
                                 try
@@ -164,7 +166,7 @@ namespace StockOS.UI.WinForms.Forms
                                 }
                                 catch (Exception exCaja)
                                 {
-                                    Log.Warning(exCaja, "No se pudo cerrar automáticamente la caja al finalizar la sesión del usuario {IdEmpleado}.", usuario.IdEmpleado);
+                                    Log.Warning(exCaja, "No se pudo limpiar la sesión de caja del usuario {IdEmpleado}.", usuario.IdEmpleado);
                                 }
                             }
 

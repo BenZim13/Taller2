@@ -267,14 +267,14 @@ namespace StockOS.UI.WinForms.Forms
             this.lblCodigo.Name = "lblCodigo";
             this.lblCodigo.Size = new System.Drawing.Size(142, 17);
             this.lblCodigo.TabIndex = 17;
-            this.lblCodigo.Text = "Contraseña (8 dígitos)";
+            this.lblCodigo.Text = "Contraseña";
 
             this.txtPassword.BackColor = System.Drawing.Color.FromArgb(51, 65, 85);
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.txtPassword.ForeColor = System.Drawing.Color.White;
             this.txtPassword.Location = new System.Drawing.Point(35, 320);
-            this.txtPassword.MaxLength = 8;
+            this.txtPassword.MaxLength = 50;
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PlaceholderText = "••••••••";
             this.txtPassword.Size = new System.Drawing.Size(490, 24);

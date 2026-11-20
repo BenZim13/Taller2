@@ -83,11 +83,16 @@ namespace StockOS.UI.WinForms.Forms
                     // Guardamos el usuario en la memoria global
                     SesionActual.Usuario = empleado;
 
-                    // Asegurar que si quedó una sesión huérfana de una ejecución previa se cierre en la base de datos
-                    _cajaService.CerrarCajaPorCierreSesion(empleado.IdEmpleado);
-
-                    // Toda nueva sesión inicia con la caja cerrada; el cajero debe abrir su caja explícitamente para su turno
-                    SesionActual.IdCajaSesionAbierta = null;
+                    // Verificar si el empleado ya contaba con un turno de caja abierto en esta sucursal (reconexión)
+                    var idSesionAbierta = _cajaService.ObtenerIdSesionAbierta(empleado.IdEmpleado);
+                    if (idSesionAbierta.HasValue && idSesionAbierta.Value > 0)
+                    {
+                        SesionActual.IdCajaSesionAbierta = idSesionAbierta.Value;
+                    }
+                    else
+                    {
+                        SesionActual.IdCajaSesionAbierta = null;
+                    }
 
                     MostrarExito("Ingreso exitoso");
                     await Task.Delay(1200);

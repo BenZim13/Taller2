@@ -116,7 +116,8 @@ namespace StockOS.Application.Tests
             Assert.True(_cajaService.VerificarCajaAbierta(_cajeroA.IdEmpleado));
             Assert.True(_mockSesionRepo.Object.VerificarCajaFisicaAbierta(1));
 
-            // 3. Cajero A cierra sesión (evento de FormInicio / Program.cs)
+            // 3. Cajero A realiza arqueo físico explícito y cierra caja antes de salir
+            _cajaService.CerrarCaja(idSesionA, 5000m);
             _cajaService.CerrarCajaPorCierreSesion(_cajeroA.IdEmpleado);
             SesionActual.Limpiar();
 
@@ -131,12 +132,13 @@ namespace StockOS.Application.Tests
         [Fact]
         public void FlujoCompleto_CajeroB_IngresaDespuesDeCajeroA_IniciaSinCajaAbierta_Y_NoPuedeCobrarHastaAbrirla()
         {
-            // 1. Cajero A inicia sesión, abre Caja 1, y luego cierra sesión
+            // 1. Cajero A inicia sesión, abre Caja 1, arquea y cierra antes de salir
             SesionActual.Usuario = _cajeroA;
             int idSesionA = _cajaService.AbrirCaja(idCaja: 1, idEmpleado: _cajeroA.IdEmpleado, montoApertura: 3000m);
             SesionActual.IdCajaSesionAbierta = idSesionA;
 
-            // Cajero A cierra su sesión
+            // Cajero A cierra su caja explícitamente y cierra su sesión
+            _cajaService.CerrarCaja(idSesionA, 3000m);
             _cajaService.CerrarCajaPorCierreSesion(_cajeroA.IdEmpleado);
             SesionActual.Limpiar();
 
@@ -167,7 +169,8 @@ namespace StockOS.Application.Tests
             puedeCobrar = SesionActual.IdCajaSesionAbierta.HasValue && SesionActual.IdCajaSesionAbierta.Value > 0;
             Assert.True(puedeCobrar);
 
-            // 4. Cajero B cierra sesión
+            // 4. Cajero B arquea y cierra sesión
+            _cajaService.CerrarCaja(idSesionB, 2500m);
             _cajaService.CerrarCajaPorCierreSesion(_cajeroB.IdEmpleado);
             SesionActual.Limpiar();
 
@@ -198,7 +201,8 @@ namespace StockOS.Application.Tests
             int idSesion1 = _cajaService.AbrirCaja(idCaja: 1, idEmpleado: _cajeroA.IdEmpleado, montoApertura: 1500m);
             SesionActual.IdCajaSesionAbierta = idSesion1;
 
-            // Cajero A cierra sesión
+            // Cajero A arquea y cierra su caja
+            _cajaService.CerrarCaja(idSesion1, 1500m);
             _cajaService.CerrarCajaPorCierreSesion(_cajeroA.IdEmpleado);
             SesionActual.Limpiar();
 
@@ -208,7 +212,7 @@ namespace StockOS.Application.Tests
             _cajaService.CerrarCajaPorCierreSesion(_cajeroA.IdEmpleado);
             SesionActual.IdCajaSesionAbierta = null;
 
-            // Verificar que al reingresar NO tiene la caja abierta
+            // Verificar que al reingresar NO tiene la caja abierta porque ya la había cerrado
             Assert.Null(SesionActual.IdCajaSesionAbierta);
             Assert.False(_cajaService.VerificarCajaAbierta(_cajeroA.IdEmpleado));
             Assert.Null(_cajaService.ObtenerIdSesionAbierta(_cajeroA.IdEmpleado));
@@ -220,6 +224,26 @@ namespace StockOS.Application.Tests
             // Abre una nueva sesión con nuevo turno
             int idSesion2 = _cajaService.AbrirCaja(idCaja: 1, idEmpleado: _cajeroA.IdEmpleado, montoApertura: 1500m);
             Assert.NotEqual(idSesion1, idSesion2);
+        }
+
+        [Fact]
+        public void Cajero_CierraSesionSinArqueo_CajaPermaneceAbiertaParaReingreso()
+        {
+            // 1. Cajero A abre caja
+            SesionActual.Usuario = _cajeroA;
+            int idSesionA = _cajaService.AbrirCaja(idCaja: 1, idEmpleado: _cajeroA.IdEmpleado, montoApertura: 4000m);
+            SesionActual.IdCajaSesionAbierta = idSesionA;
+
+            // 2. Cajero A cierra sesión SIN arquear (desconexión o logout)
+            _cajaService.CerrarCajaPorCierreSesion(_cajeroA.IdEmpleado);
+            SesionActual.Limpiar();
+
+            // 3. En memoria se limpió la sesión activa
+            Assert.Null(SesionActual.IdCajaSesionAbierta);
+
+            // 4. Regla StockOS: En la BD la caja permanece abierta esperando arqueo manual
+            Assert.True(_cajaService.VerificarCajaAbierta(_cajeroA.IdEmpleado));
+            Assert.Equal(idSesionA, _cajaService.ObtenerIdSesionAbierta(_cajeroA.IdEmpleado));
         }
     }
 }

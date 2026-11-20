@@ -302,12 +302,8 @@ namespace StockOS.UI.WinForms.Forms
 
                     _productoService.Agregar(nuevoProducto);
 
-                    if (stockFinal != 0)
-                    {
-                        _stockService.AgregarStock(nuevoProducto.IdProducto, idSucursalActual, stockFinal);
-                    }
-
-                    // Si se especificó precio de compra, guardamos el registro en compra / detalle_compra
+                    // Si se especificó precio de compra, guardamos el registro contable en compra / detalle_compra
+                    // CompraRepository.RegistrarCompra ya incrementa el stock de forma atómica dentro de su transacción.
                     if (precioCompra > 0)
                     {
                         int cantCompra = stockFinal > 0 ? stockFinal : 1;
@@ -329,6 +325,11 @@ namespace StockOS.UI.WinForms.Forms
                         };
 
                         _compraService.RegistrarCompra(nuevaCompra, nuevoDetalle);
+                    }
+                    else if (stockFinal > 0)
+                    {
+                        // Solo si NO se registró compra con ingreso de mercadería, agregamos el stock inicial directo
+                        _stockService.AgregarStock(nuevoProducto.IdProducto, idSucursalActual, stockFinal);
                     }
 
                     MostrarMensaje("Producto creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

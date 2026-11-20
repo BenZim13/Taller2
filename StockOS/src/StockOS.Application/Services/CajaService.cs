@@ -92,12 +92,11 @@ namespace StockOS.Application.Services
         public void CerrarCajaPorCierreSesion(int idEmpleado)
         {
             var idCajaSesion = _cajaSesionRepo.ObtenerIdSesionAbierta(idEmpleado);
-            if (idCajaSesion.HasValue && idCajaSesion.Value > 0)
-            {
-                decimal montoEsperado = _cajaRepo.ObtenerMontoEsperado(idCajaSesion.Value);
-                _cajaRepo.CerrarCaja(idCajaSesion.Value, montoEsperado);
-            }
-
+            
+            // Regla crítica de auditoría StockOS (AGENTS.md):
+            // Prohibido el Cierre Ciego/Automático igualando monto real con monto esperado (montoReal = montoEsperado).
+            // Si el empleado no cerró la caja manualmente mediante arqueo físico en FormCierreCaja,
+            // el turno permanece abierto en el repositorio para que pueda continuarse o arquearse explícitamente.
             if (SesionActual.Usuario == null || SesionActual.Usuario.IdEmpleado == idEmpleado || (idCajaSesion.HasValue && SesionActual.IdCajaSesionAbierta == idCajaSesion))
             {
                 SesionActual.IdCajaSesionAbierta = null;
